@@ -9,10 +9,11 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/hello")
+@RequestMapping("/admin")
 public class restAPI {
 
     List<Person> list = new ArrayList<>();
+
     @GetMapping("/get")
     public  ResponseEntity<List<Person>> get(){
         return ResponseEntity.ok(this.list);

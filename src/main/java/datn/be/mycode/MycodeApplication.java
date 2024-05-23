@@ -12,15 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @SpringBootApplication
 @OpenAPIDefinition(
-        info = @Info(title = "DATN",version = "1.0" ,description = "this project is only for nhờ om nhóm sắc nhóm",termsOfService = "runcodenow",
-        contact = @Contact(
-                name = "duy",
-                email = "duybb69@gmail.com"
-        ),
-        license = @License(
-                name = "hehe",
-                url = "runcodenow"
-        ))
+        info = @Info(title = "DATN",version = "1.0" )
 )
 public class MycodeApplication {
 
