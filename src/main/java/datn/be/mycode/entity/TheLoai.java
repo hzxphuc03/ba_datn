@@ -1,0 +1,34 @@
+package datn.be.mycode.entity;
+
+import jakarta.persistence.*;
+import lombok.*;
+
+import java.time.LocalDateTime;
+
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+@Setter
+@ToString
+
+@Entity
+@Table(name = "the_loai")
+public class TheLoai {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(name = "ten")
+    private String ten;
+
+    @Column(name = "ngay_tao")
+    private LocalDateTime ngayTao;
+
+    @Column(name = "ngay_sua")
+    private LocalDateTime ngaySua;
+
+    @Column(name = "trang_thai")
+    private int trangThai;
+
+}
