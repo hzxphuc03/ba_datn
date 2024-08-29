@@ -1,8 +1,14 @@
 package datn.be.mycode.entity;
 
-import jakarta.persistence.*;
-import lombok.*;
 
+import jakarta.persistence.*;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
+
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
 @NoArgsConstructor
@@ -13,7 +19,7 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "the_loai")
-public class TheLoai {
+public class TheLoai implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

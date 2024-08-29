@@ -1,12 +1,16 @@
 package datn.be.mycode.RESTController;
 
 import datn.be.mycode.entity.TheLoai;
+import datn.be.mycode.request.NormalTableRequest;
+import datn.be.mycode.request.TheLoaiRequest;
+import datn.be.mycode.request.TrangThaiRequest;
+import datn.be.mycode.response.NormalTableResponse;
 import datn.be.mycode.service.TheLoaiService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @CrossOrigin("*")
 @RestController
@@ -17,36 +21,56 @@ public class TheLoaiController {
     private TheLoaiService theLoaiService;
 
     @GetMapping("")
-    public List<TheLoai> getAll(){
-        return theLoaiService.getAll();
-    }
+    public ResponseEntity<?> getAll(
+            @RequestParam(name = "page",required = false) Integer page,
+            @RequestParam(name = "pageSize",required = false) Integer pageSize,
+            @RequestParam(name = "keyWord",required = false) String keyWord,
+            @RequestParam(name = "status",required = false) Integer status
+    ){
+        if(page == null){
+            page = 0;
+        }
+        if(pageSize == null){
+            pageSize = 10;
+            System.out.println("ahihi");
+        }
+        if(keyWord == null){
+            keyWord = "";
+            System.out.println("ahihi");
+        }
+        if(status == null){
+            status = 1;
+            System.out.println("ahihi");
+        }
 
-    @GetMapping("/{id}")
-    public Optional<TheLoai> getById(@PathVariable("id") Long id){
-        return theLoaiService.getById(id);
+
+        NormalTableRequest request = new NormalTableRequest(page,pageSize,keyWord,status);
+        return ResponseEntity.ok(theLoaiService.getAll(request));
     }
 
     @PostMapping("/add")
-    public List<TheLoai> add(@RequestBody TheLoai theLoai){
-        theLoaiService.add(theLoai);
-        return theLoaiService.getAll();
+    public ResponseEntity<?> add(@RequestBody TheLoaiRequest request){
+
+        return ResponseEntity.ok(theLoaiService.add(request));
     }
 
     @PutMapping("update")
-    public List<TheLoai> update(@RequestBody TheLoai theLoai){
-        theLoaiService.update(theLoai);
-        return theLoaiService.getAll();
+    public ResponseEntity<?> update(@RequestBody TheLoaiRequest request){
+
+        return ResponseEntity.ok(theLoaiService.update(request));
     }
 
-    @DeleteMapping("/delete")
-    public List<TheLoai> delete(@RequestBody TheLoai theLoai){
-        theLoaiService.delete(theLoai);
-        return theLoaiService.getAll();
-    }
+//    @PutMapping("/delete/{id}")
+//    public ResponseEntity<?> delete(@PathVariable("id") Long id){
+//
+//        return ResponseEntity.ok(theLoaiService.deleteById(id));
+//    }
 
-    @DeleteMapping("/delete/{id}")
-    public List<TheLoai> delete(@PathVariable("id") Long id){
-        theLoaiService.deleteById(id);
-        return theLoaiService.getAll();
+    @PutMapping("/update-trang-thai/{id}")
+    public ResponseEntity<?> updateTrangThai(@PathVariable("id") Long id,
+                                             @RequestParam(name = "status",required = true) Integer status
+    ){
+
+        return ResponseEntity.ok(theLoaiService.udateTrangThai(id, status));
     }
 }

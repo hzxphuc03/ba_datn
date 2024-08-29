@@ -1,21 +1,80 @@
 package datn.be.mycode.service;
 
 import datn.be.mycode.entity.TheLoai;
+import datn.be.mycode.repository.TheLoaiRepository;
+import datn.be.mycode.request.NormalTableRequest;
+import datn.be.mycode.request.TheLoaiRequest;
+import datn.be.mycode.request.TrangThaiRequest;
+import datn.be.mycode.response.NormalTableResponse;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
-public interface TheLoaiService {
+@Service
+public class TheLoaiService {
 
-    List<TheLoai> getAll();
+    @Autowired
+    private TheLoaiRepository repo;
 
-    Optional<TheLoai> getById(Long id);
+    public NormalTableResponse<TheLoai> getAll(NormalTableRequest request) {
 
-    void add(TheLoai theLoai);
+        NormalTableResponse<TheLoai> theLoaiNormalTableResponse = new NormalTableResponse<>();
+        Pageable pageable = PageRequest.of(request.getPage(),request.getPageSize());
+        Page<TheLoai> theLoaiPage;
+        if (!request.getKeyWord().equals("")) {
+            theLoaiPage = repo.findByTen(request.getKeyWord(), pageable);
+        }else {
+            theLoaiPage = repo.findAllByTrangThai(request.getStatus(), pageable);
+        }
+        List<TheLoai> theLoais = theLoaiPage.getContent().stream().toList();
 
-    void update(TheLoai theLoai);
+        theLoaiNormalTableResponse.setItem(theLoais);
+        theLoaiNormalTableResponse.setPage(request.getPage());
+        theLoaiNormalTableResponse.setPageSize(request.getPageSize());
+        theLoaiNormalTableResponse.setTotalItem(theLoaiPage.getTotalElements());
 
-    void delete  (TheLoai theLoai);
+        return theLoaiNormalTableResponse;
+    }
 
-    void deleteById  (Long id);
+
+    public TheLoai add(TheLoaiRequest request) {
+        TheLoai theLoai = new TheLoai();
+        theLoai.setTen(request.getTen());
+        theLoai.setTrangThai(1);
+        theLoai.setNgayTao(LocalDateTime.now());
+        return repo.save(theLoai);
+    }
+
+
+    public TheLoai update(TheLoaiRequest request) {
+        TheLoai theLoai = repo.findById(request.getId()).get();
+        theLoai.setTen(request.getTen());
+        theLoai.setTrangThai(request.getTrangThai());
+        theLoai.setNgaySua(LocalDateTime.now());
+        return repo.save(theLoai);
+    }
+
+
+    public void delete(TheLoai theLoai) {
+        repo.delete(theLoai);
+    }
+
+
+    public TheLoai deleteById(Long id) {
+        TheLoai theLoai = repo.findById(id).get();
+        theLoai.setTrangThai(0);
+        return repo.save(theLoai);
+    }
+
+    public TheLoai udateTrangThai(Long id, Integer status){
+        TheLoai theLoai = repo.findById(id).get();
+        theLoai.setTrangThai(status);
+        return repo.save(theLoai);
+    }
 }
