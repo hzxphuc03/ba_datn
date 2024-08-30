@@ -10,11 +10,11 @@ import lombok.*;
 
 public class NormalTableRequest {
 
-    private int page;
+    private Integer page;
 
-    private int pageSize;
+    private Integer pageSize;
 
     private String keyWord;
 
-    private int status;
+    private Integer status;
 }

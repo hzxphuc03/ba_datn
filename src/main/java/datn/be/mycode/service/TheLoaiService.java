@@ -23,11 +23,19 @@ public class TheLoaiService {
     private TheLoaiRepository repo;
 
     public NormalTableResponse<TheLoai> getAll(NormalTableRequest request) {
-
+        if (request.getPage() == null) {
+            request.setPage(1);
+        }
+        if (request.getPageSize() == null) {
+            request.setPageSize(10);
+        }
+        if (request.getStatus() == null) {
+            request.setStatus(1);
+        }
         NormalTableResponse<TheLoai> theLoaiNormalTableResponse = new NormalTableResponse<>();
-        Pageable pageable = PageRequest.of(request.getPage(),request.getPageSize());
+        Pageable pageable = PageRequest.of(request.getPage() - 1,request.getPageSize());
         Page<TheLoai> theLoaiPage;
-        if (!request.getKeyWord().equals("")) {
+        if (request.getKeyWord() != null) {
             theLoaiPage = repo.findByTen(request.getKeyWord(), pageable);
         }else {
             theLoaiPage = repo.findAllByTrangThai(request.getStatus(), pageable);
@@ -43,9 +51,11 @@ public class TheLoaiService {
     }
 
 
-    public TheLoai add(TheLoaiRequest request) {
+    public TheLoai add(String request) {
+        System.out.println("adsfsdf");
+        System.out.println(request);
         TheLoai theLoai = new TheLoai();
-        theLoai.setTen(request.getTen());
+        theLoai.setTen(request);
         theLoai.setTrangThai(1);
         theLoai.setNgayTao(LocalDateTime.now());
         return repo.save(theLoai);
