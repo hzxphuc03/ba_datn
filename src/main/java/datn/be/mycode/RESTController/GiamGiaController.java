@@ -1,5 +1,6 @@
 package datn.be.mycode.RESTController;
 
+import datn.be.mycode.entity.GiamGia;
 import datn.be.mycode.request.GiamGiaRequest;
 import datn.be.mycode.request.KichCoRequest;
 import datn.be.mycode.request.NormalTableRequest;
@@ -10,12 +11,18 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @CrossOrigin("*")
 @RestController
 @RequestMapping("/api/giam_gia")
 public class GiamGiaController {
     @Autowired
     private GiamGiaService Service;
+
+
+    private final List<GiamGia> giamGias = new ArrayList<>();
     @GetMapping("")
     public ResponseEntity<?> getall(
             @RequestParam(name = "page",required = false) Integer page,
@@ -44,5 +51,26 @@ public class GiamGiaController {
     @PostMapping("/add")
     public ResponseEntity add(@RequestBody GiamGiaRequest request){
         return ResponseEntity.ok(Service.add(request));
+    }
+    @PutMapping("update")
+    public ResponseEntity<?> update(@RequestBody GiamGiaRequest request){
+
+        return ResponseEntity.ok(Service.update(request));
+    }
+
+    @PutMapping("/delete/{id}")
+    public ResponseEntity<?> delete(@PathVariable("id") Long id){
+
+        return ResponseEntity.ok(Service.deleteById(id));
+    }
+    @GetMapping("/search")
+    public List<GiamGia> searchProduct(@RequestParam String ten) {
+        List<GiamGia> result = new ArrayList<>();
+        for (GiamGia giamGia : giamGias) {
+            if (giamGia.getTen().toLowerCase().contains(ten.toLowerCase())) {
+                result.add(giamGia);
+            }
+        }
+        return result;
     }
 }

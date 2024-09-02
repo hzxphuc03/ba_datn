@@ -2,11 +2,13 @@ package datn.be.mycode.service;
 
 import datn.be.mycode.entity.GiamGia;
 import datn.be.mycode.entity.KichCo;
+import datn.be.mycode.entity.TheLoai;
 import datn.be.mycode.repository.GiamGiaRepository;
 import datn.be.mycode.repository.KichcoRepository;
 import datn.be.mycode.request.GiamGiaRequest;
 import datn.be.mycode.request.KichCoRequest;
 import datn.be.mycode.request.NormalTableRequest;
+import datn.be.mycode.request.TheLoaiRequest;
 import datn.be.mycode.response.NormalTableResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -46,6 +48,32 @@ public class GiamGiaService {
         giamGia.setTrangThai(1);
         giamGia.setNgayTao(LocalDateTime.now());
 
+        return repository.save(giamGia);
+    }
+
+    public GiamGia update(GiamGiaRequest request) {
+        GiamGia giamGia = repository.findById(request.getId()).get();
+        giamGia.setTen(request.getTen());
+        giamGia.setTrangThai(request.getTrangThai());
+        giamGia.setNgaySua(LocalDateTime.now());
+        return repository.save(giamGia);
+    }
+
+
+    public void delete(GiamGia giamGia) {
+        repository.delete(giamGia);
+    }
+
+
+    public GiamGia deleteById(Long id) {
+        GiamGia giamGia = repository.findById(id).get();
+        giamGia.setTrangThai(0);
+        return repository.save(giamGia);
+    }
+
+    public GiamGia udateTrangThai(Long id, Integer status){
+       GiamGia giamGia = repository.findById(id).get();
+       giamGia.setTrangThai(status);
         return repository.save(giamGia);
     }
 }

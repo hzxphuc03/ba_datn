@@ -5,6 +5,7 @@ import datn.be.mycode.entity.TheLoai;
 import datn.be.mycode.repository.KichcoRepository;
 import datn.be.mycode.request.KichCoRequest;
 import datn.be.mycode.request.NormalTableRequest;
+import datn.be.mycode.request.TheLoaiRequest;
 import datn.be.mycode.response.NormalTableResponse;
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,5 +48,31 @@ public class KichCoService {
         kichCo.setNgayTao(LocalDateTime.now());
 
     return repository.save(kichCo);
+    }
+
+    public KichCo update(KichCoRequest request) {
+        KichCo kichCo = repository.findById(request.getId()).get();
+        kichCo.setTen(request.getTen());
+        kichCo.setTrangThai(request.getTrangThai());
+        kichCo.setNgaySua(LocalDateTime.now());
+        return repository.save(kichCo);
+    }
+
+
+    public void delete(KichCo kichCo) {
+        repository.delete(kichCo);
+    }
+
+
+    public KichCo deleteById(Long id) {
+        KichCo kichCo = repository.findById(id).get();
+        kichCo.setTrangThai(0);
+        return repository.save(kichCo);
+    }
+
+    public KichCo udateTrangThai(Long id, Integer status){
+        KichCo kichCo = repository.findById(id).get();
+        kichCo.setTrangThai(status);
+        return repository.save(kichCo);
     }
 }
