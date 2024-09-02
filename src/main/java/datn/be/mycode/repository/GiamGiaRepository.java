@@ -8,7 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface GiamGiaRepository extends JpaRepository<GiamGia,String> {
+public interface GiamGiaRepository extends JpaRepository<GiamGia,Long> {
     Page<GiamGia> findByTen(String name, Pageable pageable);
 
     Page<GiamGia> findAllByTrangThai(int trangThai, Pageable pageable);

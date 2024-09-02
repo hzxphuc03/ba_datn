@@ -45,4 +45,15 @@ public class GiamGiaController {
     public ResponseEntity add(@RequestBody GiamGiaRequest request){
         return ResponseEntity.ok(Service.add(request));
     }
+    @PutMapping("update")
+    public ResponseEntity<?> update(@RequestBody GiamGiaRequest request){
+
+        return ResponseEntity.ok(Service.update(request));
+    }
+
+    @PutMapping("/delete/{id}")
+    public ResponseEntity<?> delete(@PathVariable("id") Long id){
+
+        return ResponseEntity.ok(Service.deleteById(id));
+    }
 }

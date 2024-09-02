@@ -3,6 +3,8 @@ package datn.be.mycode.RESTController;
 import datn.be.mycode.entity.KichCo;
 import datn.be.mycode.request.KichCoRequest;
 import datn.be.mycode.request.NormalTableRequest;
+import datn.be.mycode.request.TheLoaiRequest;
+import datn.be.mycode.service.GiamGiaService;
 import datn.be.mycode.service.KichCoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -43,4 +45,16 @@ public class KichCoController {
     public ResponseEntity add(@RequestBody KichCoRequest request){
         return ResponseEntity.ok(kichCoService.add(request));
     }
+    @PutMapping("update")
+    public ResponseEntity<?> update(@RequestBody KichCoRequest request){
+
+        return ResponseEntity.ok(kichCoService.update(request));
+    }
+
+    @PutMapping("/delete/{id}")
+    public ResponseEntity<?> delete(@PathVariable("id") Long id){
+
+        return ResponseEntity.ok(kichCoService.deleteById(id));
+    }
+
 }
