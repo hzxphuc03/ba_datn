@@ -36,7 +36,7 @@ public class TheLoaiService {
         Pageable pageable = PageRequest.of(request.getPage() - 1,request.getPageSize());
         Page<TheLoai> theLoaiPage;
         if (request.getKeyWord() != null) {
-            theLoaiPage = repo.findByTen(request.getKeyWord(), pageable);
+            theLoaiPage = repo.searchByTen(request.getKeyWord(), pageable);
         }else {
             theLoaiPage = repo.findAllByTrangThai(request.getStatus(), pageable);
         }
@@ -52,8 +52,6 @@ public class TheLoaiService {
 
 
     public TheLoai add(String request) {
-        System.out.println("adsfsdf");
-        System.out.println(request);
         TheLoai theLoai = new TheLoai();
         theLoai.setTen(request);
         theLoai.setTrangThai(1);
