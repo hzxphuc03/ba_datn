@@ -23,9 +23,6 @@ public class ThuongHieu implements Serializable {
     @Column(name = "ten")
     private String ten;
 
-    @Column(name = "hinh_anh")
-    private String hinhAnh;
-
     @Column(name = "ngay_tao")
     private LocalDateTime ngayTao;
 

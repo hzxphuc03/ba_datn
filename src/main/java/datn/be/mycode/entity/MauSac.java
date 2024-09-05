@@ -27,6 +27,9 @@ public class MauSac implements Serializable {
     @Column(name = "ten")
     private String ten;
 
+    @Column(name = "ma_mau")
+    private String maMau;
+
     @Column(name = "ngay_tao")
     private LocalDateTime ngayTao;
 
