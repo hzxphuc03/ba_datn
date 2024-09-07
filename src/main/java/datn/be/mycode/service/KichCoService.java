@@ -24,6 +24,15 @@ public class KichCoService {
     private KichcoRepository repository;
 
     public NormalTableResponse<KichCo> getALL(NormalTableRequest request){
+        if (request.getPage() == null) {
+            request.setPage(1);
+        }
+        if (request.getPageSize() == null) {
+            request.setPageSize(10);
+        }
+        if (request.getStatus() == null) {
+            request.setStatus(1);
+        }
         NormalTableResponse<KichCo> kichCoNormalTableResponse = new NormalTableResponse<>();
         Pageable pageable= PageRequest.of(request.getPage(),request.getPageSize());
         Page<KichCo> kichCoPage;
@@ -41,9 +50,10 @@ public class KichCoService {
         return kichCoNormalTableResponse;
 
     }
-    public  KichCo add(KichCoRequest request){
+    public  KichCo add(String request){
+        System.out.println(request);
         KichCo kichCo= new KichCo();
-        kichCo.setTen(request.getTen());
+        kichCo.setTen(request);
         kichCo.setTrangThai(1);
         kichCo.setNgayTao(LocalDateTime.now());
 

@@ -25,6 +25,15 @@ public class GiamGiaService {
     private GiamGiaRepository repository;
 
     public NormalTableResponse<GiamGia> getALL(NormalTableRequest request){
+        if (request.getPage() == null) {
+            request.setPage(1);
+        }
+        if (request.getPageSize() == null) {
+            request.setPageSize(10);
+        }
+        if (request.getStatus() == null) {
+            request.setStatus(1);
+        }
         NormalTableResponse<GiamGia> GiamGiaNormalTableResponse = new NormalTableResponse<>();
         Pageable pageable= PageRequest.of(request.getPage(),request.getPageSize());
         Page<GiamGia> Page;
@@ -42,9 +51,9 @@ public class GiamGiaService {
         return GiamGiaNormalTableResponse;
 
     }
-    public  GiamGia add(GiamGiaRequest request){
+    public  GiamGia add(String request){
         GiamGia giamGia= new GiamGia();
-        giamGia.setTen(request.getTen());
+        giamGia.setTen(request);
         giamGia.setTrangThai(1);
         giamGia.setNgayTao(LocalDateTime.now());
 

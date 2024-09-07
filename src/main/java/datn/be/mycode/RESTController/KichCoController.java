@@ -1,6 +1,5 @@
 package datn.be.mycode.RESTController;
 
-import datn.be.mycode.entity.GiamGia;
 import datn.be.mycode.entity.KichCo;
 import datn.be.mycode.request.KichCoRequest;
 import datn.be.mycode.request.NormalTableRequest;
@@ -11,17 +10,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.List;
-
 @CrossOrigin("*")
 @RestController
 @RequestMapping("/api/kich_co")
 public class KichCoController {
     @Autowired
     private KichCoService kichCoService;
-
-    private final List<KichCo> kichcos = new ArrayList<>();
     @GetMapping("")
     public ResponseEntity<?> getall(
             @RequestParam(name = "page",required = false) Integer page,
@@ -61,16 +55,6 @@ public class KichCoController {
     public ResponseEntity<?> delete(@PathVariable("id") Long id){
 
         return ResponseEntity.ok(kichCoService.deleteById(id));
-    }
-    @GetMapping("/search")
-    public List<KichCo> searchProduct(@RequestParam String ten) {
-        List<KichCo> result = new ArrayList<>();
-        for (KichCo kichCo : kichcos) {
-            if (kichCo.getTen().toLowerCase().contains(ten.toLowerCase())) {
-                result.add(kichCo);
-            }
-        }
-        return result;
     }
 
 }
