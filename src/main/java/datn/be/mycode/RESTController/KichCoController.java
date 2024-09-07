@@ -42,7 +42,7 @@ public class KichCoController {
         return ResponseEntity.ok(kichCoService.getALL(request));
     }
     @PostMapping("/add")
-    public ResponseEntity add(@RequestBody KichCoRequest request){
+    public ResponseEntity add(@RequestBody String request){
         return ResponseEntity.ok(kichCoService.add(request));
     }
     @PutMapping("update")
