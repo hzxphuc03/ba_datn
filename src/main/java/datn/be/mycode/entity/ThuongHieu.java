@@ -32,4 +32,6 @@ public class ThuongHieu implements Serializable {
     @Column(name = "trang_thai")
     private int trangThai;
 
+
+
 }
