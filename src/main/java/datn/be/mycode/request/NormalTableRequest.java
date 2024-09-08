@@ -17,5 +17,4 @@ public class NormalTableRequest {
     private String keyWord;
 
     private Integer status;
-
 }
