@@ -36,7 +36,7 @@ public class KhachHang implements Serializable {
     private String soDienThoai;
 
     @Column(name = "gioi_tinh")
-    private String gioiTinh;
+    private int gioiTinh;
 
     @Column(name = "email")
     private String email;
