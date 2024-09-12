@@ -1,9 +1,11 @@
 package datn.be.mycode.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @NoArgsConstructor
@@ -30,7 +32,7 @@ public class SanPhamChiTiet implements Serializable {
     private String hinhAnh;
 
     @Column(name = "gia_hien_hanh")
-    private String giaHienHanh;
+    private BigDecimal giaHienHanh;
 
     @Column(name = "so_luong")
     private int soLuong;
