@@ -29,8 +29,6 @@ public class TableSanPhamChiTietRequest {
     private Long mauSac;
 
     private Long kichCo;
-    
-    private Long giamGia;
 
     private Long thuongHieu;
 

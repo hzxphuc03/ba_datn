@@ -85,4 +85,27 @@ public class SanPhamChiTietService {
 
         return sanPhamChiTietRepository.save(sanPhamChiTiet);
     }
+
+    public SanPhamChiTiet update(SanPhamChiTietRequest request){
+        SanPhamChiTiet sanPhamChiTiet = sanPhamChiTietRepository.findById(request.getId()).get();
+        sanPhamChiTiet.setNgaySua(LocalDateTime.now());
+        sanPhamChiTiet.setHinhAnh(request.getHinhAnh());
+        sanPhamChiTiet.setGiaHienHanh(request.getGiaHienHanh());
+        sanPhamChiTiet.setSoLuong(request.getSoLuong());
+        sanPhamChiTiet.setTrangThai(request.getTrangThai());
+        sanPhamChiTiet.setSanPham(sanPhamRepository.findById(request.getSanPham()).get());
+        sanPhamChiTiet.setMauSac(mauSacRepository.findById(request.getMauSac()).get());
+//        sanPhamChiTiet.setSanPham(sanPhamRepository.findById(request.getSanPham()).get());
+//        sanPhamChiTiet.setSanPham(sanPhamRepository.findById(request.getSanPham()).get());
+        sanPhamChiTiet.setThuongHieu(thuongHieuRepository.findById(request.getThuongHieu()).get());
+        sanPhamChiTiet.setTheLoai(theLoaiRepository.findById(request.getTheLoai()).get());
+
+        return sanPhamChiTietRepository.save(sanPhamChiTiet);
+    }
+
+    public SanPhamChiTiet udateTrangThai(Long id, Integer status){
+        SanPhamChiTiet sanPhamChiTiet = sanPhamChiTietRepository.findById(id).get();
+        sanPhamChiTiet.setTrangThai(status);
+        return sanPhamChiTietRepository.save(sanPhamChiTiet);
+    }
 }

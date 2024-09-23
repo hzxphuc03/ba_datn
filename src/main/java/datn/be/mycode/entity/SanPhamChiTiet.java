@@ -40,27 +40,27 @@ public class SanPhamChiTiet implements Serializable {
     @Column(name = "trang_thai")
     private int trangThai;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne()
     @JoinColumn(name = "id_san_pham", referencedColumnName = "id")
     private SanPham sanPham;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne()
     @JoinColumn(name = "id_mau_sac", referencedColumnName = "id")
     private MauSac mauSac;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne()
     @JoinColumn(name = "id_kich_co", referencedColumnName = "id")
     private KichCo kichCo;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne()
     @JoinColumn(name = "id_giam_gia", referencedColumnName = "id")
     private GiamGia giamGia;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne()
     @JoinColumn(name = "id_thuong_hieu", referencedColumnName = "id")
     private ThuongHieu thuongHieu;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne()
     @JoinColumn(name = "id_the_loai", referencedColumnName = "id")
     private TheLoai theLoai;
 

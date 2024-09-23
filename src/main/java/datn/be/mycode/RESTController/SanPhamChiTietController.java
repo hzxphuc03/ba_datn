@@ -32,13 +32,12 @@ public class SanPhamChiTietController {
             @RequestParam(name = "sanPham",required = false) Long idSanPham,
             @RequestParam(name = "mauSac",required = false) Long idMauSac,
             @RequestParam(name = "kichCo",required = false) Long idKichCo,
-            @RequestParam(name = "giamGia",required = false) Long idGiamGia,
             @RequestParam(name = "thuongHieu",required = false) Long idThuongHieu,
             @RequestParam(name = "theLoai",required = false) Long idTheLoai,
             @RequestParam(name = "sort",required = false) Integer sort
     ){
 
-        TableSanPhamChiTietRequest request = new TableSanPhamChiTietRequest(page, pageSize, keyWord, status, startDate, endDate, idSanPham, idMauSac, idKichCo, idGiamGia, idThuongHieu, idTheLoai, sort);
+        TableSanPhamChiTietRequest request = new TableSanPhamChiTietRequest(page, pageSize, keyWord, status, startDate, endDate, idSanPham, idMauSac, idKichCo, idThuongHieu, idTheLoai, sort);
         return ResponseEntity.ok(sanPhamChiTietService.getAll(request));
     }
 
@@ -49,18 +48,18 @@ public class SanPhamChiTietController {
         return ResponseEntity.ok(sanPhamChiTietService.addSPCT(request));
     }
 
-//    @PutMapping("update")
-//    public ResponseEntity<?> update(@RequestBody ChucVuRequest request){
-//
-//        return ResponseEntity.ok(chucVuService.update(request));
-//    }
-//
-//    @PutMapping("/update-trang-thai/{id}")
-//    public ResponseEntity<?> updateTrangThai(@PathVariable("id") Long id,
-//                                             @RequestParam(name = "status",required = true) Integer status
-//    ){
-//
-//        return ResponseEntity.ok(chucVuService.udateTrangThai(id, status));
-//    }
+    @PutMapping("update")
+    public ResponseEntity<?> update(@RequestBody SanPhamChiTietRequest request){
+
+        return ResponseEntity.ok(sanPhamChiTietService.update(request));
+    }
+
+    @PutMapping("/update-trang-thai/{id}")
+    public ResponseEntity<?> updateTrangThai(@PathVariable("id") Long id,
+                                             @RequestParam(name = "status",required = true) Integer status
+    ){
+
+        return ResponseEntity.ok(sanPhamChiTietService.udateTrangThai(id, status));
+    }
 
 }
