@@ -60,6 +60,7 @@ public class MauSacService {
         System.out.println(request);
         MauSac mauSac = new MauSac();
         mauSac.setTen(request);
+        mauSac.setMaMau(request);
         mauSac.setTrangThai(1);
         mauSac.setNgayTao(LocalDateTime.now());
         return repository.save(mauSac);
@@ -69,6 +70,7 @@ public class MauSacService {
     public MauSac update(MauSacRequest request) {
         MauSac mauSac = repository.findById(request.getId()).get();
         mauSac.setTen(request.getTen());
+        mauSac.setMaMau(request.getMaMau());
         mauSac.setTrangThai(request.getTrangThai());
         mauSac.setNgaySua(LocalDateTime.now());
         return repository.save(mauSac);

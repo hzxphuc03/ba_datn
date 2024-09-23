@@ -1,0 +1,48 @@
+package datn.be.mycode.RESTController;
+
+import datn.be.mycode.request.DiaChiRequest;
+import datn.be.mycode.request.KhachHangRequest;
+import datn.be.mycode.request.NormalTableRequest;
+import datn.be.mycode.service.DiaChiService;
+import datn.be.mycode.service.KhachHangService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+@RequestMapping("/api/dia_chi")
+public class DiaChiController {
+    @Autowired
+    private DiaChiService diaChiService;
+
+    @GetMapping("")
+    public ResponseEntity<?> getAll(
+            @RequestParam(name = "page",required = false) Integer page,
+            @RequestParam(name = "pageSize",required = false) Integer pageSize,
+            @RequestParam(name = "keyWord",required = false) String keyWord,
+            @RequestParam(name = "status",required = false) Integer status
+    ){
+
+        NormalTableRequest request = new NormalTableRequest(page,pageSize,keyWord,status);
+        return ResponseEntity.ok(diaChiService.getAll(request));
+    }
+    @PostMapping("/add")
+    public ResponseEntity<?> add(@RequestBody DiaChiRequest tenDiaChiRequest){
+        System.out.println(tenDiaChiRequest);
+        return ResponseEntity.ok(diaChiService.add(tenDiaChiRequest));
+    }
+
+    @PutMapping("update")
+    public ResponseEntity<?> update(@RequestBody DiaChiRequest request){
+
+        return ResponseEntity.ok(diaChiService.update(request));
+    }
+
+    @PutMapping("/update-trang-thai/{id}")
+    public ResponseEntity<?> updateTrangThai(@PathVariable("id") Long id,
+                                             @RequestParam(name = "status",required = true) Integer status
+    ){
+
+        return ResponseEntity.ok(diaChiService.udateTrangThai(id, status));
+    }
+}
