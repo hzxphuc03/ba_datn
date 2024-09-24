@@ -1,12 +1,15 @@
 package datn.be.mycode.RESTController;
 
+import datn.be.mycode.request.KhachHangRequest;
 import datn.be.mycode.request.NhanVienRequest;
 import datn.be.mycode.request.NormalTableRequest;
 
 import datn.be.mycode.service.NhanVienService;
 
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 @CrossOrigin("*")
@@ -30,9 +33,9 @@ public class NhanVienCotroller {
     }
 
     @PostMapping("/add")
-    public ResponseEntity<?> add(@RequestBody String tenNhanVienRequest){
-        System.out.println(tenNhanVienRequest);
-        return ResponseEntity.ok(NhanVienService.add(tenNhanVienRequest));
+    public ResponseEntity<?> add(@RequestBody @Valid KhachHangRequest request){
+        System.out.println(request);
+        return ResponseEntity.ok(NhanVienService.add(request));
     }
 
     @PutMapping("update")

@@ -2,6 +2,7 @@ package datn.be.mycode.service;
 
 import datn.be.mycode.entity.NhanVien;
 import datn.be.mycode.repository.NhanVienRepository;
+import datn.be.mycode.request.KhachHangRequest;
 import datn.be.mycode.request.NhanVienRequest;
 import datn.be.mycode.request.NormalTableRequest;
 import datn.be.mycode.response.NormalTableResponse;
@@ -31,40 +32,52 @@ public class NhanVienService {
             request.setStatus(1);
         }
         NormalTableResponse<NhanVien> nhanvienNormalTableResponse = new NormalTableResponse<>();
-        Pageable pageable = PageRequest.of(request.getPage() - 1,request.getPageSize());
+        Pageable pageable = PageRequest.of(request.getPage() - 1, request.getPageSize());
         Page<NhanVien> nhanvienPage;
         if (request.getKeyWord() != null) {
             nhanvienPage = repo.findByHoTen(request.getKeyWord(), pageable);
-        }else {
-            nhanvienPage = repo.findAllByTrangThai(request.getStatus(), pageable);
+//        }else {
+//            nhanvienPage = repo.findAllByTrangThai(request.getStatus(), pageable);
+            //  }
+            List<NhanVien> nhanviens = nhanvienPage.getContent().stream().toList();
+
+            nhanvienNormalTableResponse.setItem(nhanviens);
+            nhanvienNormalTableResponse.setPage(request.getPage());
+            nhanvienNormalTableResponse.setPageSize(request.getPageSize());
+            nhanvienNormalTableResponse.setTotalItem(nhanvienPage.getTotalElements());
         }
-        List<NhanVien> nhanviens = nhanvienPage.getContent().stream().toList();
-
-        nhanvienNormalTableResponse.setItem(nhanviens);
-        nhanvienNormalTableResponse.setPage(request.getPage());
-        nhanvienNormalTableResponse.setPageSize(request.getPageSize());
-        nhanvienNormalTableResponse.setTotalItem(nhanvienPage.getTotalElements());
-
-        return nhanvienNormalTableResponse;
-    }
+            return nhanvienNormalTableResponse;
+        }
 
 
-    public NhanVien add(String request) {
+    public NhanVien add(NhanVienRequest request) {
 
-        System.out.println(request);
-        NhanVien nhanvien = new NhanVien();
-        nhanvien.setMa(request);
-        nhanvien.setHoTen(request);
-        nhanvien.setNgaySinh(LocalDateTime.now());
-        nhanvien.setNgayTao(LocalDateTime.now());
-        nhanvien.setSoDienThoai(request);
-        nhanvien.setGioiTinh(request);
-        nhanvien.setDiaChi(request);
-        nhanvien.setHinhAnh(request);
-        nhanvien.setEmail(request);
-        nhanvien.setTaiKhoan(request);
-        nhanvien.setMatKhau(request);
-        nhanvien.setTrangThai(1);
+
+        NhanVien nhanvien = NhanVien.builder()
+                .ma(request.getMa())
+                .hoTen(request.getHoten())
+                .ngaySinh(LocalDateTime.now())
+                .ngayTao(LocalDateTime.now())
+                .soDienThoai(request.getSoDienThoai())
+                .gioiTinh(String.valueOf(request.getGioiTinh()))
+              .hinhAnh(request.getHinhAnh())
+                .diaChi(request.getDiaChi())
+                .email(request.getEmail())
+                .taiKhoan(request.getTaiKhoan())
+                .matKhau(request.getMatKhau())
+                .trangThai(request.getTrangThai()).build();
+//        setMa(request);
+//        nhanvien.setHoTen(request);
+//        nhanvien.setNgaySinh(LocalDateTime.now());
+//        nhanvien.setNgayTao(LocalDateTime.now());
+//        nhanvien.setSoDienThoai(request);
+//        nhanvien.setGioiTinh(request);
+//        nhanvien.setDiaChi(request);
+//        nhanvien.setHinhAnh(request);
+//        nhanvien.setEmail(request);
+//        nhanvien.setTaiKhoan(request);
+//        nhanvien.setMatKhau(request);
+        //nhanvien.setTrangThai(1);
         return repo.save(nhanvien);
     }
 

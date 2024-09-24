@@ -20,6 +20,7 @@ public class KhachHangRequest {
     private String hoTen;
     private LocalDateTime ngaySinh;
     private Date ngayTao;
+
     private String soDienThoai;
     private int gioiTinh;
     private String email;
