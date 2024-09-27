@@ -1,6 +1,5 @@
 package datn.be.mycode.RESTController;
 
-import datn.be.mycode.request.KhachHangRequest;
 import datn.be.mycode.request.NhanVienRequest;
 import datn.be.mycode.request.NormalTableRequest;
 
@@ -33,7 +32,7 @@ public class NhanVienCotroller {
     }
 
     @PostMapping("/add")
-    public ResponseEntity<?> add(@RequestBody @Valid KhachHangRequest request){
+    public ResponseEntity<?> add(@RequestBody @Valid NhanVienRequest request){
         System.out.println(request);
         return ResponseEntity.ok(NhanVienService.add(request));
     }
