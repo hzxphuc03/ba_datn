@@ -1,12 +1,15 @@
 package datn.be.mycode.RESTController;
 
+import datn.be.mycode.request.NormalTableRequest;
 import datn.be.mycode.request.SanPhamRequest;
 import datn.be.mycode.request.ThaoTacSanPhamRequest;
 import datn.be.mycode.request.customRequest.TableSanPhamRequest;
+import datn.be.mycode.request.customRequest.TableThaoTacSanPham;
 import datn.be.mycode.service.SanPhamService;
 import datn.be.mycode.service.ThaoTacSanPhamSevice;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Repository;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
@@ -24,12 +27,12 @@ public class ThaoTacSanPhamController {
             @RequestParam(name = "pageSize",required = false) Integer pageSize,
             @RequestParam(name = "keyWord",required = false) String keyWord,
             @RequestParam(name = "status",required = false) Integer status,
-            @RequestParam(name = "startDate",required = false) LocalDateTime startDate,
-            @RequestParam(name = "sort",required = false) Integer sort
-    ){
+            @RequestParam(name = "startDate",required = false) LocalDateTime startDate
+    );
 
-        TableThaoTacSanPhamRequest request = new TableThaoTacSanPhamRequest(page,pageSize,keyWord,status, startDate ,sort);
-            return ResponseEntity.ok(thaotacsanPhamService.getAll(request));
+
+    TableThaoTacSanPham request = new TableThaoTacSanPham(page,pageSize,keyWord,status,starDate);
+         return ResponseEntity.ok(sanPhamService.getAll(request));
     }
 
     @PostMapping("/add")

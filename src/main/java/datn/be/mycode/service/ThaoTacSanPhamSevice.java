@@ -25,7 +25,7 @@ public class ThaoTacSanPhamSevice {
     @Autowired
     private ThaoTacSanPhamRepository repo;
 
-    public NormalTableResponse<ThaoTacSanPhamResPonse> getAll(TableThaoTacSanPhamRequest request) {
+    public NormalTableResponse<ThaoTacSanPhamResPonse> getAll(TableSanPhamRequest request) {
         if (request.getPage() == null) {
             request.setPage(1);
         }
@@ -41,9 +41,7 @@ public class ThaoTacSanPhamSevice {
         NormalTableResponse<ThaoTacSanPhamResponse> thaotacsanPhamNormalTableResponse = new NormalTableResponse<>();
         Pageable pageable = PageRequest.of(request.getPage() - 1,request.getPageSize());
         Page<ThaoTacSanPhamResponse> thaotacsanPhamResponsePage;
-        if (request.getSort() == 0) {
-            thaotacsanPhamResponsePage = repo.searchAll(request.getKeyWord(), request.getStartDate(), request.getEndDate(), request.getStatus(), pageable);
-        }
+
         List<ThaoTacSanPhamResponse> thaotacsanPhamResponses = thaotacsanPhamResponsePage.getContent().stream().toList();
 
         thaotacsanPhamNormalTableResponse.setItem(thaotacsanPhamResponses);

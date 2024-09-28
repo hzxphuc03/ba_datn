@@ -9,9 +9,9 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class ThaoTacSanPhamRepository extends JpaRepository<ThaoTacSanPham,Long> {
+public interface ThaoTacSanPhamRepository extends JpaRepository<ThaoTacSanPham,Long> {
 
-    @Query("SELECT new datn.be.mycode.response.ThaoTacSanPhamResponse(sp.id sp.thaoTac, sp.ngayTao, sp.trangThai)" +
+    @Query("SELECT new datn.be.mycode.response.ThaoTacSanPhamResponse(sp.id, sp.thaoTac, sp.ngayTao, sp.trangThai)" +
             "FROM ThaoTacSanPham sp" +
             "LEFT JOIN NhanVien nv ON sp.id = nv.nhanVien.id " +
             "WHERE " +

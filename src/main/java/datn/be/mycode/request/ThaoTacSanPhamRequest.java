@@ -14,4 +14,6 @@ public class ThaoTacSanPhamRequest {
     private String ThaoTac;
     private LocalDateTime NgaySua;
     private int trangThai;
+
+
 }
