@@ -28,11 +28,11 @@ public class ThaoTacSanPhamController {
             @RequestParam(name = "keyWord",required = false) String keyWord,
             @RequestParam(name = "status",required = false) Integer status,
             @RequestParam(name = "startDate",required = false) LocalDateTime startDate
-    );
+    ){
 
 
-    TableThaoTacSanPham request = new TableThaoTacSanPham(page,pageSize,keyWord,status,starDate);
-         return ResponseEntity.ok(sanPhamService.getAll(request));
+    TableThaoTacSanPham request = new TableThaoTacSanPham(page,pageSize,keyWord,status,startDate);
+         return ResponseEntity.ok(thaotacsanPhamService.getAll(request));
     }
 
     @PostMapping("/add")

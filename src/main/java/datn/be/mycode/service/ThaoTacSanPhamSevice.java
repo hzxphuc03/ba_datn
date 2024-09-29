@@ -7,6 +7,7 @@ import datn.be.mycode.repository.ThaoTacSanPhamRepository;
 import datn.be.mycode.request.SanPhamRequest;
 import datn.be.mycode.request.ThaoTacSanPhamRequest;
 import datn.be.mycode.request.customRequest.TableSanPhamRequest;
+import datn.be.mycode.request.customRequest.TableThaoTacSanPham;
 import datn.be.mycode.response.NormalTableResponse;
 import datn.be.mycode.response.SanPhamResponse;
 import datn.be.mycode.response.ThaoTacSanPhamResPonse;
@@ -25,7 +26,7 @@ public class ThaoTacSanPhamSevice {
     @Autowired
     private ThaoTacSanPhamRepository repo;
 
-    public NormalTableResponse<ThaoTacSanPhamResPonse> getAll(TableSanPhamRequest request) {
+    public NormalTableResponse<ThaoTacSanPhamResPonse> getAll(TableThaoTacSanPham request) {
         if (request.getPage() == null) {
             request.setPage(1);
         }
@@ -35,19 +36,17 @@ public class ThaoTacSanPhamSevice {
         if (request.getStatus() == null) {
             request.setStatus(1);
         }
-        if (request.getSort() == null) {
-            request.setSort(0);
-        }
-        NormalTableResponse<ThaoTacSanPhamResponse> thaotacsanPhamNormalTableResponse = new NormalTableResponse<>();
+        NormalTableResponse<ThaoTacSanPhamResPonse> thaotacsanPhamNormalTableResponse = new NormalTableResponse<>();
         Pageable pageable = PageRequest.of(request.getPage() - 1,request.getPageSize());
-        Page<ThaoTacSanPhamResponse> thaotacsanPhamResponsePage;
+        Page<ThaoTacSanPhamResPonse> thaotacsanPhamNormalTableResponsePage
+        = repo.searchAll(request.getKeyWord(), request.getStartDate(), request.getStatus(), pageable);
 
-        List<ThaoTacSanPhamResponse> thaotacsanPhamResponses = thaotacsanPhamResponsePage.getContent().stream().toList();
+      List<ThaoTacSanPhamResPonse> thaotacsanPhamResponses = thaotacsanPhamNormalTableResponsePage.getContent().stream().toList();
 
         thaotacsanPhamNormalTableResponse.setItem(thaotacsanPhamResponses);
         thaotacsanPhamNormalTableResponse.setPage(request.getPage());
         thaotacsanPhamNormalTableResponse.setPageSize(request.getPageSize());
-        thaotacsanPhamNormalTableResponse.setTotalItem(thaotacsanPhamResponsePage.getTotalElements());
+        thaotacsanPhamNormalTableResponse.setTotalItem(thaotacsanPhamNormalTableResponsePage.getTotalElements());
 
         return thaotacsanPhamNormalTableResponse;
     }
@@ -68,7 +67,7 @@ public class ThaoTacSanPhamSevice {
         thaotacsanPham.setThaoTac(request.getThaoTac());
         thaotacsanPham.setNgayTao(LocalDateTime.now());
         thaotacsanPham.setTrangThai(request.getTrangThai());
-        return repo.save(sanPham);
+        return repo.save(thaotacsanPham);
     }
 
 
@@ -80,6 +79,6 @@ public class ThaoTacSanPhamSevice {
     public ThaoTacSanPham  udateTrangThai(Long id, Integer status){
         ThaoTacSanPham  thaotacsanPham = repo.findById(id).get();
         thaotacsanPham.setTrangThai(status);
-        return repo.save(sanPham);
+        return repo.save(thaotacsanPham);
     }
 }

@@ -2,11 +2,15 @@ package datn.be.mycode.repository;
 
 import datn.be.mycode.entity.ThaoTacSanPham;
 import datn.be.mycode.entity.TheLoai;
+import datn.be.mycode.response.SanPhamResponse;
+import datn.be.mycode.response.ThaoTacSanPhamResPonse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
+
+import java.time.LocalDateTime;
 
 @Repository
 public interface ThaoTacSanPhamRepository extends JpaRepository<ThaoTacSanPham,Long> {
@@ -15,12 +19,13 @@ public interface ThaoTacSanPhamRepository extends JpaRepository<ThaoTacSanPham,L
             "FROM ThaoTacSanPham sp" +
             "LEFT JOIN NhanVien nv ON sp.id = nv.nhanVien.id " +
             "WHERE " +
+            "(:thaoTac IS null OR sp.ten LIKE %:thaoTac%) AND " +
             "(:startDate IS NULL OR sp.ngayTao >= :startDate) AND " +
 
             "(:status IS NULL OR sp.trangThai = :status)" +
             "GROUP BY sp.id,sp.ngayTao, sp.thaoTac, sp.trangThai"
     )
-    Page<ThaoTacSanPham> findAllByTrangThai(int trangThai, Pageable pageable);
 
+    Page<ThaoTacSanPhamResPonse> searchAll(String thaoTac, LocalDateTime startDate,  Integer status, Pageable pageable);
 
 }
