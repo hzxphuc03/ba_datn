@@ -15,15 +15,15 @@ import java.time.LocalDateTime;
 @Repository
 public interface ThaoTacSanPhamRepository extends JpaRepository<ThaoTacSanPham,Long> {
 
-    @Query("SELECT new datn.be.mycode.response.ThaoTacSanPhamResponse(sp.id, sp.thaoTac, sp.ngayTao, sp.trangThai)" +
-            "FROM ThaoTacSanPham sp" +
-            "LEFT JOIN NhanVien nv ON sp.id = nv.nhanVien.id " +
+    @Query("SELECT new datn.be.mycode.response.ThaoTacSanPhamResPonse(ttspLEFT.id,ttspLEFT.thaoTac, ttspLEFT.ngayTao, ttspLEFT.trangThai)" +
+            "FROM ThaoTacSanPham ttsp" +
+            "LEFT JOIN NhanVien nv ON ttspLEFT.id = nv.id " +
             "WHERE " +
-            "(:thaoTac IS null OR sp.ten LIKE %:thaoTac%) AND " +
-            "(:startDate IS NULL OR sp.ngayTao >= :startDate) AND " +
+            "(:thaoTac IS null OR ttspLEFT.thaoTac LIKE %:thaoTac%) AND " +
+            "(:startDate IS NULL OR ttspLEFT.ngayTao >= :startDate) AND " +
 
-            "(:status IS NULL OR sp.trangThai = :status)" +
-            "GROUP BY sp.id,sp.ngayTao, sp.thaoTac, sp.trangThai"
+            "(:status IS NULL OR ttspLEFT.trangThai = :status)" +
+            "GROUP BY ttspLEFT.id,ttspLEFT.ngayTao, ttspLEFT.thaoTac, ttspLEFT.trangThai"
     )
 
     Page<ThaoTacSanPhamResPonse> searchAll(String thaoTac, LocalDateTime startDate,  Integer status, Pageable pageable);

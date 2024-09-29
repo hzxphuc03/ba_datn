@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 public class ThaoTacSanPhamResPonse {
     private Long id;
 
-    private String ThaoTac;
+    private String thaoTac;
     private LocalDateTime NgaySua;
     private int trangThai;
 private NhanVien nhanVien;
