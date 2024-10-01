@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 @Repository
 public interface SanPhamRepository extends JpaRepository<SanPham, Long> {
 
-    @Query("SELECT new datn.be.mycode.response.SanPhamResponse(sp.id, sp.ma, sp.ten, sp.moTa, sp.ngayTao, sp.ngaySua, sp.soLuongDaBan, sp.nguoiTao, sp.trangThai, SUM(spct.soLuong))" +
+    @Query("SELECT new datn.be.mycode.response.SanPhamResponse(sp.id, sp.ma, sp.ten, sp.moTa, sp.hinhAnh, sp.ngayTao, sp.ngaySua, sp.soLuongDaBan, sp.nguoiTao, sp.trangThai, SUM(spct.soLuong))" +
             "FROM SanPham sp " +
             "LEFT JOIN SanPhamChiTiet spct ON sp.id = spct.sanPham.id " +
             "WHERE " +
@@ -25,7 +25,7 @@ public interface SanPhamRepository extends JpaRepository<SanPham, Long> {
     )
     Page<SanPhamResponse> searchAll(String ten, LocalDateTime startDate, LocalDateTime endDate, Integer status, Pageable pageable);
 
-    @Query("SELECT new datn.be.mycode.response.SanPhamResponse(sp.id, sp.ma, sp.ten, sp.moTa, sp.ngayTao, sp.ngaySua, sp.soLuongDaBan, sp.nguoiTao, sp.trangThai, SUM(spct.soLuong))" +
+    @Query("SELECT new datn.be.mycode.response.SanPhamResponse(sp.id, sp.ma, sp.ten, sp.moTa, sp.hinhAnh, sp.ngayTao, sp.ngaySua, sp.soLuongDaBan, sp.nguoiTao, sp.trangThai, SUM(spct.soLuong))" +
             "FROM SanPham sp " +
             "LEFT JOIN SanPhamChiTiet spct ON sp.id = spct.sanPham.id " +
             "WHERE " +

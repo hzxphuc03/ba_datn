@@ -12,6 +12,10 @@ public interface PhuongThucThanhToanRepository extends JpaRepository<PhuongThucT
 
     Page<PhuongThucThanhToan> findAllByTrangThai(int trangThai, Pageable pageable);
 
-    @Query("SELECT u FROM PhuongThucThanhToan u WHERE u.ten LIKE %:name%")
-    Page<PhuongThucThanhToan> searchByTen(String name, Pageable pageable);
+    @Query("SELECT u FROM PhuongThucThanhToan u " +
+            "WHERE " +
+            "(:ten IS null OR u.ten LIKE %:ten%) AND " +
+            "(:trangThai IS null OR u.trangThai = :trangThai)"
+            )
+    Page<PhuongThucThanhToan> searchByTen(String ten, int trangThai, Pageable pageable);
 }

@@ -29,9 +29,9 @@ public class PhuongThucThanhToanController {
 
 
     @PostMapping("/add")
-    public ResponseEntity<?> add(@RequestBody String tenChuVuRequest){
+    public ResponseEntity<?> add(@RequestBody String Request){
 
-        return ResponseEntity.ok(phuongThucThanhToanService.add(tenChuVuRequest));
+        return ResponseEntity.ok(phuongThucThanhToanService.add(Request));
     }
 
     @PutMapping("update")

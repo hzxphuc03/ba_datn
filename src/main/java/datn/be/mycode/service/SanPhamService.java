@@ -59,6 +59,7 @@ public class SanPhamService {
 //        sanPham.setMa(request.getMa());
         sanPham.setTen(request.getTen());
         sanPham.setMoTa(request.getMoTa());
+        sanPham.setHinhAnh(request.getHinhAnh());
         sanPham.setNgayTao(LocalDateTime.now());
         sanPham.setTrangThai(1);
         return repo.save(sanPham);
@@ -70,6 +71,7 @@ public class SanPhamService {
         sanPham.setMa(request.getMa());
         sanPham.setTen(request.getTen());
         sanPham.setMoTa(request.getMoTa());
+        sanPham.setHinhAnh(request.getHinhAnh());
         sanPham.setNgaySua(LocalDateTime.now());
         sanPham.setTrangThai(request.getTrangThai());
         return repo.save(sanPham);
