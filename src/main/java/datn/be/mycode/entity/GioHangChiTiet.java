@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @NoArgsConstructor
@@ -22,6 +23,12 @@ public class GioHangChiTiet implements Serializable {
 
     @Column(name = "so_luong")
     private int soLuong;
+
+    @Column(name = "gia_hien_hanh")
+    private BigDecimal giaHienHanh;
+
+    @Column(name = "gia_da_giam")
+    private BigDecimal giaDaGiam;
 
     @Column(name = "trang_thai")
     private int trangThai;

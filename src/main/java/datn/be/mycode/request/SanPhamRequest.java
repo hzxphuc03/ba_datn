@@ -11,6 +11,7 @@ public class SanPhamRequest {
     private String ma;
     private String ten;
     private String moTa;
+    private String hinhAnh;
     private LocalDateTime ngayTao;
     private LocalDateTime NgaySua;
     private int soLuongDaBan;

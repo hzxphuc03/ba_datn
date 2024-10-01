@@ -35,11 +35,9 @@ public class PhuongThucThanhToanService {
         NormalTableResponse<PhuongThucThanhToan> theLoaiNormalTableResponse = new NormalTableResponse<>();
         Pageable pageable = PageRequest.of(request.getPage() - 1,request.getPageSize());
         Page<PhuongThucThanhToan> phuongThucThanhToanPage;
-        if (request.getKeyWord() != null) {
-            phuongThucThanhToanPage = repo.searchByTen(request.getKeyWord(), pageable);
-        }else {
-            phuongThucThanhToanPage = repo.findAllByTrangThai(request.getStatus(), pageable);
-        }
+
+        phuongThucThanhToanPage = repo.searchByTen(request.getKeyWord(), request.getStatus(), pageable);
+
         List<PhuongThucThanhToan> phuongThucThanhToans = phuongThucThanhToanPage.getContent();
 
         theLoaiNormalTableResponse.setItem(phuongThucThanhToans);

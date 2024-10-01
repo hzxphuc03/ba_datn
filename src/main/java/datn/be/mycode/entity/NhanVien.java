@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @ToString
-
+@Builder
 @Entity
 @Table(name = "nhan_vien")
 public class NhanVien implements Serializable {

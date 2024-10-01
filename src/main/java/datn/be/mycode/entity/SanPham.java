@@ -29,6 +29,9 @@ public class SanPham implements Serializable {
     @Column(name = "mo_ta")
     private String moTa;
 
+    @Column(name = "hinh_anh")
+    private String hinhAnh;
+
     @Column(name = "ngay_tao")
     private LocalDateTime ngayTao;
 

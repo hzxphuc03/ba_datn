@@ -16,6 +16,7 @@ public interface NhanVienRepository extends JpaRepository<NhanVien,Long> {
         Page<NhanVien> findByHoTen(String name, Pageable pageable);
 
         Page<NhanVienResPonse> findAllByTrangThai(int trangThai, Pageable pageable);
+
     @Query("SELECT new datn.be.mycode.response.NhanVienResPonse(nv.id, nv.ma, nv.hoTen, nv.ngaySinh,nv.ngayTao,nv.soDienThoai,nv.gioiTinh,nv.diaChi,nv.hinhAnh,nv.email,nv.taiKhoan,nv.matKhau, nv.trangThai)" +
             "FROM NhanVien nv " +
             "LEFT JOIN ChucVu cv ON cv.id = nv.id " +
