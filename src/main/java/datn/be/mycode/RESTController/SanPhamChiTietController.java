@@ -32,12 +32,10 @@ public class SanPhamChiTietController {
             @RequestParam(name = "sanPham",required = false) Long idSanPham,
             @RequestParam(name = "mauSac",required = false) Long idMauSac,
             @RequestParam(name = "kichCo",required = false) Long idKichCo,
-            @RequestParam(name = "thuongHieu",required = false) Long idThuongHieu,
-            @RequestParam(name = "theLoai",required = false) Long idTheLoai,
             @RequestParam(name = "sort",required = false) Integer sort
     ){
 
-        TableSanPhamChiTietRequest request = new TableSanPhamChiTietRequest(page, pageSize, keyWord, status, startDate, endDate, idSanPham, idMauSac, idKichCo, idThuongHieu, idTheLoai, sort);
+        TableSanPhamChiTietRequest request = new TableSanPhamChiTietRequest(page, pageSize, keyWord, status, startDate, endDate, idSanPham, idMauSac, idKichCo,  sort);
         return ResponseEntity.ok(sanPhamChiTietService.getAll(request));
     }
 

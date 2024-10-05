@@ -31,8 +31,11 @@ public class SanPhamChiTiet implements Serializable {
     @Column(name = "hinh_anh")
     private String hinhAnh;
 
-    @Column(name = "gia_hien_hanh")
-    private BigDecimal giaHienHanh;
+    @Column(name = "gia_nhap")
+    private BigDecimal giaNhap;
+
+    @Column(name = "gia_ban")
+    private BigDecimal giaBan;
 
     @Column(name = "so_luong")
     private int soLuong;

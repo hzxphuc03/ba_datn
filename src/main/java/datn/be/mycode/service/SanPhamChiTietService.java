@@ -1,5 +1,6 @@
 package datn.be.mycode.service;
 
+import datn.be.mycode.entity.KichCo;
 import datn.be.mycode.entity.SanPham;
 import datn.be.mycode.entity.SanPhamChiTiet;
 import datn.be.mycode.repository.*;
@@ -27,14 +28,9 @@ public class SanPhamChiTietService {
     private SanPhamRepository sanPhamRepository;
     @Autowired
     private MauSacRepository mauSacRepository;
-//    @Autowired
-//    private SanPhamRepository sanPhamRepositoryrepo;
-//    @Autowired
-//    private SanPhamRepository sanPhamRepositoryrepo;
     @Autowired
-    private ThuongHieuRepository thuongHieuRepository;
-    @Autowired
-    private TheLoaiRepository theLoaiRepository;
+    private KichcoRepository kichcoRepository;
+
 
     public NormalTableResponse<SanPhamChiTietResponse> getAll(TableSanPhamChiTietRequest request) {
         if (request.getPage() == null) {
@@ -54,9 +50,9 @@ public class SanPhamChiTietService {
         Page<SanPhamChiTietResponse> sanPhamChiTietResponsePage;
         if (request.getSort() == 0) {
             System.out.println(request.toString());
-            sanPhamChiTietResponsePage = sanPhamChiTietRepository.searchAll( request.getStartDate(), request.getEndDate(), request.getStatus(), request.getSanPham(), request.getMauSac(), request.getKichCo(), request.getThuongHieu(), request.getTheLoai(), pageable);
+            sanPhamChiTietResponsePage = sanPhamChiTietRepository.searchAll( request, pageable);
         }else {
-            sanPhamChiTietResponsePage = sanPhamChiTietRepository.searchAllSortedBySoLuong( request.getStartDate(), request.getEndDate(), request.getStatus(), request.getTheLoai(), request.getTheLoai(), request.getTheLoai(), request.getTheLoai(), request.getTheLoai(), pageable);
+            sanPhamChiTietResponsePage = sanPhamChiTietRepository.searchAllSortedBySoLuong( request, pageable);
         }
         List<SanPhamChiTietResponse> sanPhamChiTietResponses = sanPhamChiTietResponsePage.getContent().stream().toList();
 
@@ -73,15 +69,13 @@ public class SanPhamChiTietService {
         SanPhamChiTiet sanPhamChiTiet = new SanPhamChiTiet();
         sanPhamChiTiet.setNgayTao(LocalDateTime.now());
         sanPhamChiTiet.setHinhAnh(request.getHinhAnh());
-        sanPhamChiTiet.setGiaHienHanh(request.getGiaHienHanh());
+        sanPhamChiTiet.setGiaNhap(request.getGiaNhap());
+        sanPhamChiTiet.setGiaBan(request.getGiaBan());
         sanPhamChiTiet.setSoLuong(request.getSoLuong());
         sanPhamChiTiet.setTrangThai(request.getTrangThai());
         sanPhamChiTiet.setSanPham(sanPhamRepository.findById(request.getSanPham()).get());
         sanPhamChiTiet.setMauSac(mauSacRepository.findById(request.getMauSac()).get());
-//        sanPhamChiTiet.setSanPham(sanPhamRepository.findById(request.getSanPham()).get());
-//        sanPhamChiTiet.setSanPham(sanPhamRepository.findById(request.getSanPham()).get());
-        sanPhamChiTiet.setThuongHieu(thuongHieuRepository.findById(request.getThuongHieu()).get());
-        sanPhamChiTiet.setTheLoai(theLoaiRepository.findById(request.getTheLoai()).get());
+        sanPhamChiTiet.setKichCo(kichcoRepository.findById(request.getKichCo()).get());
 
         return sanPhamChiTietRepository.save(sanPhamChiTiet);
     }
@@ -90,15 +84,13 @@ public class SanPhamChiTietService {
         SanPhamChiTiet sanPhamChiTiet = sanPhamChiTietRepository.findById(request.getId()).get();
         sanPhamChiTiet.setNgaySua(LocalDateTime.now());
         sanPhamChiTiet.setHinhAnh(request.getHinhAnh());
-        sanPhamChiTiet.setGiaHienHanh(request.getGiaHienHanh());
+        sanPhamChiTiet.setGiaNhap(request.getGiaNhap());
+        sanPhamChiTiet.setGiaBan(request.getGiaBan());
         sanPhamChiTiet.setSoLuong(request.getSoLuong());
         sanPhamChiTiet.setTrangThai(request.getTrangThai());
         sanPhamChiTiet.setSanPham(sanPhamRepository.findById(request.getSanPham()).get());
         sanPhamChiTiet.setMauSac(mauSacRepository.findById(request.getMauSac()).get());
-//        sanPhamChiTiet.setSanPham(sanPhamRepository.findById(request.getSanPham()).get());
-//        sanPhamChiTiet.setSanPham(sanPhamRepository.findById(request.getSanPham()).get());
-        sanPhamChiTiet.setThuongHieu(thuongHieuRepository.findById(request.getThuongHieu()).get());
-        sanPhamChiTiet.setTheLoai(theLoaiRepository.findById(request.getTheLoai()).get());
+        sanPhamChiTiet.setKichCo(kichcoRepository.findById(request.getKichCo()).get());
 
         return sanPhamChiTietRepository.save(sanPhamChiTiet);
     }

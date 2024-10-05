@@ -12,9 +12,22 @@ public class SanPhamRequest {
     private String ten;
     private String moTa;
     private String hinhAnh;
+    private int trongLuong;
+    private String beMatSuDung;
+    private String congNghe;
+    private String kieuDang;
+    private String giaThapNhat;
+    private String giaCaoNhat;
     private LocalDateTime ngayTao;
     private LocalDateTime NgaySua;
-    private int soLuongDaBan;
     private String nguoiTao;
     private int trangThai;
+
+    private Long idGiamGia;
+    private Long idThuongHieu;
+    private Long idTheLoai;
+    private Long idLoaiCo;
+    private Long idVatLieu;
+    private Long idLoaiDe;
+
 }

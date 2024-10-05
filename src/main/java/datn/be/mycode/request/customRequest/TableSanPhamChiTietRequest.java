@@ -30,9 +30,5 @@ public class TableSanPhamChiTietRequest {
 
     private Long kichCo;
 
-    private Long thuongHieu;
-
-    private Long theLoai;
-
     private Integer sort; // 0 la binh thuong, 1 la xap xep theo so luong < 10
 }
