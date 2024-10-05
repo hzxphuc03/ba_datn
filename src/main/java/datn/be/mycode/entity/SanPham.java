@@ -32,14 +32,29 @@ public class SanPham implements Serializable {
     @Column(name = "hinh_anh")
     private String hinhAnh;
 
+    @Column(name = "trong_luong")
+    private int trongLuong;
+
+    @Column(name = "be_mat_su_dung")
+    private String beMatSuDung;
+
+    @Column(name = "cong_nghe")
+    private String congNghe;
+
+    @Column(name = "kieu_dang")
+    private String kieuDang;
+
+    @Column(name = "gia_thap_nhat")
+    private String giaThapNhat;
+
+    @Column(name = "gia_cao_nhat")
+    private String giaCaoNhat;
+
     @Column(name = "ngay_tao")
     private LocalDateTime ngayTao;
 
     @Column(name = "ngay_sua")
     private LocalDateTime ngaySua;
-
-    @Column(name = "so_luong_da_ban")
-    private int soLuongDaBan;
 
     @Column(name = "nguoi_tao")
     private String nguoiTao;
@@ -47,4 +62,28 @@ public class SanPham implements Serializable {
     @Column(name = "trang_thai")
     private int trangThai;
 
+
+    @ManyToOne()
+    @JoinColumn(name = "id_giam_gia", referencedColumnName = "id")
+    private GiamGia giamGia;
+
+    @ManyToOne()
+    @JoinColumn(name = "id_thuong_hieu", referencedColumnName = "id")
+    private ThuongHieu thuongHieu;
+
+    @ManyToOne()
+    @JoinColumn(name = "id_the_loai", referencedColumnName = "id")
+    private TheLoai theLoai;
+
+    @ManyToOne()
+    @JoinColumn(name = "id_loai_co", referencedColumnName = "id")
+    private LoaiCo loaiCo;
+
+    @ManyToOne()
+    @JoinColumn(name = "id_vat_lieu", referencedColumnName = "id")
+    private VatLieu vatLieu;
+
+    @ManyToOne()
+    @JoinColumn(name = "id_loai_de", referencedColumnName = "id")
+    private LoaiDe loaiDe;
 }

@@ -39,9 +39,9 @@ public class SanPhamService {
         Pageable pageable = PageRequest.of(request.getPage() - 1,request.getPageSize());
         Page<SanPhamResponse> sanPhamResponsePage;
         if (request.getSort() == 0) {
-            sanPhamResponsePage = repo.searchAll(request.getKeyWord(), request.getStartDate(), request.getEndDate(), request.getStatus(), pageable);
+            sanPhamResponsePage = repo.searchAll(request, pageable);
         }else {
-            sanPhamResponsePage = repo.searchAllSortedBySoLuong(request.getKeyWord(), request.getStartDate(), request.getEndDate(), request.getStatus(), pageable);
+            sanPhamResponsePage = repo.searchAllSortedBySoLuong(request, pageable);
         }
         List<SanPhamResponse> sanPhamResponses = sanPhamResponsePage.getContent().stream().toList();
 

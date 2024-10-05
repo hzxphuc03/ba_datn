@@ -18,13 +18,11 @@ public class SanPhamChiTietRequest {
     private LocalDateTime ngayTao;
     private LocalDateTime ngaySua;
     private String hinhAnh;
-    private BigDecimal giaHienHanh;
+    private BigDecimal giaNhap;
+    private BigDecimal giaBan;
     private int soLuong;
     private int trangThai;
     private Long sanPham;
     private Long mauSac;
     private Long kichCo;
-    private Long giamGia;
-    private Long thuongHieu;
-    private Long theLoai;
 }

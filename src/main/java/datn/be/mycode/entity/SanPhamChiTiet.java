@@ -31,8 +31,11 @@ public class SanPhamChiTiet implements Serializable {
     @Column(name = "hinh_anh")
     private String hinhAnh;
 
-    @Column(name = "gia_hien_hanh")
-    private BigDecimal giaHienHanh;
+    @Column(name = "gia_nhap")
+    private BigDecimal giaNhap;
+
+    @Column(name = "gia_ban")
+    private BigDecimal giaBan;
 
     @Column(name = "so_luong")
     private int soLuong;
@@ -52,16 +55,5 @@ public class SanPhamChiTiet implements Serializable {
     @JoinColumn(name = "id_kich_co", referencedColumnName = "id")
     private KichCo kichCo;
 
-    @ManyToOne()
-    @JoinColumn(name = "id_giam_gia", referencedColumnName = "id")
-    private GiamGia giamGia;
-
-    @ManyToOne()
-    @JoinColumn(name = "id_thuong_hieu", referencedColumnName = "id")
-    private ThuongHieu thuongHieu;
-
-    @ManyToOne()
-    @JoinColumn(name = "id_the_loai", referencedColumnName = "id")
-    private TheLoai theLoai;
 
 }
