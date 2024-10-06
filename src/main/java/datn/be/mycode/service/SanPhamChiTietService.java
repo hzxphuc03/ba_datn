@@ -1,6 +1,5 @@
 package datn.be.mycode.service;
 
-import datn.be.mycode.entity.KichCo;
 import datn.be.mycode.entity.SanPham;
 import datn.be.mycode.entity.SanPhamChiTiet;
 import datn.be.mycode.repository.*;
@@ -8,7 +7,8 @@ import datn.be.mycode.request.SanPhamChiTietRequest;
 import datn.be.mycode.request.customRequest.TableSanPhamChiTietRequest;
 import datn.be.mycode.response.NormalTableResponse;
 import datn.be.mycode.response.SanPhamChiTietResponse;
-import datn.be.mycode.response.SanPhamResponse;
+import datn.be.mycode.response.customResponse.SanPhamChiTiet.SanPhamChiTietByIdSP;
+import datn.be.mycode.response.customResponse.SanPhamChiTiet.SanPhamChiTietByIdSanPhamRes;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -64,6 +64,34 @@ public class SanPhamChiTietService {
         return sanPhamNormalTableResponse;
     }
 
+    public SanPhamChiTietByIdSanPhamRes getByIdSanPham(Long idSanPham){
+
+        List<SanPhamChiTiet> listSanPhamChiTiet = sanPhamChiTietRepository.findAllBySanPham_Id(idSanPham);
+
+        List<SanPhamChiTietByIdSP> listSanPhamChiTietRes = new ArrayList<>();
+
+        listSanPhamChiTiet.forEach(sanPhamChiTiet -> {
+            SanPhamChiTietByIdSP sanPhamChiTietByIdSP = SanPhamChiTietByIdSP.builder()
+                    .id(sanPhamChiTiet.getId())
+                    .ngayTao(sanPhamChiTiet.getNgayTao())
+                    .ngaySua(sanPhamChiTiet.getNgaySua())
+                    .hinhAnh(sanPhamChiTiet.getHinhAnh())
+                    .giaNhap(sanPhamChiTiet.getGiaNhap())
+                    .giaBan(sanPhamChiTiet.getGiaBan())
+                    .soLuong(sanPhamChiTiet.getSoLuong())
+                    .trangThai(sanPhamChiTiet.getTrangThai())
+                    .sanPham(sanPhamChiTiet.getSanPham().getId())
+                    .mauSac(sanPhamChiTiet.getMauSac().getId())
+                    .kichCo(sanPhamChiTiet.getKichCo().getId())
+                    .build();
+            listSanPhamChiTietRes.add(sanPhamChiTietByIdSP);
+        });
+
+        SanPham sanPhamRes = listSanPhamChiTiet.get(0).getSanPham();
+
+        SanPhamChiTietByIdSanPhamRes sanPhamChiTietByIdSanPhamRes = new SanPhamChiTietByIdSanPhamRes(sanPhamRes, listSanPhamChiTietRes);
+        return sanPhamChiTietByIdSanPhamRes;
+    }
 
     public SanPhamChiTiet addSPCT(SanPhamChiTietRequest request){
         SanPhamChiTiet sanPhamChiTiet = new SanPhamChiTiet();

@@ -36,16 +36,16 @@ public class KichCoService {
         NormalTableResponse<KichCo> kichCoNormalTableResponse = new NormalTableResponse<>();
         Pageable pageable= PageRequest.of(request.getPage(),request.getPageSize());
         Page<KichCo> kichCoPage;
-        if (!request.getKeyWord().equals("")) {
+        if (request.getKeyWord() != null) {
             kichCoPage = repository.findByTen(request.getKeyWord(), pageable);
         }else {
             kichCoPage = repository.findAllByTrangThai(request.getStatus(), pageable);
         }
         List<KichCo> kichCos = kichCoPage.getContent().stream().toList();
 
-        kichCoNormalTableResponse .setItem(kichCos);
-        kichCoNormalTableResponse .getPage();
-        kichCoNormalTableResponse .getPageSize();
+        kichCoNormalTableResponse.setItem(kichCos);
+        kichCoNormalTableResponse.setPage(request.getPage());
+        kichCoNormalTableResponse.setPageSize(request.getPageSize());
         kichCoNormalTableResponse.setTotalItem(kichCoPage.getTotalElements());
         return kichCoNormalTableResponse;
 

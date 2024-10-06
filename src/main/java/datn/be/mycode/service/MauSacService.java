@@ -55,12 +55,10 @@ public class MauSacService {
         return mauSacNormalTableResponse;
     }
 
-    public MauSac add(String request) {
-        System.out.println("addso1");
-        System.out.println(request);
+    public MauSac add(MauSacRequest request) {
         MauSac mauSac = new MauSac();
-        mauSac.setTen(request);
-        mauSac.setMaMau(request);
+        mauSac.setTen(request.getTen());
+        mauSac.setMaMau(request.getMaMau());
         mauSac.setTrangThai(1);
         mauSac.setNgayTao(LocalDateTime.now());
         return repository.save(mauSac);

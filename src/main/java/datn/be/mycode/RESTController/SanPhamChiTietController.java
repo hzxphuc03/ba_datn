@@ -39,6 +39,12 @@ public class SanPhamChiTietController {
         return ResponseEntity.ok(sanPhamChiTietService.getAll(request));
     }
 
+    @GetMapping("/get-by-idSanPham")
+    public ResponseEntity<?> getByIdSanPham(
+            @RequestParam(name = "idSanPham",required = false) Long idSanPham
+    ){
+        return ResponseEntity.ok(sanPhamChiTietService.getByIdSanPham(idSanPham));
+    }
 
     @PostMapping("/add")
     public ResponseEntity<?> add(@RequestBody SanPhamChiTietRequest request){

@@ -49,4 +49,7 @@ public interface SanPhamChiTietRepository extends JpaRepository<SanPhamChiTiet, 
     )
     Page<SanPhamChiTietResponse> searchAllSortedBySoLuong(@Param("request") TableSanPhamChiTietRequest request, Pageable pageable);
 
+
+    List<SanPhamChiTiet> findAllBySanPham_Id(Long idSanPham);
+
 }

@@ -24,5 +24,7 @@ public class TableSanPhamRequest {
 
     private LocalDateTime endDate;
 
+    private Long giamGia, thuongHieu, theLoai, loaiCo, vatLieu, loaiDe;
+
     private Integer sort; // 0 la binh thuong, 1 la xap xep theo so luong < 10
 }

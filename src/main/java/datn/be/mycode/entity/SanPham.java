@@ -4,12 +4,14 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
 @Setter
+@Builder
 @ToString
 
 @Entity
@@ -45,10 +47,10 @@ public class SanPham implements Serializable {
     private String kieuDang;
 
     @Column(name = "gia_thap_nhat")
-    private String giaThapNhat;
+    private BigDecimal giaThapNhat;
 
     @Column(name = "gia_cao_nhat")
-    private String giaCaoNhat;
+    private BigDecimal giaCaoNhat;
 
     @Column(name = "ngay_tao")
     private LocalDateTime ngayTao;
