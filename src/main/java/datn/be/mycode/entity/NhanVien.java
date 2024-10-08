@@ -36,7 +36,7 @@ public class NhanVien implements Serializable {
     private String soDienThoai;
 
     @Column(name = "gioi_tinh")
-    private String gioiTinh;
+    private int gioiTinh;
 
     @Column(name = "dia_chi")
     private String diaChi;
@@ -56,7 +56,7 @@ public class NhanVien implements Serializable {
     @Column(name = "trang_thai")
     private int trangThai;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne()
     @JoinColumn(name = "id_chuc_vu", referencedColumnName = "id")
     private ChucVu chucVu;
 

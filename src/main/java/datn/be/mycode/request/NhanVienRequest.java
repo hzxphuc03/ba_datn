@@ -18,11 +18,12 @@ public class NhanVienRequest {
     private LocalDateTime ngaySinh;
     private LocalDateTime ngayTao;
     private String soDienThoai;
-    private String gioiTinh;
+    private int gioiTinh;
     private String diaChi;
     private String hinhAnh;
     private String email;
     private String taiKhoan;
     private String matKhau;
+    private Long idChucVu;
     private int trangThai;
 }

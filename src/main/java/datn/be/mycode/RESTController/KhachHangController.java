@@ -29,6 +29,14 @@ public class KhachHangController {
         NormalTableRequestKhachHang request = new NormalTableRequestKhachHang(page,pageSize,keyWord,status,soDienThoai,taiKhoan,email);
         return ResponseEntity.ok(khachHangService.getAll(request));
     }
+
+    @GetMapping("/get-by-id/{id}")
+    public ResponseEntity<?> getByIdSanPham(
+            @PathVariable(name = "id",required = false) Long id
+    ){
+        return ResponseEntity.ok(khachHangService.getById(id));
+    }
+
     @PostMapping("/add")
     public ResponseEntity<?> add(@RequestBody KhachHangRequest tenKhachHangRequest){
         System.out.println(tenKhachHangRequest);
