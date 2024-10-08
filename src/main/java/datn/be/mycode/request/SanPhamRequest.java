@@ -2,6 +2,7 @@ package datn.be.mycode.request;
 
 import lombok.Data;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Date;
 
@@ -16,8 +17,8 @@ public class SanPhamRequest {
     private String beMatSuDung;
     private String congNghe;
     private String kieuDang;
-    private String giaThapNhat;
-    private String giaCaoNhat;
+    private BigDecimal giaThapNhat;
+    private BigDecimal giaCaoNhat;
     private LocalDateTime ngayTao;
     private LocalDateTime NgaySua;
     private String nguoiTao;

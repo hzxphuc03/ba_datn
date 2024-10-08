@@ -26,11 +26,24 @@ public class SanPhamController {
             @RequestParam(name = "status",required = false) Integer status,
             @RequestParam(name = "startDate",required = false) LocalDateTime startDate,
             @RequestParam(name = "endDate",required = false) LocalDateTime endDate,
+            @RequestParam(name = "giamGia",required = false) Long idGiamGia,
+            @RequestParam(name = "thuongHieu",required = false) Long idThuongHieu,
+            @RequestParam(name = "theLoai",required = false) Long idTheLoai,
+            @RequestParam(name = "loaiCo",required = false) Long idLoaiCo,
+            @RequestParam(name = "vatLieu",required = false) Long idVatLieu,
+            @RequestParam(name = "loaiDe",required = false) Long idLoaiDe,
             @RequestParam(name = "sort",required = false) Integer sort
     ){
 
-        TableSanPhamRequest request = new TableSanPhamRequest(page,pageSize,keyWord,status, startDate, endDate, sort);
+        TableSanPhamRequest request = new TableSanPhamRequest(page,pageSize,keyWord,status, startDate, endDate, idGiamGia, idThuongHieu, idTheLoai, idLoaiCo, idVatLieu, idLoaiDe, sort);
         return ResponseEntity.ok(sanPhamService.getAll(request));
+    }
+
+    @GetMapping("/get-by-id")
+    public ResponseEntity<?> getById(
+            @RequestParam(name = "idSanPham",required = false) Long idSanPham
+    ){
+        return ResponseEntity.ok(sanPhamService.getSanPhamById(idSanPham));
     }
 
     @PostMapping("/add")

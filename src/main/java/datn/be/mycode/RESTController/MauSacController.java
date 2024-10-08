@@ -25,9 +25,9 @@ public class MauSacController {
         return ResponseEntity.ok(mauSacService.getAll(request));
     }
     @PostMapping("/add")
-    public ResponseEntity<?> add(@RequestBody String tenMauSacRequest){
-        System.out.println(tenMauSacRequest);
-        return ResponseEntity.ok(mauSacService.add(tenMauSacRequest));
+    public ResponseEntity<?> add(@RequestBody MauSacRequest request){
+
+        return ResponseEntity.ok(mauSacService.add(request));
     }
 
     @PutMapping("update")

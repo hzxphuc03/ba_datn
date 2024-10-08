@@ -2,7 +2,7 @@ package datn.be.mycode.service;
 
 
 import datn.be.mycode.entity.SanPham;
-import datn.be.mycode.repository.SanPhamRepository;
+import datn.be.mycode.repository.*;
 import datn.be.mycode.request.SanPhamRequest;
 import datn.be.mycode.request.customRequest.TableSanPhamRequest;
 import datn.be.mycode.response.NormalTableResponse;
@@ -21,6 +21,18 @@ public class SanPhamService {
 
     @Autowired
     private SanPhamRepository repo;
+    @Autowired
+    private GiamGiaRepository giamGiaRepository;
+    @Autowired
+    private ThuongHieuRepository thuongHieuRepository;
+    @Autowired
+    private TheLoaiRepository theLoaiRepository;
+    @Autowired
+    private LoaiCoRepository loaiCoRepository;
+    @Autowired
+    private VatLieuRepository vatLieuRepository;
+    @Autowired
+    private LoaiDeRepository loaiDeRepository;
 
     public NormalTableResponse<SanPhamResponse> getAll(TableSanPhamRequest request) {
         if (request.getPage() == null) {
@@ -55,25 +67,52 @@ public class SanPhamService {
 
 
     public SanPham add(SanPhamRequest request) {
-        SanPham sanPham = new SanPham();
-//        sanPham.setMa(request.getMa());
-        sanPham.setTen(request.getTen());
-        sanPham.setMoTa(request.getMoTa());
-        sanPham.setHinhAnh(request.getHinhAnh());
-        sanPham.setNgayTao(LocalDateTime.now());
-        sanPham.setTrangThai(1);
+        SanPham sanPham = SanPham.builder()
+                .ten(request.getTen())
+                .moTa(request.getMoTa())
+                .hinhAnh(request.getHinhAnh())
+                .trongLuong(request.getTrongLuong())
+                .beMatSuDung(request.getBeMatSuDung())
+                .congNghe(request.getCongNghe())
+                .kieuDang(request.getKieuDang())
+                .giaThapNhat(request.getGiaThapNhat())
+                .giaCaoNhat(request.getGiaCaoNhat())
+                .ngayTao(LocalDateTime.now())
+                .nguoiTao(request.getNguoiTao())
+                .trangThai(1)
+                .giamGia(request.getIdGiamGia() != 0? giamGiaRepository.findById(request.getIdGiamGia()).get() : null)
+                .thuongHieu(thuongHieuRepository.findById(request.getIdThuongHieu()).get())
+                .theLoai(theLoaiRepository.findById(request.getIdTheLoai()).get())
+                .loaiCo(loaiCoRepository.findById(request.getIdLoaiCo()).get())
+                .vatLieu(vatLieuRepository.findById(request.getIdVatLieu()).get())
+                .loaiDe(loaiDeRepository.findById(request.getIdLoaiDe()).get())
+                .build();
+
         return repo.save(sanPham);
     }
 
 
     public SanPham update(SanPhamRequest request) {
         SanPham sanPham = repo.findById(request.getId()).get();
+
         sanPham.setMa(request.getMa());
         sanPham.setTen(request.getTen());
         sanPham.setMoTa(request.getMoTa());
         sanPham.setHinhAnh(request.getHinhAnh());
+        sanPham.setTrongLuong(request.getTrongLuong());
+        sanPham.setBeMatSuDung(request.getBeMatSuDung());
+        sanPham.setCongNghe(request.getCongNghe());
+        sanPham.setKieuDang(request.getKieuDang());
+        sanPham.setGiaThapNhat(request.getGiaThapNhat());
+        sanPham.setGiaCaoNhat(request.getGiaCaoNhat());
         sanPham.setNgaySua(LocalDateTime.now());
         sanPham.setTrangThai(request.getTrangThai());
+        sanPham.setGiamGia(request.getIdGiamGia() != 0? giamGiaRepository.findById(request.getIdGiamGia()).get() : null);
+        sanPham.setThuongHieu(thuongHieuRepository.findById(request.getIdThuongHieu()).get());
+        sanPham.setTheLoai(theLoaiRepository.findById(request.getIdTheLoai()).get());
+        sanPham.setLoaiCo(loaiCoRepository.findById(request.getIdLoaiCo()).get());
+        sanPham.setVatLieu(vatLieuRepository.findById(request.getIdVatLieu()).get());
+        sanPham.setLoaiDe(loaiDeRepository.findById(request.getIdLoaiDe()).get());
         return repo.save(sanPham);
     }
 
@@ -82,6 +121,9 @@ public class SanPhamService {
 //        repo.delete(sanPham);
 //    }
 
+    public SanPham getSanPhamById(Long id){
+        return repo.findById(id).get();
+    }
 
     public SanPham udateTrangThai(Long id, Integer status){
         SanPham sanPham = repo.findById(id).get();
