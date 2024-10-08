@@ -39,9 +39,9 @@ public class SanPhamChiTietController {
         return ResponseEntity.ok(sanPhamChiTietService.getAll(request));
     }
 
-    @GetMapping("/get-by-idSanPham")
+    @GetMapping("/get-by-idSanPham/{idSanPham}")
     public ResponseEntity<?> getByIdSanPham(
-            @RequestParam(name = "idSanPham",required = false) Long idSanPham
+            @PathVariable(name = "idSanPham",required = false) Long idSanPham
     ){
         return ResponseEntity.ok(sanPhamChiTietService.getByIdSanPham(idSanPham));
     }

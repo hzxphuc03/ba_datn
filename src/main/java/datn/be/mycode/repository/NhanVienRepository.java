@@ -1,6 +1,7 @@
 package datn.be.mycode.repository;
 
 import datn.be.mycode.entity.NhanVien;
+import datn.be.mycode.request.customRequest.TableNhanVienRequest;
 import datn.be.mycode.response.NhanVienResPonse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -17,17 +18,39 @@ public interface NhanVienRepository extends JpaRepository<NhanVien,Long> {
 
         Page<NhanVienResPonse> findAllByTrangThai(int trangThai, Pageable pageable);
 
-    @Query("SELECT new datn.be.mycode.response.NhanVienResPonse(nv.id, nv.ma, nv.hoTen, nv.ngaySinh,nv.ngayTao,nv.soDienThoai,nv.gioiTinh,nv.diaChi,nv.hinhAnh,nv.email,nv.taiKhoan,nv.matKhau, nv.trangThai)" +
+    @Query("SELECT nv " +
             "FROM NhanVien nv " +
-            "LEFT JOIN ChucVu cv ON cv.id = nv.id " +
             "WHERE " +
-            "(:ten IS null OR nv.hoTen LIKE %:ten%) AND " +
-            "(:startDate IS NULL OR nv.ngayTao >= :startDate) AND " +
-            "(:endDate IS NULL OR nv.ngayTao <= :endDate) AND " +
-            "(:status IS NULL OR nv.trangThai = :status)" +
-            "GROUP BY  nv.hoTen, nv.ngaySinh,nv.ngayTao,nv.soDienThoai,nv.gioiTinh,nv.diaChi,nv.hinhAnh,nv.email,nv.taiKhoan,nv.matKhau, nv.trangThai"
+            "(:#{#request.keyWord} IS null OR nv.hoTen LIKE %:#{#request.keyWord}%) AND " +
+            "(:#{#request.idChucVu} IS null OR nv.chucVu.id = :#{#request.idChucVu}) AND " +
+            "(:#{#request.status} IS NULL OR nv.trangThai = :#{#request.status})"
     )
-    Page<NhanVien> searchAll(String ten, LocalDateTime startDate, LocalDateTime endDate, Integer status, Pageable pageable);
+    Page<NhanVien> searchAll(TableNhanVienRequest request, Pageable pageable);
 
+    @Query("SELECT nv " +
+            "FROM NhanVien nv " +
+            "WHERE " +
+            "(:#{#request.keyWord} IS null OR nv.soDienThoai LIKE %:#{#request.keyWord}%) AND " +
+            "(:#{#request.idChucVu} IS null OR nv.chucVu.id = :#{#request.idChucVu}) AND " +
+            "(:#{#request.status} IS NULL OR nv.trangThai = :#{#request.status})"
+    )
+    Page<NhanVien> searchAllBySDT(TableNhanVienRequest request, Pageable pageable);
 
+    @Query("SELECT nv " +
+            "FROM NhanVien nv " +
+            "WHERE " +
+            "(:#{#request.keyWord} IS null OR nv.taiKhoan LIKE %:#{#request.keyWord}%) AND " +
+            "(:#{#request.idChucVu} IS null OR nv.chucVu.id = :#{#request.idChucVu}) AND " +
+            "(:#{#request.status} IS NULL OR nv.trangThai = :#{#request.status})"
+    )
+    Page<NhanVien> searchAllByUsername(TableNhanVienRequest request, Pageable pageable);
+
+    @Query("SELECT nv " +
+            "FROM NhanVien nv " +
+            "WHERE " +
+            "(:#{#request.keyWord} IS null OR nv.email LIKE %:#{#request.keyWord}%) AND " +
+            "(:#{#request.idChucVu} IS null OR nv.chucVu.id = :#{#request.idChucVu}) AND " +
+            "(:#{#request.status} IS NULL OR nv.trangThai = :#{#request.status})"
+    )
+    Page<NhanVien> searchAllByEmail(TableNhanVienRequest request, Pageable pageable);
 }

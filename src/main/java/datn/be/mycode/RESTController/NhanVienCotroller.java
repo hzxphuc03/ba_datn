@@ -3,6 +3,7 @@ package datn.be.mycode.RESTController;
 import datn.be.mycode.request.NhanVienRequest;
 import datn.be.mycode.request.NormalTableRequest;
 
+import datn.be.mycode.request.customRequest.TableNhanVienRequest;
 import datn.be.mycode.service.NhanVienService;
 
 import jakarta.validation.Valid;
@@ -24,11 +25,19 @@ public class NhanVienCotroller {
             @RequestParam(name = "page",required = false) Integer page,
             @RequestParam(name = "pageSize",required = false) Integer pageSize,
             @RequestParam(name = "keyWord",required = false) String keyWord,
+            @RequestParam(name = "idChucVu",required = false) Long idChucVu,
             @RequestParam(name = "status",required = false) Integer status
     ){
 
-        NormalTableRequest request = new NormalTableRequest(page,pageSize,keyWord,status);
+        TableNhanVienRequest request = new TableNhanVienRequest(page,pageSize,keyWord, idChucVu,status);
         return ResponseEntity.ok(NhanVienService.getAll(request));
+    }
+
+    @GetMapping("/get-by-id/{id}")
+    public ResponseEntity<?> getByIdSanPham(
+            @PathVariable(name = "id",required = false) Long id
+    ){
+        return ResponseEntity.ok(NhanVienService.getById(id));
     }
 
     @PostMapping("/add")

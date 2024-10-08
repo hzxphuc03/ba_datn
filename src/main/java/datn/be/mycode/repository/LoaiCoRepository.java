@@ -12,10 +12,10 @@ public interface LoaiCoRepository extends JpaRepository<LoaiCo,Long> {
 
 //    Page<ThuongHieu> findByTen(String name, Pageable pageable);
 //
-//    Page<LoaiCo> findAllByTrangThai(int trangThai, Pageable pageable);
-//
-//    @Query("SELECT u FROM ThuongHieu u WHERE u.ten LIKE %:name%")
-//    Page<ThuongHieu> searchByTen(String name, Pageable pageable);
+    Page<LoaiCo> findAllByTrangThai(int trangThai, Pageable pageable);
+
+    @Query("SELECT u FROM LoaiCo u WHERE u.ten LIKE %:name%")
+    Page<LoaiCo> searchByTen(String name, Pageable pageable);
 
 
 }

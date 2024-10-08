@@ -1,6 +1,7 @@
 package datn.be.mycode.service;
 
 import datn.be.mycode.entity.KhachHang;
+import datn.be.mycode.entity.NhanVien;
 import datn.be.mycode.repository.KhachHangRepository;
 import datn.be.mycode.request.KhachHangRequest;
 import datn.be.mycode.request.NormalTableRequest;
@@ -55,6 +56,10 @@ public class KhachHangService {
         khachHangNormalTableResponse.setTotalItem(khachHangPage.getTotalElements());
 
         return khachHangNormalTableResponse;
+    }
+
+    public KhachHang getById(Long id){
+        return repository.findById(id).get();
     }
 
     public KhachHang add(KhachHangRequest request) {
