@@ -44,12 +44,6 @@ public class TheLoaiController {
         return ResponseEntity.ok(theLoaiService.update(request));
     }
 
-//    @PutMapping("/delete/{id}")
-//    public ResponseEntity<?> delete(@PathVariable("id") Long id){
-//
-//        return ResponseEntity.ok(theLoaiService.deleteById(id));
-//    }
-
     @PutMapping("/update-trang-thai/{id}")
     public ResponseEntity<?> updateTrangThai(@PathVariable("id") Long id,
                                              @RequestParam(name = "status",required = true) Integer status

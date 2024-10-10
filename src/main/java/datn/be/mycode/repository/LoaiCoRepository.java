@@ -10,8 +10,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface LoaiCoRepository extends JpaRepository<LoaiCo,Long> {
 
-//    Page<ThuongHieu> findByTen(String name, Pageable pageable);
-//
     Page<LoaiCo> findAllByTrangThai(int trangThai, Pageable pageable);
 
     @Query("SELECT u FROM LoaiCo u WHERE u.ten LIKE %:name%")

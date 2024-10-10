@@ -37,7 +37,7 @@ public class KichCoService {
         Pageable pageable= PageRequest.of(request.getPage(),request.getPageSize());
         Page<KichCo> kichCoPage;
         if (request.getKeyWord() != null) {
-            kichCoPage = repository.findByTen(request.getKeyWord(), pageable);
+            kichCoPage = repository.searchByTen(request.getKeyWord(), pageable);
         }else {
             kichCoPage = repository.findAllByTrangThai(request.getStatus(), pageable);
         }
