@@ -24,7 +24,7 @@ public class KichCoController {
             @RequestParam(name = "status",required = false) Integer status
     ){
         NormalTableRequest request = new NormalTableRequest(page,pageSize,keyWord,status);
-        return ResponseEntity.ok(kichCoService.getALL(request));
+        return ResponseEntity.ok(kichCoService.getAll(request));
     }
 
     @PostMapping("/add")
@@ -38,10 +38,12 @@ public class KichCoController {
         return ResponseEntity.ok(kichCoService.update(request));
     }
 
-    @PutMapping("/delete/{id}")
-    public ResponseEntity<?> delete(@PathVariable("id") Long id){
+    @PutMapping("/update-trang-thai/{id}")
+    public ResponseEntity<?> updateTrangThai(@PathVariable("id") Long id,
+                                             @RequestParam(name = "status",required = true) Integer status
+    ){
 
-        return ResponseEntity.ok(kichCoService.deleteById(id));
+        return ResponseEntity.ok(kichCoService.udateTrangThai(id, status));
     }
 
 }

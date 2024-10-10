@@ -1,7 +1,6 @@
 package datn.be.mycode.repository;
 
 import datn.be.mycode.entity.KichCo;
-import datn.be.mycode.entity.LoaiCo;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
