@@ -24,7 +24,7 @@ public class GiamGiaService {
     @Autowired
     private GiamGiaRepository repository;
 
-    public NormalTableResponse<GiamGia> getALL(NormalTableRequest request){
+    public NormalTableResponse<GiamGia> getAll(NormalTableRequest request){
         if (request.getPage() == null) {
             request.setPage(1);
         }
@@ -35,23 +35,29 @@ public class GiamGiaService {
             request.setStatus(1);
         }
         NormalTableResponse<GiamGia> GiamGiaNormalTableResponse = new NormalTableResponse<>();
-        Pageable pageable= PageRequest.of(request.getPage(),request.getPageSize());
+        Pageable pageable= PageRequest.of(request.getPage() - 1,request.getPageSize());
         Page<GiamGia> Page;
-        if (!request.getKeyWord().equals("")) {
+        if (request.getKeyWord() != null) {
             Page = repository.findByTen(request.getKeyWord(), pageable);
         }else {
            Page = repository.findAllByTrangThai(request.getStatus(), pageable);
         }
         List<GiamGia> giamGias = Page.getContent().stream().toList();
 
-        GiamGiaNormalTableResponse .setItem(giamGias);
-        GiamGiaNormalTableResponse .getPage();
+        GiamGiaNormalTableResponse.setItem(giamGias);
+        GiamGiaNormalTableResponse.getPage();
         GiamGiaNormalTableResponse.getPageSize();
         GiamGiaNormalTableResponse.setTotalItem(Page.getTotalElements());
         return GiamGiaNormalTableResponse;
 
     }
-    public  GiamGia add(String request){
+
+    public GiamGia getById(Long id){
+
+        return repository.findById(id).get();
+    }
+
+    public GiamGia add(String request){
         GiamGia giamGia= new GiamGia();
         giamGia.setTen(request);
         giamGia.setTrangThai(1);

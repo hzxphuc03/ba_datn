@@ -1,48 +1,60 @@
 package datn.be.mycode.RESTController;
 
+
 import datn.be.mycode.request.GiamGiaRequest;
-import datn.be.mycode.request.KichCoRequest;
+import datn.be.mycode.request.LoaiCoRequest;
 import datn.be.mycode.request.NormalTableRequest;
 import datn.be.mycode.service.GiamGiaService;
-import datn.be.mycode.service.KichCoService;
+import datn.be.mycode.service.LoaiCoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-@CrossOrigin("*")
+
 @RestController
 @RequestMapping("/api/giam_gia")
 public class GiamGiaController {
     @Autowired
-    private GiamGiaService Service;
+    private GiamGiaService giamGiaService;
+
     @GetMapping("")
-    public ResponseEntity<?> getall(
+    public ResponseEntity<?> getAll(
             @RequestParam(name = "page",required = false) Integer page,
             @RequestParam(name = "pageSize",required = false) Integer pageSize,
             @RequestParam(name = "keyWord",required = false) String keyWord,
             @RequestParam(name = "status",required = false) Integer status
     ){
-        if(page == null){
-            page = 0;
-        }
-        if(pageSize == null){
-            pageSize = 10;
-            System.out.println("ahihi");
-        }
-        if(keyWord == null){
-            keyWord = "";
-            System.out.println("ahihi");
-        }
-        if(status == null){
-            status = 1;
-            System.out.println("ahihi");
-        }
+
         NormalTableRequest request = new NormalTableRequest(page,pageSize,keyWord,status);
-        return ResponseEntity.ok(Service.getALL(request));
+        return ResponseEntity.ok(giamGiaService.getAll(request));
     }
+
+    @GetMapping("/get-by-id/{id}")
+    public ResponseEntity<?> getByIdSanPham(
+            @PathVariable(name = "id",required = false) Long id
+    ){
+        return ResponseEntity.ok(giamGiaService.getById(id));
+    }
+
     @PostMapping("/add")
-    public ResponseEntity add(@RequestBody String request){
-        return ResponseEntity.ok(Service.add(request));
+    public ResponseEntity<?> add(@RequestBody String tenThuongHieuRequest){
+        System.out.println(tenThuongHieuRequest);
+        return ResponseEntity.ok(giamGiaService.add(tenThuongHieuRequest));
     }
+
+    @PutMapping("update")
+    public ResponseEntity<?> update(@RequestBody GiamGiaRequest request){
+
+        return ResponseEntity.ok(giamGiaService.update(request));
+    }
+
+    @PutMapping("/update-trang-thai/{id}")
+    public ResponseEntity<?> updateTrangThai(@PathVariable("id") Long id,
+                                             @RequestParam(name = "status",required = true) Integer status
+    ){
+
+        return ResponseEntity.ok(giamGiaService.udateTrangThai(id, status));
+    }
+
+
 }
