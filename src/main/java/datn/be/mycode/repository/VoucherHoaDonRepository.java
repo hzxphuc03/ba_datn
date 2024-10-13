@@ -1,0 +1,23 @@
+package datn.be.mycode.repository;
+
+import datn.be.mycode.entity.Voucher;
+import datn.be.mycode.entity.VoucherHoaDon;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.stereotype.Repository;
+
+@Repository
+public interface VoucherHoaDonRepository extends JpaRepository<VoucherHoaDon,Long> {
+
+    Page<VoucherHoaDon> findAllByTrangThai(int trangThai, Pageable pageable);
+
+    @Query("SELECT vhd FROM VoucherHoaDon vhd WHERE vhd.voucher.ma LIKE %:ma%")
+    Page<VoucherHoaDon> searchByVoucherMa(String ma, Pageable pageable);
+
+    @Query("SELECT vhd FROM VoucherHoaDon vhd WHERE vhd.voucher.ten LIKE %:ten%")
+    Page<VoucherHoaDon> searchByVoucherTen(String ten, Pageable pageable);
+
+
+}
