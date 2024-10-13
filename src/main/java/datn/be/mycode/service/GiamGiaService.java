@@ -45,8 +45,8 @@ public class GiamGiaService {
         List<GiamGia> giamGias = Page.getContent().stream().toList();
 
         GiamGiaNormalTableResponse.setItem(giamGias);
-        GiamGiaNormalTableResponse.getPage();
-        GiamGiaNormalTableResponse.getPageSize();
+        GiamGiaNormalTableResponse.setPage(request.getPage());
+        GiamGiaNormalTableResponse.setPageSize(request.getPageSize());
         GiamGiaNormalTableResponse.setTotalItem(Page.getTotalElements());
         return GiamGiaNormalTableResponse;
 
