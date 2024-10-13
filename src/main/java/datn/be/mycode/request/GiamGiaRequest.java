@@ -3,6 +3,7 @@ package datn.be.mycode.request;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @AllArgsConstructor
@@ -10,11 +11,12 @@ import java.util.Date;
 @Getter
 @Setter
 @ToString
+@Builder
 public class GiamGiaRequest {
     private Long id;
-    @NotBlank(message = "ko dc trong")
     private String ten;
-    private Date ngayTao;
-    private Date ngaySua;
+    private LocalDateTime ngayBatDau;
+    private LocalDateTime ngayKetThuc;
+    private int mucGiam;
     private int trangThai;
 }

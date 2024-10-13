@@ -10,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
+
 
 @RestController
 @RequestMapping("/api/giam_gia")
@@ -37,9 +39,10 @@ public class GiamGiaController {
     }
 
     @PostMapping("/add")
-    public ResponseEntity<?> add(@RequestBody String tenThuongHieuRequest){
-        System.out.println(tenThuongHieuRequest);
-        return ResponseEntity.ok(giamGiaService.add(tenThuongHieuRequest));
+    public ResponseEntity<?> add(
+            @RequestBody GiamGiaRequest request
+    ){
+        return ResponseEntity.ok(giamGiaService.add(request));
     }
 
     @PutMapping("update")

@@ -57,9 +57,12 @@ public class GiamGiaService {
         return repository.findById(id).get();
     }
 
-    public GiamGia add(String request){
+    public GiamGia add(GiamGiaRequest request){
         GiamGia giamGia= new GiamGia();
-        giamGia.setTen(request);
+        giamGia.setTen(request.getTen());
+        giamGia.setNgayBatDau(request.getNgayBatDau());
+        giamGia.setNgayKetThuc(request.getNgayKetThuc());
+        giamGia.setMucGiam(request.getMucGiam());
         giamGia.setTrangThai(1);
         giamGia.setNgayTao(LocalDateTime.now());
 
@@ -69,6 +72,9 @@ public class GiamGiaService {
     public GiamGia update(GiamGiaRequest request) {
         GiamGia giamGia = repository.findById(request.getId()).get();
         giamGia.setTen(request.getTen());
+        giamGia.setNgayBatDau(request.getNgayBatDau());
+        giamGia.setNgayKetThuc(request.getNgayKetThuc());
+        giamGia.setMucGiam(request.getMucGiam());
         giamGia.setTrangThai(request.getTrangThai());
         giamGia.setNgaySua(LocalDateTime.now());
         return repository.save(giamGia);

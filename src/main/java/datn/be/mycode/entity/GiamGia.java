@@ -33,6 +33,12 @@ public class GiamGia implements Serializable {
     @Column(name = "ngay_sua")
     private LocalDateTime ngaySua;
 
+    @Column(name = "ngay_bat_dau")
+    private LocalDateTime ngayBatDau;
+
+    @Column(name = "ngay_ket_thuc")
+    private LocalDateTime ngayKetThuc;
+
     @Column(name = "muc_giam")
     private int mucGiam;
 
