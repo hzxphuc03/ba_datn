@@ -1,6 +1,5 @@
 package datn.be.mycode.repository;
 
-import datn.be.mycode.entity.KhachHang;
 import datn.be.mycode.entity.VoucherKhachHang;
 import datn.be.mycode.response.VoucherKhachHangResponse;
 import org.springframework.data.domain.Page;

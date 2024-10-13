@@ -1,6 +1,5 @@
 package datn.be.mycode.repository;
 
-import datn.be.mycode.entity.Voucher;
 import datn.be.mycode.entity.VoucherHoaDon;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

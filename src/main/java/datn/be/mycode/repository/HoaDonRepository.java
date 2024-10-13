@@ -6,9 +6,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 @Repository
 public interface HoaDonRepository extends JpaRepository<HoaDon, Long> {
@@ -24,4 +26,6 @@ public interface HoaDonRepository extends JpaRepository<HoaDon, Long> {
     )
     Page<HoaDonResponse> searchAll(String ma, LocalDateTime startDate, LocalDateTime endDate, Long idKhachHang, Long idNhanVien, Pageable pageable);
 
+    @Query("SELECT u FROM HoaDon u WHERE u.id = :id")
+    Optional<HoaDon> searchById(@Param("id") Long id);
 }

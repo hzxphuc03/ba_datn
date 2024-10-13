@@ -3,8 +3,8 @@ package datn.be.mycode.service;
 
 import datn.be.mycode.entity.Voucher;
 import datn.be.mycode.repository.VoucherRepository;
-import datn.be.mycode.request.TableVoucherRequest;
 import datn.be.mycode.request.VoucherRequest;
+import datn.be.mycode.request.customRequest.TableVoucherRequest;
 import datn.be.mycode.response.NormalTableResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;

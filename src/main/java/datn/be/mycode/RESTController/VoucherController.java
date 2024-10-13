@@ -1,7 +1,8 @@
 package datn.be.mycode.RESTController;
 
-import datn.be.mycode.request.TableVoucherRequest;
+
 import datn.be.mycode.request.VoucherRequest;
+import datn.be.mycode.request.customRequest.TableVoucherRequest;
 import datn.be.mycode.service.VoucherService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

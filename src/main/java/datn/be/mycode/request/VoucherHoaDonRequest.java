@@ -1,11 +1,5 @@
 package datn.be.mycode.request;
 
-import datn.be.mycode.entity.HoaDon;
-import datn.be.mycode.entity.Voucher;
-import jakarta.persistence.Column;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
