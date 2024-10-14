@@ -1,5 +1,7 @@
 package datn.be.mycode.response.customResponse.SanPhamChiTiet;
 
+import datn.be.mycode.entity.KichCo;
+import datn.be.mycode.entity.MauSac;
 import lombok.*;
 
 import java.math.BigDecimal;
@@ -23,6 +25,6 @@ public class SanPhamChiTietByIdSP {
     private int soLuong;
     private int trangThai;
     private Long sanPham;
-    private Long mauSac;
-    private Long kichCo;
+    private MauSac mauSac;
+    private KichCo kichCo;
 }

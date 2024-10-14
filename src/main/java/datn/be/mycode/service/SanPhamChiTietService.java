@@ -81,8 +81,8 @@ public class SanPhamChiTietService {
                     .soLuong(sanPhamChiTiet.getSoLuong())
                     .trangThai(sanPhamChiTiet.getTrangThai())
                     .sanPham(sanPhamChiTiet.getSanPham().getId())
-                    .mauSac(sanPhamChiTiet.getMauSac().getId())
-                    .kichCo(sanPhamChiTiet.getKichCo().getId())
+                    .mauSac(sanPhamChiTiet.getMauSac())
+                    .kichCo(sanPhamChiTiet.getKichCo())
                     .build();
             listSanPhamChiTietRes.add(sanPhamChiTietByIdSP);
         });
