@@ -13,6 +13,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -52,4 +53,18 @@ public interface SanPhamChiTietRepository extends JpaRepository<SanPhamChiTiet, 
 
     List<SanPhamChiTiet> findAllBySanPham_Id(Long idSanPham);
 
+    @Query("SELECT min(spct.giaBan) " +
+            "FROM SanPhamChiTiet spct " +
+            "WHERE " +
+            "(:idSanPham IS NULL OR spct.sanPham.id = :idSanPham) "
+    )
+    BigDecimal findGiaMinByIdSanPham(Long idSanPham);
+
+
+    @Query("SELECT max(spct.giaBan) " +
+            "FROM SanPhamChiTiet spct " +
+            "WHERE " +
+            "(:idSanPham IS NULL OR spct.sanPham.id = :idSanPham) "
+    )
+    BigDecimal findGiaMaxByIdSanPham(Long idSanPham);
 }

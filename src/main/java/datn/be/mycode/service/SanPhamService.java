@@ -13,6 +13,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -33,6 +34,8 @@ public class SanPhamService {
     private VatLieuRepository vatLieuRepository;
     @Autowired
     private LoaiDeRepository loaiDeRepository;
+    @Autowired
+    private SanPhamChiTietRepository sanPhamChiTietRepository;
 
     public NormalTableResponse<SanPhamResponse> getAll(TableSanPhamRequest request) {
         if (request.getPage() == null) {
@@ -75,8 +78,8 @@ public class SanPhamService {
                 .beMatSuDung(request.getBeMatSuDung())
                 .congNghe(request.getCongNghe())
                 .kieuDang(request.getKieuDang())
-                .giaThapNhat(request.getGiaThapNhat())
-                .giaCaoNhat(request.getGiaCaoNhat())
+                .giaThapNhat(BigDecimal.valueOf(0))
+                .giaCaoNhat(BigDecimal.valueOf(0))
                 .ngayTao(LocalDateTime.now())
                 .nguoiTao(request.getNguoiTao())
                 .trangThai(1)
@@ -103,8 +106,6 @@ public class SanPhamService {
         sanPham.setBeMatSuDung(request.getBeMatSuDung());
         sanPham.setCongNghe(request.getCongNghe());
         sanPham.setKieuDang(request.getKieuDang());
-        sanPham.setGiaThapNhat(request.getGiaThapNhat());
-        sanPham.setGiaCaoNhat(request.getGiaCaoNhat());
         sanPham.setNgaySua(LocalDateTime.now());
         sanPham.setTrangThai(request.getTrangThai());
         sanPham.setGiamGia(request.getIdGiamGia() != 0? giamGiaRepository.findById(request.getIdGiamGia()).get() : null);
@@ -121,8 +122,8 @@ public class SanPhamService {
 //        repo.delete(sanPham);
 //    }
 
-    public SanPham getSanPhamById(Long id){
-        return repo.findById(id).get();
+    public SanPhamResponse getSanPhamById(Long id){
+        return repo.searchById(id);
     }
 
     public SanPham udateTrangThai(Long id, Integer status){
