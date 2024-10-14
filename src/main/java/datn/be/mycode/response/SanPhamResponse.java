@@ -5,6 +5,7 @@ import lombok.*;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 
@@ -23,8 +24,8 @@ public class SanPhamResponse {
     private String beMatSuDung;
     private String congNghe;
     private String kieuDang;
-    private String giaThapNhat;
-    private String giaCaoNhat;
+    private BigDecimal giaThapNhat;
+    private BigDecimal giaCaoNhat;
     private LocalDateTime ngayTao;
     private LocalDateTime NgaySua;
     private String nguoiTao;
