@@ -1,6 +1,7 @@
 package datn.be.mycode.response;
 
 
+import datn.be.mycode.entity.*;
 import lombok.*;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
@@ -31,11 +32,11 @@ public class SanPhamResponse {
     private String nguoiTao;
     private Long soLuong;
     private int trangThai;
-    private Long idGiamGia;
-    private Long idThuongHieu;
-    private Long idTheLoai;
-    private Long idLoaiCo;
-    private Long idVatLieu;
-    private Long idLoaiDe;
+    private GiamGia GiamGia;
+    private ThuongHieu ThuongHieu;
+    private TheLoai TheLoai;
+    private LoaiCo LoaiCo;
+    private VatLieu VatLieu;
+    private LoaiDe LoaiDe;
 
 }

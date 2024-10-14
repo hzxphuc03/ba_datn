@@ -17,8 +17,6 @@ public class SanPhamRequest {
     private String beMatSuDung;
     private String congNghe;
     private String kieuDang;
-    private BigDecimal giaThapNhat;
-    private BigDecimal giaCaoNhat;
     private LocalDateTime ngayTao;
     private LocalDateTime NgaySua;
     private String nguoiTao;
