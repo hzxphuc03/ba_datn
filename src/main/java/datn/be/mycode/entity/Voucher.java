@@ -36,7 +36,7 @@ public class Voucher implements Serializable {
     @Column(name = "ngay_tao")
     private LocalDateTime ngayTao;
 
-    @Column(name = "ngay_sinh")
+    @Column(name = "ngay_sua")
     private LocalDateTime ngaySua;
 
     @Column(name = "so_luong")

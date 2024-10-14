@@ -1,0 +1,99 @@
+package datn.be.mycode.service;
+
+
+import datn.be.mycode.entity.Voucher;
+import datn.be.mycode.repository.VoucherRepository;
+import datn.be.mycode.request.VoucherRequest;
+import datn.be.mycode.request.customRequest.TableVoucherRequest;
+import datn.be.mycode.response.NormalTableResponse;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
+import java.util.List;
+
+@Service
+public class VoucherService {
+    @Autowired
+    VoucherRepository repository;
+
+
+    public NormalTableResponse<Voucher> getAll(TableVoucherRequest request) {
+
+        if (request.getPage() ==  null) {
+            request.setPage(1);
+        }
+        if (request.getPageSize() == null) {
+            request.setPageSize(10);
+        }
+        if (request.getStatus() == null) {
+            request.setStatus(1);
+        }
+
+        NormalTableResponse<Voucher> voucherNormalTableResponse = new NormalTableResponse<>();
+        Pageable pageable = PageRequest.of(request.getPage() - 1,request.getPageSize());
+        Page<Voucher> voucherPage;
+        if (request.getKeyWord() != null ) {
+            voucherPage = repository.searchByTenOrMa(request.getKeyWord(), pageable);
+        }else if (request.getStartDate() != null & request.getStartDate() != null){
+            voucherPage = repository.searchByNgayTao(request.getStartDate(),request.getEndDate(), pageable);
+        }else if (request.getPhanTramGiam() != null ){
+            voucherPage = repository.searchByPhanTramGiam(request.getPhanTramGiam(), pageable);
+        } else {
+            voucherPage = repository.findAllByTrangThai(request.getStatus(), pageable);
+        }
+
+        List<Voucher> vouchers = voucherPage.getContent().stream().toList();
+
+        voucherNormalTableResponse.setItem(vouchers);
+        voucherNormalTableResponse.setPage(request.getPage());
+        voucherNormalTableResponse.setPageSize(request.getPageSize());
+        voucherNormalTableResponse.setTotalItem(voucherPage.getTotalElements());
+
+        return voucherNormalTableResponse;
+    }
+
+
+
+    public Voucher add(VoucherRequest request) {
+        System.out.println("addDC1");
+        System.out.println(request);
+        Voucher voucher = new Voucher();
+        voucher.setMa(request.getMa());
+        voucher.setTen(request.getTen());
+        voucher.setNgayBatDau(request.getNgayBatDau());
+        voucher.setNgayKetThuc(request.getNgayKetThuc());
+        voucher.setNgayTao(LocalDateTime.now());
+        voucher.setSoLuong(request.getSoLuong());
+        voucher.setPhanTramGiam(request.getPhanTramGiam());
+        voucher.setGiamToiDa(request.getGiamToiDa());
+        voucher.setGiaTriGiamToiThieu(request.getGiaTriGiamToiThieu());
+        voucher.setTrangThai(1);
+
+        return repository.save(voucher);
+    }
+
+    public Voucher update(VoucherRequest request) {
+        Voucher voucher = repository.findById(request.getId()).get();
+        voucher.setMa(request.getMa());
+        voucher.setTen(request.getTen());
+        voucher.setNgayBatDau(request.getNgayBatDau());
+        voucher.setNgayKetThuc(request.getNgayKetThuc());
+        voucher.setNgaySua(LocalDateTime.now());
+        voucher.setSoLuong(request.getSoLuong());
+        voucher.setPhanTramGiam(request.getPhanTramGiam());
+        voucher.setGiamToiDa(request.getGiamToiDa());
+        voucher.setGiaTriGiamToiThieu(request.getGiaTriGiamToiThieu());
+        voucher.setTrangThai(request.getTrangThai());
+        return repository.save(voucher);
+    }
+
+    public Voucher udateTrangThai(Long id, Integer status){
+        Voucher voucher = repository.findById(id).get();
+        voucher.setTrangThai(status);
+        return repository.save(voucher);
+    }
+}
