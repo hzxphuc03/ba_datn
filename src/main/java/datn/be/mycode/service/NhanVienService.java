@@ -1,12 +1,14 @@
 package datn.be.mycode.service;
 
 import datn.be.mycode.entity.NhanVien;
+import datn.be.mycode.entity.loginTest;
 import datn.be.mycode.repository.ChucVuRepository;
 import datn.be.mycode.repository.NhanVienRepository;
 
 import datn.be.mycode.request.NhanVienRequest;
 import datn.be.mycode.request.NormalTableRequest;
 import datn.be.mycode.request.customRequest.TableNhanVienRequest;
+import datn.be.mycode.response.LoginResponse;
 import datn.be.mycode.response.NormalTableResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -133,5 +135,10 @@ public class NhanVienService {
         NhanVien nhanvien = repo.findById(id).get();
         nhanvien.setTrangThai(status);
         return repo.save(nhanvien);
+    }
+
+    public LoginResponse getAccount(loginTest loginRequest) {
+
+        return repo.getAccount(loginRequest);
     }
 }
