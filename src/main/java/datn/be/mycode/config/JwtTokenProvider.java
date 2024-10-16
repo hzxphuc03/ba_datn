@@ -24,7 +24,7 @@ import java.util.stream.Collectors;
 @Component
 public class JwtTokenProvider {
     private static final String SECRET_KEY = "71023003";
-    private static final long TOKEN_VALIDITY = 60;  // 2 hours
+    private static final long TOKEN_VALIDITY = 24 * 60 * 60;  // 2 hours
 //    private static final long TOKEN_VALIDITY = 60 * 60 * 24 * 10; // 10 days
 
     public static String generateToken(String username, String role) {

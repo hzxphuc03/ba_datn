@@ -3,12 +3,10 @@ package datn.be.mycode.entity;
 public class loginTest {
     private String username;
     private String pass;
-    private String role;
 
-    public loginTest(String username, String pass, String role) {
+    public loginTest(String username, String pass) {
         this.username = username;
         this.pass = pass;
-        this.role = role;
     }
 
     public String getUsername() {
@@ -27,11 +25,5 @@ public class loginTest {
         this.pass = pass;
     }
 
-    public String getRole() {
-        return role;
-    }
 
-    public void setRole(String role) {
-        this.role = role;
-    }
 }
