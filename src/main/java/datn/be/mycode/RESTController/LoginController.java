@@ -4,6 +4,7 @@ package datn.be.mycode.RESTController;
 import datn.be.mycode.config.JwtTokenProvider;
 import datn.be.mycode.entity.loginTest;
 import datn.be.mycode.response.LoginResponse;
+import datn.be.mycode.response.erroResponse;
 import datn.be.mycode.service.NhanVienService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
@@ -23,7 +24,7 @@ public class LoginController {
     private NhanVienService nhanVienService;
 
     @PostMapping("/nhan_vien_login")
-    public ResponseEntity<Map<String, String>> login(@RequestBody loginTest loginRequest) {
+    public ResponseEntity<?> login(@RequestBody loginTest loginRequest) {
         LoginResponse loginResponse = nhanVienService.getAccount(loginRequest);
             if (loginResponse != null) {
                 String token = jwtTokenProvider.generateToken(loginResponse.getUsername(), loginResponse.getRole());
@@ -32,7 +33,7 @@ public class LoginController {
                 return ResponseEntity.ok(response);
             }
 
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new erroResponse(400,"Tài khoản hoặc mật khẩu không chính xác"));
     }
 
 }
