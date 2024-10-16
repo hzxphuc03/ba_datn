@@ -1,7 +1,9 @@
 package datn.be.mycode.repository;
 
 import datn.be.mycode.entity.NhanVien;
+import datn.be.mycode.entity.loginTest;
 import datn.be.mycode.request.customRequest.TableNhanVienRequest;
+import datn.be.mycode.response.LoginResponse;
 import datn.be.mycode.response.NhanVienResPonse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -53,4 +55,13 @@ public interface NhanVienRepository extends JpaRepository<NhanVien,Long> {
             "(:#{#request.status} IS NULL OR nv.trangThai = :#{#request.status})"
     )
     Page<NhanVien> searchAllByEmail(TableNhanVienRequest request, Pageable pageable);
+
+    @Query("SELECT new datn.be.mycode.response.LoginResponse(nv.taiKhoan, nv.chucVu.ten) " +
+            "FROM NhanVien nv " +
+            "WHERE " +
+            "(nv.taiKhoan LIKE :#{#request.username}) AND " +
+            "(nv.matKhau = :#{#request.pass}) AND " +
+            "(nv.trangThai = 1)"
+    )
+    LoginResponse getAccount(loginTest request);
 }
