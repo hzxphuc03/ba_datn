@@ -5,6 +5,8 @@ import lombok.*;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -31,5 +33,15 @@ public class ChucVu implements Serializable {
 
     @Column(name = "trang_thai")
     private int trangThai;
+
+    public Map<String, String> toMap() {
+        Map<String, String> map = new LinkedHashMap<>();
+        map.put("id", this.id+"");
+        map.put("ten", this.ten);
+        map.put("ngayTao", this.ngayTao+"");
+        map.put("ngaySua", this.ngaySua+"");
+        map.put("trangThai", this.trangThai+"");
+        return map;
+    }
 
 }

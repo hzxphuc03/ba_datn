@@ -18,18 +18,14 @@ import java.util.*;
 @RestController
 @RequestMapping("/api/auth")
 public class LoginController {
-    @Autowired
-    private JwtTokenProvider jwtTokenProvider;
+
     @Autowired
     private NhanVienService nhanVienService;
 
     @PostMapping("/nhan_vien_login")
     public ResponseEntity<?> login(@RequestBody loginTest loginRequest) {
-        LoginResponse loginResponse = nhanVienService.getAccount(loginRequest);
-            if (loginResponse != null) {
-                String token = jwtTokenProvider.generateToken(loginResponse.getUsername(), loginResponse.getRole());
-                Map<String, String> response = new HashMap<>();
-                response.put("token", token);
+        Map<String, String> response = nhanVienService.getAccount(loginRequest);
+            if (response != null) {
                 return ResponseEntity.ok(response);
             }
 
