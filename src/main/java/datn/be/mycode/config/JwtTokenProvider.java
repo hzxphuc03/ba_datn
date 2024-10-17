@@ -1,6 +1,7 @@
 package datn.be.mycode.config;
 
 
+import datn.be.mycode.entity.NhanVien;
 import datn.be.mycode.entity.loginTest;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
@@ -27,10 +28,11 @@ public class JwtTokenProvider {
     private static final long TOKEN_VALIDITY = 24 * 60 * 60;  // 2 hours
 //    private static final long TOKEN_VALIDITY = 60 * 60 * 24 * 10; // 10 days
 
-    public static String generateToken(String username, String role) {
+    public static String generateToken(String username, String role, NhanVien nhanVien) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("username", username);
         claims.put("role", role);
+        claims.put("nhanVien", nhanVien.toString());
 
         return Jwts.builder()
                 .setClaims(claims)

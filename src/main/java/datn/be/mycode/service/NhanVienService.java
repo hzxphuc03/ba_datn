@@ -1,5 +1,6 @@
 package datn.be.mycode.service;
 
+import datn.be.mycode.config.JwtTokenProvider;
 import datn.be.mycode.entity.NhanVien;
 import datn.be.mycode.entity.loginTest;
 import datn.be.mycode.repository.ChucVuRepository;
@@ -14,10 +15,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class NhanVienService {
@@ -26,6 +30,8 @@ public class NhanVienService {
     private NhanVienRepository repo;
     @Autowired
     private ChucVuRepository chucVuRepository;
+    @Autowired
+    private JwtTokenProvider jwtTokenProvider;
 
     public NormalTableResponse<NhanVien> getAll(TableNhanVienRequest request) {
         if (request.getPage() == null) {
@@ -137,8 +143,17 @@ public class NhanVienService {
         return repo.save(nhanvien);
     }
 
-    public LoginResponse getAccount(loginTest loginRequest) {
+    public Map<String, String> getAccount(loginTest loginRequest) {
 
-        return repo.getAccount(loginRequest);
+        NhanVien nhanVien = repo.getAccount(loginRequest);
+        Map<String, String> response = new HashMap<>();
+        if (nhanVien != null) {
+            String token = jwtTokenProvider.generateToken(nhanVien.getTaiKhoan(), nhanVien.getChucVu().getTen(), nhanVien);
+            response.clear();
+            response.put("token", token);
+            return response;
+        }
+
+        return null;
     }
 }

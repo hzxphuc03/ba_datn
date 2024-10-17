@@ -56,12 +56,12 @@ public interface NhanVienRepository extends JpaRepository<NhanVien,Long> {
     )
     Page<NhanVien> searchAllByEmail(TableNhanVienRequest request, Pageable pageable);
 
-    @Query("SELECT new datn.be.mycode.response.LoginResponse(nv.taiKhoan, nv.chucVu.ten) " +
+    @Query("SELECT nv " +
             "FROM NhanVien nv " +
             "WHERE " +
             "(nv.taiKhoan LIKE :#{#request.username}) AND " +
             "(nv.matKhau = :#{#request.pass}) AND " +
             "(nv.trangThai = 1)"
     )
-    LoginResponse getAccount(loginTest request);
+    NhanVien getAccount(loginTest request);
 }
