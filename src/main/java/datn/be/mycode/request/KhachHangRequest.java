@@ -18,6 +18,7 @@ public class KhachHangRequest {
     @NotBlank(message = "ko dc trong")
     private String ma;
     private String hoTen;
+    private String hinhAnh;
     private LocalDateTime ngaySinh;
     private Date ngayTao;
 

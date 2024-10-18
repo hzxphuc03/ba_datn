@@ -18,7 +18,7 @@ import java.util.List;
 @Repository
 public interface SanPhamRepository extends JpaRepository<SanPham, Long> {
 
-    @Query("SELECT new datn.be.mycode.response.SanPhamResponse(sp.id, sp.ma, sp.ten, sp.moTa, sp.hinhAnh, sp.trongLuong, sp.beMatSuDung, sp.congNghe, sp.kieuDang, min(spct.giaBan), max(spct.giaBan), sp.ngayTao, sp.ngaySua, sp.nguoiTao, SUM(spct.soLuong), sp.trangThai,sp.giamGia, sp.thuongHieu, sp.theLoai, sp.loaiCo, sp.vatLieu, sp.loaiDe)" +
+    @Query("SELECT new datn.be.mycode.response.SanPhamResponse(sp.id, sp.ma, sp.ten, sp.moTa, sp.hinhAnh, sp.trongLuong, sp.beMatSuDung, sp.congNghe, sp.kieuDang, sp.giaThapNhat, sp.giaCaoNhat, sp.ngayTao, sp.ngaySua, sp.nguoiTao, sp.soLuong, sp.trangThai,sp.giamGia, sp.thuongHieu, sp.theLoai, sp.loaiCo, sp.vatLieu, sp.loaiDe)" +
             "FROM SanPham sp " +
             "LEFT JOIN SanPhamChiTiet spct ON sp.id = spct.sanPham.id " +
             "LEFT JOIN sp.giamGia g " +
@@ -33,12 +33,12 @@ public interface SanPhamRepository extends JpaRepository<SanPham, Long> {
             "(:#{#request.vatLieu} IS NULL OR sp.vatLieu.id = :#{#request.vatLieu}) AND " +
             "(:#{#request.loaiDe} IS NULL OR sp.loaiDe.id = :#{#request.loaiDe}) AND " +
             "(:#{#request.status} IS NULL OR sp.trangThai = :#{#request.status})" +
-            "GROUP BY sp.id, sp.ma, sp.ten, sp.moTa, sp.hinhAnh, sp.trongLuong, sp.beMatSuDung, sp.congNghe, sp.kieuDang, sp.giaThapNhat, sp.giaCaoNhat, sp.ngayTao, sp.ngaySua, sp.nguoiTao, sp.trangThai, sp.giamGia, sp.thuongHieu, sp.theLoai, sp.loaiCo, sp.vatLieu, sp.loaiDe " +
+            "GROUP BY sp.id, sp.ma, sp.ten, sp.moTa, sp.hinhAnh, sp.trongLuong, sp.beMatSuDung, sp.congNghe, sp.kieuDang, sp.giaThapNhat, sp.giaCaoNhat, sp.ngayTao, sp.ngaySua, sp.nguoiTao, sp.soLuong, sp.trangThai, sp.giamGia, sp.thuongHieu, sp.theLoai, sp.loaiCo, sp.vatLieu, sp.loaiDe " +
             "ORDER BY sp.ngayTao DESC"
     )
     Page<SanPhamResponse> searchAll(@Param("request") TableSanPhamRequest request, Pageable pageable);
 
-    @Query("SELECT new datn.be.mycode.response.SanPhamResponse(sp.id, sp.ma, sp.ten, sp.moTa, sp.hinhAnh, sp.trongLuong, sp.beMatSuDung, sp.congNghe, sp.kieuDang, min(spct.giaBan), max(spct.giaBan), sp.ngayTao, sp.ngaySua, sp.nguoiTao, SUM(spct.soLuong), sp.trangThai, sp.giamGia, sp.thuongHieu, sp.theLoai, sp.loaiCo, sp.vatLieu, sp.loaiDe)" +
+    @Query("SELECT new datn.be.mycode.response.SanPhamResponse(sp.id, sp.ma, sp.ten, sp.moTa, sp.hinhAnh, sp.trongLuong, sp.beMatSuDung, sp.congNghe, sp.kieuDang, sp.giaThapNhat, sp.giaCaoNhat, sp.ngayTao, sp.ngaySua, sp.nguoiTao, sp.soLuong, sp.trangThai, sp.giamGia, sp.thuongHieu, sp.theLoai, sp.loaiCo, sp.vatLieu, sp.loaiDe)" +
             "FROM SanPham sp " +
             "LEFT JOIN SanPhamChiTiet spct ON sp.id = spct.sanPham.id " +
             "LEFT JOIN sp.giamGia g " +
@@ -53,13 +53,13 @@ public interface SanPhamRepository extends JpaRepository<SanPham, Long> {
             "(:#{#request.vatLieu} IS NULL OR sp.vatLieu.id = :#{#request.vatLieu}) AND " +
             "(:#{#request.loaiDe} IS NULL OR sp.loaiDe.id = :#{#request.loaiDe}) AND " +
             "(:#{#request.status} IS NULL OR sp.trangThai = :#{#request.status})" +
-            "GROUP BY sp.id, sp.ma, sp.ten, sp.moTa, sp.hinhAnh, sp.trongLuong, sp.beMatSuDung, sp.congNghe, sp.kieuDang, sp.giaThapNhat, sp.giaCaoNhat, sp.ngayTao, sp.ngaySua, sp.nguoiTao, sp.trangThai, sp.giamGia, sp.thuongHieu, sp.theLoai, sp.loaiCo, sp.vatLieu, sp.loaiDe " +
-            "ORDER BY SUM(spct.soLuong) ASC"
+            "GROUP BY sp.id, sp.ma, sp.ten, sp.moTa, sp.hinhAnh, sp.trongLuong, sp.beMatSuDung, sp.congNghe, sp.kieuDang, sp.giaThapNhat, sp.giaCaoNhat, sp.ngayTao, sp.ngaySua, sp.nguoiTao, sp.soLuong, sp.trangThai, sp.giamGia, sp.thuongHieu, sp.theLoai, sp.loaiCo, sp.vatLieu, sp.loaiDe " +
+            "ORDER BY sp.soLuong ASC"
     )
     Page<SanPhamResponse> searchAllSortedBySoLuong(@Param("request") TableSanPhamRequest request, Pageable pageable);
 
 
-    @Query("SELECT new datn.be.mycode.response.SanPhamResponse(sp.id, sp.ma, sp.ten, sp.moTa, sp.hinhAnh, sp.trongLuong, sp.beMatSuDung, sp.congNghe, sp.kieuDang, min(spct.giaBan), max(spct.giaBan), sp.ngayTao, sp.ngaySua, sp.nguoiTao, SUM(spct.soLuong), sp.trangThai,sp.giamGia, sp.thuongHieu, sp.theLoai, sp.loaiCo, sp.vatLieu, sp.loaiDe)" +
+    @Query("SELECT new datn.be.mycode.response.SanPhamResponse(sp.id, sp.ma, sp.ten, sp.moTa, sp.hinhAnh, sp.trongLuong, sp.beMatSuDung, sp.congNghe, sp.kieuDang, sp.giaThapNhat, sp.giaCaoNhat, sp.ngayTao, sp.ngaySua, sp.nguoiTao, sp.soLuong, sp.trangThai,sp.giamGia, sp.thuongHieu, sp.theLoai, sp.loaiCo, sp.vatLieu, sp.loaiDe)" +
             "FROM SanPham sp " +
             "LEFT JOIN SanPhamChiTiet spct ON sp.id = spct.sanPham.id " +
             "LEFT JOIN sp.giamGia g " +

@@ -95,37 +95,94 @@ public class SanPhamChiTietService {
 
     public SanPhamChiTiet addSPCT(SanPhamChiTietRequest request){
         SanPhamChiTiet sanPhamChiTiet = new SanPhamChiTiet();
+        SanPham sanPham = sanPhamRepository.findById(request.getSanPham()).get();
+
         sanPhamChiTiet.setNgayTao(LocalDateTime.now());
         sanPhamChiTiet.setHinhAnh(request.getHinhAnh());
         sanPhamChiTiet.setGiaNhap(request.getGiaNhap());
         sanPhamChiTiet.setGiaBan(request.getGiaBan());
         sanPhamChiTiet.setSoLuong(request.getSoLuong());
         sanPhamChiTiet.setTrangThai(request.getTrangThai());
-        sanPhamChiTiet.setSanPham(sanPhamRepository.findById(request.getSanPham()).get());
+        sanPhamChiTiet.setSanPham(sanPham);
         sanPhamChiTiet.setMauSac(mauSacRepository.findById(request.getMauSac()).get());
         sanPhamChiTiet.setKichCo(kichcoRepository.findById(request.getKichCo()).get());
 
-        return sanPhamChiTietRepository.save(sanPhamChiTiet);
+        SanPhamChiTiet sanPhamChiTietR = sanPhamChiTietRepository.save(sanPhamChiTiet);
+
+        if(sanPham.getGiaThapNhat().compareTo(sanPhamChiTietR.getGiaBan())>0){
+            sanPham.setGiaThapNhat(sanPhamChiTietR.getGiaBan());
+        }else if(sanPham.getGiaThapNhat().intValue() == 0){
+            sanPham.setGiaThapNhat(sanPhamChiTietR.getGiaBan());
+        }
+        if(sanPham.getGiaCaoNhat().compareTo(sanPhamChiTietR.getGiaBan())<0){
+            sanPham.setGiaCaoNhat(sanPhamChiTietR.getGiaBan());
+        }
+            sanPham.setSoLuong(sanPham.getSoLuong() + sanPhamChiTietR.getSoLuong());
+            sanPhamRepository.save(sanPham);
+
+
+        return sanPhamChiTietR;
     }
 
     public SanPhamChiTiet update(SanPhamChiTietRequest request){
         SanPhamChiTiet sanPhamChiTiet = sanPhamChiTietRepository.findById(request.getId()).get();
+        SanPham sanPham = sanPhamRepository.findById(request.getSanPham()).get();
+
         sanPhamChiTiet.setNgaySua(LocalDateTime.now());
         sanPhamChiTiet.setHinhAnh(request.getHinhAnh());
         sanPhamChiTiet.setGiaNhap(request.getGiaNhap());
         sanPhamChiTiet.setGiaBan(request.getGiaBan());
         sanPhamChiTiet.setSoLuong(request.getSoLuong());
         sanPhamChiTiet.setTrangThai(request.getTrangThai());
-        sanPhamChiTiet.setSanPham(sanPhamRepository.findById(request.getSanPham()).get());
+        sanPhamChiTiet.setSanPham(sanPham);
         sanPhamChiTiet.setMauSac(mauSacRepository.findById(request.getMauSac()).get());
         sanPhamChiTiet.setKichCo(kichcoRepository.findById(request.getKichCo()).get());
 
-        return sanPhamChiTietRepository.save(sanPhamChiTiet);
+
+        SanPhamChiTiet sanPhamChiTietR = sanPhamChiTietRepository.save(sanPhamChiTiet);
+
+        boolean check = false;
+        if(sanPham.getGiaThapNhat().compareTo(sanPhamChiTietR.getGiaBan())>0){
+            sanPham.setGiaThapNhat(sanPhamChiTietR.getGiaBan());
+            check = true;
+        }else if(sanPham.getGiaThapNhat().intValue() == 0){
+            sanPham.setGiaThapNhat(sanPhamChiTietR.getGiaBan());
+            check = true;
+        }
+        if(sanPham.getGiaCaoNhat().compareTo(sanPhamChiTietR.getGiaBan())<0){
+            sanPham.setGiaCaoNhat(sanPhamChiTietR.getGiaBan());
+            check = true;
+        }
+        if(sanPhamChiTietR.getTrangThai() == 0){
+            sanPham.setSoLuong(sanPham.getSoLuong() - sanPhamChiTiet.getSoLuong());
+            check = true;
+        }
+        if(sanPhamChiTietR.getSoLuong() != sanPhamChiTiet.getSoLuong()){
+            sanPham.setSoLuong(sanPham.getSoLuong() - sanPhamChiTiet.getSoLuong() + sanPhamChiTietR.getSoLuong());
+            check = true;
+        }
+        if(check) {
+            sanPhamRepository.save(sanPham);
+        }
+
+        return sanPhamChiTietR;
     }
 
     public SanPhamChiTiet udateTrangThai(Long id, Integer status){
         SanPhamChiTiet sanPhamChiTiet = sanPhamChiTietRepository.findById(id).get();
+        SanPham sanPham = sanPhamRepository.findById(sanPhamChiTiet.getSanPham().getId()).get();
+
         sanPhamChiTiet.setTrangThai(status);
-        return sanPhamChiTietRepository.save(sanPhamChiTiet);
+
+        SanPhamChiTiet sanPhamChiTietR = sanPhamChiTietRepository.save(sanPhamChiTiet);
+
+        if(sanPhamChiTietR.getTrangThai() == 0){
+            sanPham.setSoLuong(sanPham.getSoLuong() - sanPhamChiTiet.getSoLuong());
+        } else{
+            sanPham.setSoLuong(sanPham.getSoLuong() + sanPhamChiTiet.getSoLuong());
+        }
+        sanPhamRepository.save(sanPham);
+
+        return sanPhamChiTietR;
     }
 }

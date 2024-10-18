@@ -26,6 +26,9 @@ public class KhachHang implements Serializable {
     @Column(name = "ho_ten")
     private String hoTen;
 
+    @Column(name = "hinh_anh")
+    private String hinhAnh;
+
     @Column(name = "ngay_sinh")
     private LocalDateTime ngaySinh;
 

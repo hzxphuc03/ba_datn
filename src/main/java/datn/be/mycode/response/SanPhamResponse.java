@@ -30,7 +30,7 @@ public class SanPhamResponse {
     private LocalDateTime ngayTao;
     private LocalDateTime NgaySua;
     private String nguoiTao;
-    private Long soLuong;
+    private int soLuong;
     private int trangThai;
     private GiamGia GiamGia;
     private ThuongHieu ThuongHieu;

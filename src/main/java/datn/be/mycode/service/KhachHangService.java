@@ -68,6 +68,7 @@ public class KhachHangService {
         KhachHang khachHang = new KhachHang();
         khachHang.setMa(request.getMa());
         khachHang.setHoTen(request.getHoTen());
+        khachHang.setHinhAnh(request.getHinhAnh());
         khachHang.setNgaySinh(request.getNgaySinh());
         khachHang.setTrangThai(1);
         khachHang.setNgayTao(LocalDateTime.now());
@@ -87,6 +88,7 @@ public class KhachHangService {
         KhachHang khachHang = repository.findById(request.getId()).get();
         khachHang.setMa(request.getMa());
         khachHang.setHoTen(request.getHoTen());
+        khachHang.setHinhAnh(request.getHinhAnh());
         khachHang.setNgaySinh(request.getNgaySinh());
         khachHang.setTrangThai(request.getTrangThai());
         khachHang.setSoDienThoai(request.getSoDienThoai());

@@ -33,11 +33,11 @@ public class HoaDonChiTiet implements Serializable {
     @Column(name = "trang_thai")
     private int trangThai;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne()
     @JoinColumn(name = "id_hoa_don", referencedColumnName = "id")
     private HoaDon hoaDon;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne()
     @JoinColumn(name = "id_chi_tiet_san_pham", referencedColumnName = "id")
     private SanPhamChiTiet sanPhamChiTiet;
 

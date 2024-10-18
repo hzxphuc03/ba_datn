@@ -38,9 +38,9 @@ public class KhachHangController {
     }
 
     @PostMapping("/add")
-    public ResponseEntity<?> add(@RequestBody KhachHangRequest tenKhachHangRequest){
-        System.out.println(tenKhachHangRequest);
-        return ResponseEntity.ok(khachHangService.add(tenKhachHangRequest));
+    public ResponseEntity<?> add(@RequestBody KhachHangRequest request){
+
+        return ResponseEntity.ok(khachHangService.add(request));
     }
 
     @PutMapping("update")
