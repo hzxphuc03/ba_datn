@@ -82,6 +82,7 @@ public class SanPhamService {
                 .giaCaoNhat(BigDecimal.valueOf(0))
                 .ngayTao(LocalDateTime.now())
                 .nguoiTao(request.getNguoiTao())
+                .soLuong(0)
                 .trangThai(1)
                 .giamGia(request.getIdGiamGia() != 0? giamGiaRepository.findById(request.getIdGiamGia()).get() : null)
                 .thuongHieu(thuongHieuRepository.findById(request.getIdThuongHieu()).get())

@@ -38,6 +38,13 @@ public class VoucherController {
         return ResponseEntity.ok(service.add(tenVoucherRequest));
     }
 
+    @GetMapping("/get-by-id")
+    public ResponseEntity<?> getById(
+            @RequestParam(name = "idVoucher",required = false) Long idVoucher
+    ){
+        return ResponseEntity.ok(service.getVoucherById(idVoucher));
+    }
+
     @PutMapping("update")
     public ResponseEntity<?> update(@RequestBody VoucherRequest request){
 

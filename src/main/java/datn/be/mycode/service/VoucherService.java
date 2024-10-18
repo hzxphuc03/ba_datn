@@ -71,7 +71,7 @@ public class VoucherService {
         voucher.setPhanTramGiam(request.getPhanTramGiam());
         voucher.setGiamToiDa(request.getGiamToiDa());
         voucher.setGiaTriGiamToiThieu(request.getGiaTriGiamToiThieu());
-        voucher.setTrangThai(1);
+        voucher.setTrangThai(request.getTrangThai());
 
         return repository.save(voucher);
     }
@@ -95,5 +95,9 @@ public class VoucherService {
         Voucher voucher = repository.findById(id).get();
         voucher.setTrangThai(status);
         return repository.save(voucher);
+    }
+
+    public Voucher getVoucherById(Long idVoucher) {
+        return repository.searchById(idVoucher).get();
     }
 }
