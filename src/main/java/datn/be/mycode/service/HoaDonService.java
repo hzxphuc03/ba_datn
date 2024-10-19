@@ -1,6 +1,7 @@
 package datn.be.mycode.service;
 
 import datn.be.mycode.entity.HoaDon;
+import datn.be.mycode.entity.NhanVien;
 import datn.be.mycode.entity.SanPham;
 import datn.be.mycode.entity.ThaoTacHoaDon;
 import datn.be.mycode.repository.HoaDonRepository;
@@ -17,6 +18,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -87,6 +90,35 @@ public class HoaDonService {
         thaoTacHoaDonService.add(thaoTacHoaDon);
 
         return hoaDonRes;
+    }
+    public HoaDon add(Long idNhanVien){
+        NhanVien nhanVien = nhanVienRepository.findById(idNhanVien).orElse(null);
+if(nhanVien != null){
+        HoaDon hoaDon = new HoaDon().builder()
+                .ngayTao(LocalDateTime.now())
+                .phiShip(BigDecimal.valueOf(0))
+                .tongTien(BigDecimal.valueOf(0))
+                .tongTienSanPhamChuaGiam(BigDecimal.valueOf(0))
+                .tongTienGiam(BigDecimal.valueOf(0))
+                .phuongThucThanhToan(phuongThucThanhToanRepository.findById(Long.valueOf(1)).get())
+                .nhanVien(nhanVien)
+                .trangThai(1)
+                .build();
+
+        HoaDon hoaDonRes = repo.save(hoaDon);
+        hoaDonRes.setMa("HD" + hoaDonRes.getId());
+        ThaoTacHoaDon thaoTacHoaDon = new ThaoTacHoaDon().builder()
+                .thaoTac("add")
+                .trangThai(1)
+                .hoaDon(hoaDonRes)
+                .nhanVien(hoaDon.getNhanVien())
+                .build();
+
+        thaoTacHoaDonService.add(thaoTacHoaDon);
+
+        return repo.save(hoaDonRes);
+    }
+return null;
     }
 
     public HoaDon update(HoaDonRequest request){
