@@ -36,7 +36,7 @@ public class HoaDonService {
     @Autowired
     private PhuongThucThanhToanRepository phuongThucThanhToanRepository;
 
-    public NormalTableResponse<HoaDonResponse> getAll(TableHoaDonRequest request) {
+    public NormalTableResponse<HoaDon> getAll(TableHoaDonRequest request) {
         if (request.getPage() == null) {
             request.setPage(1);
         }
@@ -46,11 +46,11 @@ public class HoaDonService {
         if (request.getStatus() == null) {
             request.setStatus(1);
         }
-        NormalTableResponse<HoaDonResponse> hoaDonNormalTableResponse = new NormalTableResponse<>();
+        NormalTableResponse<HoaDon> hoaDonNormalTableResponse = new NormalTableResponse<>();
         Pageable pageable = PageRequest.of(request.getPage() - 1,request.getPageSize());
-        Page<HoaDonResponse> hoaDonResponsePage;
+        Page<HoaDon> hoaDonResponsePage;
         hoaDonResponsePage = repo.searchAll(request.getKeyWord(), request.getStartDate(), request.getEndDate(), request.getIdKhachHang(), request.getIdNhanVien(), pageable);
-        List<HoaDonResponse> hoaDonResponses = hoaDonResponsePage.getContent().stream().toList();
+        List<HoaDon> hoaDonResponses = hoaDonResponsePage.getContent().stream().toList();
 
         hoaDonNormalTableResponse.setItem(hoaDonResponses);
         hoaDonNormalTableResponse.setPage(request.getPage());
