@@ -21,6 +21,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -60,18 +62,25 @@ public class HoaDonChiTietService {
     public ResponseEntity<?> add(HoaDonChiTietRequest request){
 
         HoaDonChiTiet hoaDonChiTiet = repo.findByHoaDonIdAndSanPhamChiTietId(request.getIdHoaDon(), request.getIdSanPhamChiTiet());
-
+        var hd = hoaDonRepository.findById(request.getIdHoaDon()).orElse(null);
+        var spct = sanPhamChiTietRepository.findById(request.getIdSanPhamChiTiet()).orElse(null);
+        var giamGia = spct.getSanPham().getGiamGia();
+        var gia = spct.getGiaBan();
         if(request.getSoLuong() == 0) repo.delete(hoaDonChiTiet);
 
+        if(giamGia != null && giamGia.getNgayBatDau().isAfter(LocalDateTime.now()) && giamGia.getNgayKetThuc().isBefore(LocalDateTime.now())){
+            var mucGiam = BigDecimal.valueOf(giamGia.getMucGiam());
+            gia = gia.subtract(gia.multiply(mucGiam));
+        }else {
+            gia = spct.getGiaBan();
+        }
 
         if(hoaDonChiTiet==null) {
-            var hd = hoaDonRepository.findById(request.getIdHoaDon()).orElse(null);
-            var spct = sanPhamChiTietRepository.findById(request.getIdSanPhamChiTiet()).orElse(null);
             if(hd!=null && spct!=null) {
                 hoaDonChiTiet = new HoaDonChiTiet().builder()
                         .soLuong(request.getSoLuong())
-                        .giaHienHanh(request.getGiaHienHanh())
-                        .giaDaGiam(request.getGiaDaGiam())
+                        .giaHienHanh(gia)
+                        .giaDaGiam(gia)
                         .trangThai(1)
                         .hoaDon(hd)
                         .sanPhamChiTiet(spct)
@@ -83,6 +92,7 @@ public class HoaDonChiTietService {
         }
         else{
             hoaDonChiTiet.AddSoluong(request.getSoLuong());
+            if(hoaDonChiTiet.getSoLuong()>spct.getSoLuong()) return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new erroResponse(400,"Số lượng không vượt quá số lượng có"));
         }
 
 

@@ -46,6 +46,23 @@ public class SanPhamChiTietController {
         return ResponseEntity.ok(sanPhamChiTietService.getByIdSanPham(idSanPham));
     }
 
+    @GetMapping("/get-ban-hang")
+    public ResponseEntity<?> getBanHang(
+            @RequestParam(name = "page",required = false) Integer page,
+            @RequestParam(name = "pageSize",required = false) Integer pageSize,
+            @RequestParam(name = "keyWord",required = false) String keyWord,
+            @RequestParam(name = "status",required = false) Integer status,
+            @RequestParam(name = "startDate",required = false) LocalDateTime startDate,
+            @RequestParam(name = "endDate",required = false) LocalDateTime endDate,
+            @RequestParam(name = "sanPham",required = false) Long idSanPham,
+            @RequestParam(name = "mauSac",required = false) Long idMauSac,
+            @RequestParam(name = "kichCo",required = false) Long idKichCo,
+            @RequestParam(name = "sort",required = false) Integer sort
+    ){
+        TableSanPhamChiTietRequest request = new TableSanPhamChiTietRequest(page, pageSize, keyWord, status, startDate, endDate, idSanPham, idMauSac, idKichCo,  sort);
+        return ResponseEntity.ok(sanPhamChiTietService.getAllSanPham(request));
+    }
+
     @PostMapping("/add")
     public ResponseEntity<?> add(@RequestBody SanPhamChiTietRequest request){
 

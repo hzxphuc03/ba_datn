@@ -18,8 +18,6 @@ public class HoaDonChiTietRequest {
 
     private Long id;
     private int soLuong;
-    private BigDecimal giaHienHanh;
-    private BigDecimal giaDaGiam;
     private int trangThai;
     private Long idHoaDon;
     private Long idSanPhamChiTiet;
