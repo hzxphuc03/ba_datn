@@ -28,7 +28,7 @@ public class HoaDon implements Serializable {
     @Column(name = "ngay_tao")
     private LocalDateTime ngayTao;
 
-    @Column(name = "ngay_thanh_toan")
+    @Column(name = "ngay_thanh_toan",nullable = true)
     private LocalDateTime ngayThanhToan;
 
     @Column(name = "ghi_chu")
