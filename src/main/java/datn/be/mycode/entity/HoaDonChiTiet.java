@@ -1,5 +1,6 @@
 package datn.be.mycode.entity;
 
+import datn.be.mycode.request.HoaDonChiTietRequest;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -42,4 +43,7 @@ public class HoaDonChiTiet implements Serializable {
     @JoinColumn(name = "id_chi_tiet_san_pham", referencedColumnName = "id")
     private SanPhamChiTiet sanPhamChiTiet;
 
+    public void AddSoluong(int sl){
+        soLuong = sl;
+    }
 }
