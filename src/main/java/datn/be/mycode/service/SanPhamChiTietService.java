@@ -7,6 +7,7 @@ import datn.be.mycode.request.SanPhamChiTietRequest;
 import datn.be.mycode.request.customRequest.TableSanPhamChiTietRequest;
 import datn.be.mycode.response.NormalTableResponse;
 import datn.be.mycode.response.SanPhamChiTietResponse;
+import datn.be.mycode.response.customResponse.SanPhamChiTiet.SanPhamBanHang;
 import datn.be.mycode.response.customResponse.SanPhamChiTiet.SanPhamChiTietByIdSP;
 import datn.be.mycode.response.customResponse.SanPhamChiTiet.SanPhamChiTietByIdSanPhamRes;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -68,24 +69,7 @@ public class SanPhamChiTietService {
 
         List<SanPhamChiTiet> listSanPhamChiTiet = sanPhamChiTietRepository.findAllBySanPham_Id(idSanPham);
 
-        List<SanPhamChiTietByIdSP> listSanPhamChiTietRes = new ArrayList<>();
-
-        listSanPhamChiTiet.forEach(sanPhamChiTiet -> {
-            SanPhamChiTietByIdSP sanPhamChiTietByIdSP = SanPhamChiTietByIdSP.builder()
-                    .id(sanPhamChiTiet.getId())
-                    .ngayTao(sanPhamChiTiet.getNgayTao())
-                    .ngaySua(sanPhamChiTiet.getNgaySua())
-                    .hinhAnh(sanPhamChiTiet.getHinhAnh())
-                    .giaNhap(sanPhamChiTiet.getGiaNhap())
-                    .giaBan(sanPhamChiTiet.getGiaBan())
-                    .soLuong(sanPhamChiTiet.getSoLuong())
-                    .trangThai(sanPhamChiTiet.getTrangThai())
-                    .sanPham(sanPhamChiTiet.getSanPham().getId())
-                    .mauSac(sanPhamChiTiet.getMauSac())
-                    .kichCo(sanPhamChiTiet.getKichCo())
-                    .build();
-            listSanPhamChiTietRes.add(sanPhamChiTietByIdSP);
-        });
+        List<SanPhamChiTietByIdSP> listSanPhamChiTietRes = getSanPhamChiTietsBySanPham(listSanPhamChiTiet);
 
         SanPham sanPhamRes = listSanPhamChiTiet.get(0).getSanPham();
 
@@ -197,5 +181,66 @@ public class SanPhamChiTietService {
         sanPhamRepository.save(sanPham);
 
         return sanPhamChiTiet;
+    }
+
+    public NormalTableResponse<SanPhamBanHang> getAllSanPham(TableSanPhamChiTietRequest request) {
+        if (request.getPage() == null) {
+            request.setPage(1);
+        }
+        if (request.getPageSize() == null) {
+            request.setPageSize(10);
+        }
+        if (request.getStatus() == null) {
+            request.setStatus(1);
+        }
+        if (request.getSort() == null) {
+            request.setSort(0);
+        }
+        NormalTableResponse<SanPhamBanHang> sanPhamNormalTableResponse = new NormalTableResponse<>();
+        Pageable pageable = PageRequest.of(request.getPage() - 1,request.getPageSize());
+        Page<SanPhamChiTietResponse> sanPhamChiTietResponsePage;
+
+        Page<SanPham> sanPhamPage = sanPhamRepository.findAll(pageable);
+        List<SanPham> sanPhams = sanPhamPage.getContent();
+        List<SanPhamBanHang> sanPhamBanHangs = new ArrayList<>();
+        if (sanPhams!=null) {
+            for (SanPham sanPham : sanPhams) {
+                SanPhamBanHang sanPhamBanHang = new SanPhamBanHang();
+                sanPhamBanHang.setSanPham(sanPham);
+                sanPhamBanHang.setSanPhamChiTiets(sanPhamChiTietRepository.findAllBySanPham_Id(sanPham.getId()));
+                sanPhamBanHangs.add(sanPhamBanHang);
+            }
+        }
+        sanPhamNormalTableResponse.setItem(sanPhamBanHangs);
+        sanPhamNormalTableResponse.setPage(request.getPage());
+        sanPhamNormalTableResponse.setPageSize(request.getPageSize());
+        sanPhamNormalTableResponse.setTotalItem(sanPhamPage.getTotalElements());
+
+        return sanPhamNormalTableResponse;
+
+    }
+
+    List<SanPhamChiTietByIdSP> getSanPhamChiTietsBySanPham(List<SanPhamChiTiet> listSanPhamChiTiet){
+
+        List<SanPhamChiTietByIdSP> listSanPhamChiTietRes = new ArrayList<>();
+
+        listSanPhamChiTiet.forEach(sanPhamChiTiet -> {
+            SanPhamChiTietByIdSP sanPhamChiTietByIdSP = SanPhamChiTietByIdSP.builder()
+                    .id(sanPhamChiTiet.getId())
+                    .ngayTao(sanPhamChiTiet.getNgayTao())
+                    .ngaySua(sanPhamChiTiet.getNgaySua())
+                    .hinhAnh(sanPhamChiTiet.getHinhAnh())
+                    .giaNhap(sanPhamChiTiet.getGiaNhap())
+                    .giaBan(sanPhamChiTiet.getGiaBan())
+                    .soLuong(sanPhamChiTiet.getSoLuong())
+                    .trangThai(sanPhamChiTiet.getTrangThai())
+                    .sanPham(sanPhamChiTiet.getSanPham().getId())
+                    .mauSac(sanPhamChiTiet.getMauSac())
+                    .kichCo(sanPhamChiTiet.getKichCo())
+                    .build();
+            listSanPhamChiTietRes.add(sanPhamChiTietByIdSP);
+        });
+
+        return listSanPhamChiTietRes;
     }
 }
