@@ -37,13 +37,19 @@ public class HoaDonCotroller {
 
     @PostMapping("/add")
     public ResponseEntity<?> add(@RequestBody HoaDonRequest request){
-        System.out.println(request);
+
         return ResponseEntity.ok(hoaDonService.add(request));
+    }
+
+    @PostMapping("/add-nhanh")
+    public ResponseEntity<?> addFast(@RequestParam("idNhanVien") Long idNhanVien){
+
+        return ResponseEntity.ok(hoaDonService.add(idNhanVien));
     }
 
     @PutMapping("update")
     public ResponseEntity<?> update(@RequestBody HoaDonRequest request){
-        System.out.println(request);
+
         return ResponseEntity.ok(hoaDonService.update(request));
     }
 
