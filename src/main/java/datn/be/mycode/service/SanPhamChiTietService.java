@@ -126,6 +126,8 @@ public class SanPhamChiTietService {
 
     public SanPhamChiTiet update(SanPhamChiTietRequest request){
         SanPhamChiTiet sanPhamChiTiet = sanPhamChiTietRepository.findById(request.getId()).get();
+        int trangThai = sanPhamChiTiet.getTrangThai();
+        int soLuong = sanPhamChiTiet.getSoLuong();
         SanPham sanPham = sanPhamRepository.findById(request.getSanPham()).get();
 
         sanPhamChiTiet.setNgaySua(LocalDateTime.now());
@@ -139,50 +141,61 @@ public class SanPhamChiTietService {
         sanPhamChiTiet.setKichCo(kichcoRepository.findById(request.getKichCo()).get());
 
 
-        SanPhamChiTiet sanPhamChiTietR = sanPhamChiTietRepository.save(sanPhamChiTiet);
+        sanPhamChiTiet = sanPhamChiTietRepository.save(sanPhamChiTiet);
 
         boolean check = false;
-        if(sanPham.getGiaThapNhat().compareTo(sanPhamChiTietR.getGiaBan())>0){
-            sanPham.setGiaThapNhat(sanPhamChiTietR.getGiaBan());
+        if(sanPham.getGiaThapNhat().compareTo(sanPhamChiTiet.getGiaBan())>0){
+            sanPham.setGiaThapNhat(sanPhamChiTiet.getGiaBan());
             check = true;
         }else if(sanPham.getGiaThapNhat().intValue() == 0){
-            sanPham.setGiaThapNhat(sanPhamChiTietR.getGiaBan());
+            sanPham.setGiaThapNhat(sanPhamChiTiet.getGiaBan());
             check = true;
         }
-        if(sanPham.getGiaCaoNhat().compareTo(sanPhamChiTietR.getGiaBan())<0){
-            sanPham.setGiaCaoNhat(sanPhamChiTietR.getGiaBan());
+
+        if(sanPham.getGiaCaoNhat().compareTo(sanPhamChiTiet.getGiaBan())<0){
+            sanPham.setGiaCaoNhat(sanPhamChiTiet.getGiaBan());
             check = true;
         }
-        if(sanPhamChiTietR.getTrangThai() == 0){
-            sanPham.setSoLuong(sanPham.getSoLuong() - sanPhamChiTiet.getSoLuong());
+        if(trangThai != sanPhamChiTiet.getTrangThai()) {
             check = true;
-        }
-        if(sanPhamChiTietR.getSoLuong() != sanPhamChiTiet.getSoLuong()){
-            sanPham.setSoLuong(sanPham.getSoLuong() - sanPhamChiTiet.getSoLuong() + sanPhamChiTietR.getSoLuong());
-            check = true;
+
+            if (sanPhamChiTiet.getTrangThai() == 0) {
+                sanPham.setSoLuong(sanPham.getSoLuong() - soLuong);
+            }else {
+                sanPham.setSoLuong(sanPham.getSoLuong() + sanPhamChiTiet.getSoLuong());
+            }
+        } else if( trangThai ==1){
+            if (soLuong != sanPhamChiTiet.getSoLuong()) {
+                    sanPham.setSoLuong(sanPham.getSoLuong() + sanPhamChiTiet.getSoLuong() - soLuong);
+                    check = true;
+                }
         }
         if(check) {
             sanPhamRepository.save(sanPham);
         }
 
-        return sanPhamChiTietR;
+        return sanPhamChiTiet;
     }
 
     public SanPhamChiTiet udateTrangThai(Long id, Integer status){
         SanPhamChiTiet sanPhamChiTiet = sanPhamChiTietRepository.findById(id).get();
+        int trangThai = sanPhamChiTiet.getTrangThai();
+        int soLuong = sanPhamChiTiet.getSoLuong();
         SanPham sanPham = sanPhamRepository.findById(sanPhamChiTiet.getSanPham().getId()).get();
 
         sanPhamChiTiet.setTrangThai(status);
 
-        SanPhamChiTiet sanPhamChiTietR = sanPhamChiTietRepository.save(sanPhamChiTiet);
+        sanPhamChiTiet = sanPhamChiTietRepository.save(sanPhamChiTiet);
 
-        if(sanPhamChiTietR.getTrangThai() == 0){
+        if(sanPhamChiTiet.getTrangThai()!= trangThai){
+            if(sanPhamChiTiet.getTrangThai() == 0){
             sanPham.setSoLuong(sanPham.getSoLuong() - sanPhamChiTiet.getSoLuong());
-        } else{
+            } else{
             sanPham.setSoLuong(sanPham.getSoLuong() + sanPhamChiTiet.getSoLuong());
+            }
         }
         sanPhamRepository.save(sanPham);
 
-        return sanPhamChiTietR;
+        return sanPhamChiTiet;
     }
 }
