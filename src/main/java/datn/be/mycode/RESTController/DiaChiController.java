@@ -1,11 +1,8 @@
 package datn.be.mycode.RESTController;
 
 import datn.be.mycode.request.DiaChiRequest;
-import datn.be.mycode.request.KhachHangRequest;
-import datn.be.mycode.request.NormalTableRequest;
 import datn.be.mycode.request.customRequest.TableDiaChiRequest;
 import datn.be.mycode.service.DiaChiService;
-import datn.be.mycode.service.KhachHangService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -27,6 +24,15 @@ public class DiaChiController {
         TableDiaChiRequest request = new TableDiaChiRequest(page,pageSize,keyWord,status);
         return ResponseEntity.ok(diaChiService.getAll(request));
     }
+
+    @GetMapping("get-by-idkh")
+    public ResponseEntity<?> getByIdkh(
+            @RequestParam(name="idKhachHang",required = false) Long idKhachHang
+    ){
+        return ResponseEntity.ok(diaChiService.getDiaChiByIdKhachHang(idKhachHang));
+    }
+
+
     @PostMapping("/add")
     public ResponseEntity<?> add(@RequestBody DiaChiRequest tenDiaChiRequest){
         System.out.println(tenDiaChiRequest);

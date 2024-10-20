@@ -4,7 +4,6 @@ import datn.be.mycode.entity.DiaChi;
 import datn.be.mycode.repository.DiaChiRepository;
 import datn.be.mycode.repository.KhachHangRepository;
 import datn.be.mycode.request.DiaChiRequest;
-import datn.be.mycode.request.NormalTableRequest;
 import datn.be.mycode.request.customRequest.TableDiaChiRequest;
 import datn.be.mycode.response.NormalTableResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,7 +40,7 @@ public class DiaChiService {
         Pageable pageable = PageRequest.of(request.getPage() - 1,request.getPageSize());
         Page<DiaChi> diaChiPage;
         if (request.getKeyWord() != null) {
-            diaChiPage = repository.searchByIdKhachHang(request.getKeyWord(), pageable);
+            diaChiPage = repository.findAllById(request.getKeyWord(), pageable);
 
         }else {
             diaChiPage = repository.findAllByTrangThai(request.getStatus(), pageable);
@@ -107,6 +106,10 @@ public class DiaChiService {
         // Cập nhật trạng thái cho địa chỉ hiện tại
         diaChi.setTrangThai(status);
         return repository.save(diaChi);
+    }
+
+    public List<DiaChi> getDiaChiByIdKhachHang(Long id){
+        return repository.searchByIdKhachHang(id);
     }
 
 }
