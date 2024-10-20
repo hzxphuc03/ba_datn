@@ -98,4 +98,13 @@ public class HoaDonChiTietService {
 
         return ResponseEntity.ok(repo.save(hoaDonChiTiet));
     }
+    public ResponseEntity<?> delete(Long id){
+        try{
+            var hoaDonChiTiet = repo.findById(id).get();
+            repo.delete(hoaDonChiTiet);
+            return ResponseEntity.ok("Xóa thành công");
+        }catch (Exception e){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new erroResponse(400,"Xóa thất bại"));
+        }
+    }
 }

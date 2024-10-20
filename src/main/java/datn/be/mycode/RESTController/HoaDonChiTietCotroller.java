@@ -55,4 +55,8 @@ public class HoaDonChiTietCotroller {
 //
 //        return ResponseEntity.ok(hoaDonChiTietService.udateTrangThai(id, status));
 //    }
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<?> delete(@PathVariable("id") Long id){
+        return hoaDonChiTietService.delete(id);
+    }
 }
