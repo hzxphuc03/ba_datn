@@ -17,7 +17,14 @@ public class DiaChiRequest {
 
     private Long id;
     @NotBlank(message = "ko dc trong")
-    private String diaChi;
+    private String idTinhThanh;
+    private String tinhThanh;
+    private String idQuanHuyen;
+    private String quanHuyen;
+    private String idPhuongXa;
+    private String phuongXa;
+    private String ghiChu;
+
     private int trangThai;
     private Long idKhachHang;
 }

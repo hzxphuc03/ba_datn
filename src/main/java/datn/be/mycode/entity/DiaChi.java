@@ -20,13 +20,28 @@ public class DiaChi implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "dia_chi")
-    private String diaChi;
+    @Column(name = "id_tinh_thanh")
+    private String idTinhThanh;
+    @Column(name = "tinh_thanh")
+    private String tinhThanh;
+
+    @Column(name = "id_quan_huyen")
+    private String idQuanHuyen;
+    @Column(name = "quan_huyen")
+    private String quanHuyen;
+
+    @Column(name = "id_phuong_xa")
+    private String idPhuongXa;
+    @Column(name = "phuong_xa")
+    private String phuongXa;
+
+    @Column(name = "ghi_chu")
+    private String ghiChu;
 
     @Column(name = "trang_thai")
     private int trangThai;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne()
     @JoinColumn(name = "id_khach_hang", referencedColumnName = "id")
     private KhachHang khachHang;
 
