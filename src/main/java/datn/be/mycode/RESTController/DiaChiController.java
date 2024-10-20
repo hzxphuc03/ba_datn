@@ -3,6 +3,7 @@ package datn.be.mycode.RESTController;
 import datn.be.mycode.request.DiaChiRequest;
 import datn.be.mycode.request.KhachHangRequest;
 import datn.be.mycode.request.NormalTableRequest;
+import datn.be.mycode.request.customRequest.TableDiaChiRequest;
 import datn.be.mycode.service.DiaChiService;
 import datn.be.mycode.service.KhachHangService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,11 +20,11 @@ public class DiaChiController {
     public ResponseEntity<?> getAll(
             @RequestParam(name = "page",required = false) Integer page,
             @RequestParam(name = "pageSize",required = false) Integer pageSize,
-            @RequestParam(name = "keyWord",required = false) String keyWord,
+            @RequestParam(name = "keyWord",required = false) Long keyWord,
             @RequestParam(name = "status",required = false) Integer status
     ){
 
-        NormalTableRequest request = new NormalTableRequest(page,pageSize,keyWord,status);
+        TableDiaChiRequest request = new TableDiaChiRequest(page,pageSize,keyWord,status);
         return ResponseEntity.ok(diaChiService.getAll(request));
     }
     @PostMapping("/add")
@@ -43,6 +44,6 @@ public class DiaChiController {
                                              @RequestParam(name = "status",required = true) Integer status
     ){
 
-        return ResponseEntity.ok(diaChiService.udateTrangThai(id, status));
+        return ResponseEntity.ok(diaChiService.updateTrangThai(id, status));
     }
 }
