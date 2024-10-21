@@ -1,6 +1,7 @@
 package datn.be.mycode.RESTController;
 
 import datn.be.mycode.request.DiaChiRequest;
+import datn.be.mycode.request.customRequest.TableDiaChiKhachHangRequest;
 import datn.be.mycode.request.customRequest.TableDiaChiRequest;
 import datn.be.mycode.service.DiaChiService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,9 +28,12 @@ public class DiaChiController {
 
     @GetMapping("get-by-idkh")
     public ResponseEntity<?> getByIdkh(
+            @RequestParam(name = "page",required = false) Integer page,
+            @RequestParam(name = "pageSize",required = false) Integer pageSize,
             @RequestParam(name="idKhachHang",required = false) Long idKhachHang
     ){
-        return ResponseEntity.ok(diaChiService.getDiaChiByIdKhachHang(idKhachHang));
+        TableDiaChiKhachHangRequest request = new TableDiaChiKhachHangRequest(page,pageSize,idKhachHang);
+        return ResponseEntity.ok(diaChiService.getDiaChiByIdKhachHang(request));
     }
 
 

@@ -9,8 +9,6 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
-
 @Repository
 public interface DiaChiRepository extends JpaRepository<DiaChi, Long> {
 
@@ -19,7 +17,7 @@ public interface DiaChiRepository extends JpaRepository<DiaChi, Long> {
 
 
     @Query("SELECT d FROM DiaChi d WHERE d.khachHang.id = :id")
-    List<DiaChi> searchByIdKhachHang(@Param("id") Long id);
+    Page<DiaChi> searchByIdKhachHang(@Param("id") Long id,Pageable pageable);
 
     @Modifying
     @Query("UPDATE DiaChi d SET d.trangThai = 0 WHERE d.khachHang.id = :khachHangId AND d.id <> :diaChiId")

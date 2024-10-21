@@ -4,6 +4,7 @@ import datn.be.mycode.entity.DiaChi;
 import datn.be.mycode.repository.DiaChiRepository;
 import datn.be.mycode.repository.KhachHangRepository;
 import datn.be.mycode.request.DiaChiRequest;
+import datn.be.mycode.request.customRequest.TableDiaChiKhachHangRequest;
 import datn.be.mycode.request.customRequest.TableDiaChiRequest;
 import datn.be.mycode.response.NormalTableResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -108,8 +109,30 @@ public class DiaChiService {
         return repository.save(diaChi);
     }
 
-    public List<DiaChi> getDiaChiByIdKhachHang(Long id){
-        return repository.searchByIdKhachHang(id);
-    }
+//    public List<DiaChi> getDiaChiByIdKhachHang(Long id){
+//        return repository.searchByIdKhachHang(id);
+//    }
 
+    public NormalTableResponse<DiaChi> getDiaChiByIdKhachHang(TableDiaChiKhachHangRequest request) {
+
+        if (request.getPage() ==  null) {
+            request.setPage(1);
+        }
+        if (request.getPageSize() == null) {
+            request.setPageSize(10);
+        }
+
+        NormalTableResponse<DiaChi> diaChiNormalTableResponse = new NormalTableResponse<>();
+        Pageable pageable = PageRequest.of(request.getPage() - 1,request.getPageSize());
+        Page<DiaChi> diaChiPage;
+            diaChiPage = repository.searchByIdKhachHang(request.getIdKhachHang(), pageable);
+        List<DiaChi> diaChis = diaChiPage.getContent().stream().toList();
+
+        diaChiNormalTableResponse.setItem(diaChis);
+        diaChiNormalTableResponse.setPage(request.getPage());
+        diaChiNormalTableResponse.setPageSize(request.getPageSize());
+        diaChiNormalTableResponse.setTotalItem(diaChiPage.getTotalElements());
+
+        return diaChiNormalTableResponse;
+    }
 }
