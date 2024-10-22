@@ -12,4 +12,9 @@ public class erroResponse {
     private int errorCode;
 
     private String messageError;
+
+    public erroResponse(String messageError) {
+        this.errorCode = 400;
+        this.messageError = messageError;
+    }
 }

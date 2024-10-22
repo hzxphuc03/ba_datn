@@ -66,7 +66,10 @@ public class HoaDonChiTietService {
         var spct = sanPhamChiTietRepository.findById(request.getIdSanPhamChiTiet()).orElse(null);
         var giamGia = spct.getSanPham().getGiamGia();
         var gia = spct.getGiaBan();
-        if(request.getSoLuong() == 0) repo.delete(hoaDonChiTiet);
+
+        if(request.getSoLuong() <= 0) return getErro("Số lượng phải lớn hơn 0");
+        if(request.getSoLuong()>spct.getSoLuong()) return getErro("Số lượng sản phẩm không vượt quá số lượng đang có");
+
 
         if(giamGia != null && giamGia.getNgayBatDau().isAfter(LocalDateTime.now()) && giamGia.getNgayKetThuc().isBefore(LocalDateTime.now())){
             var mucGiam = BigDecimal.valueOf(giamGia.getMucGiam());
@@ -87,17 +90,20 @@ public class HoaDonChiTietService {
                         .build();
             }
             else{
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new erroResponse(400,"Hóa đơn hoặc sản phẩm này chưa tồn tại"));
+                return getErro("Hóa đơn hoặc sản phẩm này chưa tồn tại");
             }
         }
         else{
             hoaDonChiTiet.AddSoluong(request.getSoLuong());
-            if(hoaDonChiTiet.getSoLuong()>spct.getSoLuong()) return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new erroResponse(400,"Số lượng không vượt quá số lượng có"));
+            if(hoaDonChiTiet.getSoLuong()>spct.getSoLuong()) return getErro("Số lượng sản phẩm trong hóa đơn không vượt quá số lượng sản phẩm đang có");
         }
 
+        var hoaDonChiTietRes = new HoaDonChiTietResponse(repo.save(hoaDonChiTiet));
 
-        return ResponseEntity.ok(repo.save(hoaDonChiTiet));
+        return ResponseEntity.ok(hoaDonChiTietRes);
     }
+
+
     public ResponseEntity<?> delete(Long id){
         try{
             var hoaDonChiTiet = repo.findById(id).get();
@@ -106,5 +112,9 @@ public class HoaDonChiTietService {
         }catch (Exception e){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new erroResponse(400,"Xóa thất bại"));
         }
+    }
+
+    private ResponseEntity<?> getErro(String s){
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new erroResponse(s));
     }
 }

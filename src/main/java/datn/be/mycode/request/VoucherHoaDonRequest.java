@@ -18,4 +18,9 @@ public class VoucherHoaDonRequest {
     private int trangThai;
     private Long voucher;
     private Long hoaDon;
+
+    public VoucherHoaDonRequest(Long voucher, Long hoaDon) {
+        this.voucher = voucher;
+        this.hoaDon = hoaDon;
+    }
 }
