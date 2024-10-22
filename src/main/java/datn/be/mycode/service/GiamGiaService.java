@@ -97,4 +97,8 @@ public class GiamGiaService {
        giamGia.setTrangThai(status);
         return repository.save(giamGia);
     }
+
+    public void update(GiamGia giamGia) {
+        repository.save(giamGia);
+    }
 }
