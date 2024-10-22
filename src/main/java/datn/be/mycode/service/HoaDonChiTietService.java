@@ -35,28 +35,69 @@ public class HoaDonChiTietService {
     @Autowired
     private SanPhamChiTietRepository sanPhamChiTietRepository;
 
+    @Autowired
+    private GiamGiaService giamGiaService;
+    @Autowired
+    private SanPhamService sanPhamService;
+
     public NormalTableResponse<HoaDonChiTiet> getAllByIdHoaDon(NormalTableRequest request) {
+
+        CheckRequest(request);
+
+
+        Pageable pageable = PageRequest.of(request.getPage() - 1,request.getPageSize());
+        Page<HoaDonChiTiet> hoaDonResponsePage;
+        List<HoaDonChiTiet> hoaDonChiTiets;
+        var hoaDonNormalTableResponse = new NormalTableResponse<HoaDonChiTiet>();
+        for (int i = 0; i < 2; i++) {
+            hoaDonResponsePage = repo.findAllByHoaDon_Id(Long.valueOf(request.getKeyWord()), pageable);
+            hoaDonChiTiets = hoaDonResponsePage.getContent();
+
+            if(i != 1) {
+                CheckGiamGia(hoaDonChiTiets);
+            }else {
+
+                hoaDonNormalTableResponse.setItem(hoaDonChiTiets);
+                hoaDonNormalTableResponse.setPage(request.getPage());
+                hoaDonNormalTableResponse.setPageSize(request.getPageSize());
+                hoaDonNormalTableResponse.setTotalItem(hoaDonResponsePage.getTotalElements());
+            }
+
+        }
+        return hoaDonNormalTableResponse;
+    }
+
+    private void CheckGiamGia(List<HoaDonChiTiet> hoaDonChiTiets) {
+        for (HoaDonChiTiet hoaDonChiTiet :hoaDonChiTiets) {
+            var sanPhamChiTiet = hoaDonChiTiet.getSanPhamChiTiet();
+            var sanPham = sanPhamChiTiet.getSanPham();
+            var giamGia = sanPham.getGiamGia();
+
+            if(giamGia.getNgayKetThuc().isBefore(LocalDateTime.now())){
+                giamGia.setTrangThai(3);
+                sanPham.setGiamGia(null);
+
+                hoaDonChiTiet.setGiaDaGiam(sanPhamChiTiet.getGiaBan());
+
+                giamGiaService.update(giamGia);
+                sanPhamService.update(sanPham);
+                repo.save(hoaDonChiTiet);
+            }
+
+        }
+    }
+
+    private void CheckRequest(NormalTableRequest request) {
         if (request.getPage() == null) {
             request.setPage(1);
         }
         if (request.getPageSize() == null) {
             request.setPageSize(10);
         }
+
         if (request.getStatus() == null) {
             request.setStatus(1);
         }
-        NormalTableResponse<HoaDonChiTiet> hoaDonNormalTableResponse = new NormalTableResponse<>();
-        Pageable pageable = PageRequest.of(request.getPage() - 1,request.getPageSize());
-        Page<HoaDonChiTiet> hoaDonResponsePage;
-        hoaDonResponsePage = repo.findAllByHoaDon_Id(Long.valueOf(request.getKeyWord()), pageable);
-        List<HoaDonChiTiet> hoaDonChiTiets = hoaDonResponsePage.getContent();
-
-        hoaDonNormalTableResponse.setItem(hoaDonChiTiets);
-        hoaDonNormalTableResponse.setPage(request.getPage());
-        hoaDonNormalTableResponse.setPageSize(request.getPageSize());
-        hoaDonNormalTableResponse.setTotalItem(hoaDonResponsePage.getTotalElements());
-
-        return hoaDonNormalTableResponse;
     }
 
     public ResponseEntity<?> add(HoaDonChiTietRequest request){
@@ -93,6 +134,7 @@ public class HoaDonChiTietService {
                 return getErro("Hóa đơn hoặc sản phẩm này chưa tồn tại");
             }
         }
+
         else{
             hoaDonChiTiet.AddSoluong(request.getSoLuong());
             if(hoaDonChiTiet.getSoLuong()>spct.getSoLuong()) return getErro("Số lượng sản phẩm trong hóa đơn không vượt quá số lượng sản phẩm đang có");

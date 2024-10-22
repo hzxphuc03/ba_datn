@@ -132,4 +132,8 @@ public class SanPhamService {
         sanPham.setTrangThai(status);
         return repo.save(sanPham);
     }
+
+    public void update(SanPham sanPham) {
+        repo.save(sanPham);
+    }
 }
