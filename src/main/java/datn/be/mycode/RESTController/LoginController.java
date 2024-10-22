@@ -24,12 +24,8 @@ public class LoginController {
 
     @PostMapping("/nhan_vien_login")
     public ResponseEntity<?> login(@RequestBody loginTest loginRequest) {
-        Map<String, String> response = nhanVienService.getAccount(loginRequest);
-            if (response != null) {
-                return ResponseEntity.ok(response);
-            }
 
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new erroResponse(400,"Tài khoản hoặc mật khẩu không chính xác"));
+        return nhanVienService.getAccount(loginRequest);
     }
 
 }

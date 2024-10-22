@@ -1,8 +1,10 @@
 package datn.be.mycode.RESTController;
 
 import datn.be.mycode.request.HoaDonRequest;
-import datn.be.mycode.request.NhanVienRequest;
 
+import datn.be.mycode.request.customRequest.BanHang.AddDiaChi;
+import datn.be.mycode.request.customRequest.BanHang.AddObject;
+import datn.be.mycode.request.customRequest.BanHang.AddVoucher;
 import datn.be.mycode.request.customRequest.TableHoaDonRequest;
 import datn.be.mycode.service.HoaDonService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,6 +53,30 @@ public class HoaDonCotroller {
     public ResponseEntity<?> update(@RequestBody HoaDonRequest request){
 
         return ResponseEntity.ok(hoaDonService.update(request));
+    }
+
+    @PutMapping("/add-khach-hang")
+    public ResponseEntity<?> addKhachHang(@RequestBody() AddObject request){
+
+        return ResponseEntity.ok(hoaDonService.hoaDonAddKhachHang(request));
+    }
+
+    @PutMapping("/add-phuong-thuc-thanh-toan")
+    public ResponseEntity<?> addPhuongThucThanhToan(@RequestBody() AddObject request){
+
+        return ResponseEntity.ok(hoaDonService.hoaDonAddPhuongThucThanhToan(request));
+    }
+
+    @PutMapping("/add-dia-chi")
+    public ResponseEntity<?> addDiaChi(@RequestBody() AddDiaChi request){
+
+        return ResponseEntity.ok(hoaDonService.hoaDonAddDiaChi(request));
+    }
+
+    @PutMapping("/add-voucher")
+    public ResponseEntity<?> addVoucher(@RequestBody() AddVoucher request){
+
+        return ResponseEntity.ok(hoaDonService.hoaDonAddVoucher(request));
     }
 
     @PutMapping("/update-trang-thai/{id}")

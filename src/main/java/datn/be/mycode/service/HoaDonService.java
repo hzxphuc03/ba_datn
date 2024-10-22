@@ -1,25 +1,26 @@
 package datn.be.mycode.service;
 
-import datn.be.mycode.entity.HoaDon;
-import datn.be.mycode.entity.NhanVien;
-import datn.be.mycode.entity.SanPham;
-import datn.be.mycode.entity.ThaoTacHoaDon;
-import datn.be.mycode.repository.HoaDonRepository;
-import datn.be.mycode.repository.KhachHangRepository;
-import datn.be.mycode.repository.NhanVienRepository;
-import datn.be.mycode.repository.PhuongThucThanhToanRepository;
+import datn.be.mycode.entity.*;
+import datn.be.mycode.repository.*;
 import datn.be.mycode.request.HoaDonRequest;
+import datn.be.mycode.request.VoucherHoaDonRequest;
+import datn.be.mycode.request.customRequest.BanHang.AddObject;
+import datn.be.mycode.request.customRequest.BanHang.AddDiaChi;
+import datn.be.mycode.request.customRequest.BanHang.AddVoucher;
 import datn.be.mycode.request.customRequest.TableHoaDonRequest;
 import datn.be.mycode.response.NormalTableResponse;
-import datn.be.mycode.response.HoaDonResponse;
+import datn.be.mycode.response.erroResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -35,6 +36,10 @@ public class HoaDonService {
     private KhachHangRepository khachHangRepository;
     @Autowired
     private PhuongThucThanhToanRepository phuongThucThanhToanRepository;
+    @Autowired
+    private VoucherRepository voucherRepository;
+    @Autowired
+    private VoucherHoaDonService voucherHoaDonService;
 
     public NormalTableResponse<HoaDon> getAll(TableHoaDonRequest request) {
         if (request.getPage() == null) {
@@ -69,7 +74,6 @@ public class HoaDonService {
                 .ghiChu(request.getGhiChu())
                 .tenNguoiNhan(request.getTenNguoiNhan())
                 .sdtNguoiNhan(request.getSdtNguoiNhan())
-                .diaChiNguoiNhan(request.getDiaChiNguoiNhan())
                 .phiShip(request.getPhiShip())
                 .tongTien(request.getTongTien())
                 .tongTienSanPhamChuaGiam(request.getTongTienSanPhamChuaGiam())
@@ -93,7 +97,7 @@ public class HoaDonService {
     }
     public HoaDon add(Long idNhanVien){
         NhanVien nhanVien = nhanVienRepository.findById(idNhanVien).orElse(null);
-if(nhanVien != null){
+        if(nhanVien != null){
         HoaDon hoaDon = new HoaDon().builder()
                 .ngayTao(LocalDateTime.now())
                 .phiShip(BigDecimal.valueOf(0))
@@ -118,7 +122,7 @@ if(nhanVien != null){
 
         return repo.save(hoaDonRes);
     }
-return null;
+        return null;
     }
 
     public HoaDon update(HoaDonRequest request){
@@ -129,7 +133,6 @@ return null;
                 .ghiChu(request.getGhiChu())
                 .tenNguoiNhan(request.getTenNguoiNhan())
                 .sdtNguoiNhan(request.getSdtNguoiNhan())
-                .diaChiNguoiNhan(request.getDiaChiNguoiNhan())
                 .phiShip(request.getPhiShip())
                 .tongTien(request.getTongTien())
                 .tongTienSanPhamChuaGiam(request.getTongTienSanPhamChuaGiam())
@@ -168,4 +171,111 @@ return null;
 
         return hoaDonRes;
     }
+
+    public ResponseEntity<?> hoaDonAddDiaChi(AddDiaChi request) {
+        var hoaDon = repo.findById(request.getIdHoaDon()).orElse(null);
+
+        if (hoaDon != null){
+
+            if(checkDiaChi(request)){
+                getDiaChi(hoaDon, request);
+                hoaDon.setTenNguoiNhan(request.getTenNguoiNhan());
+                hoaDon.setSdtNguoiNhan(request.getSdtNguoiNhan());
+                return ResponseEntity.ok(repo.save(hoaDon));
+            }
+            return getErro("Địa chỉ hoặc thông tin người nhận trống");
+        }
+
+        return getErro("Hóa đơn không tồn tại");
+    }
+
+    private boolean checkDiaChi(AddDiaChi request) {
+        boolean check = false;
+        if (!request.getGhiChu().trim().isEmpty()){
+            check =true;
+        }
+        if (!request.getTenNguoiNhan().trim().isEmpty()){
+            check =true;
+        }
+        if (!request.getSdtNguoiNhan().trim().isEmpty()){
+            check =true;
+        }
+        return check;
+    }
+
+    private void getDiaChi(HoaDon hoaDon, AddDiaChi request) {
+        hoaDon.setIdTinhThanh(request.getIdTinhThanh());
+        hoaDon.setTinhThanh(request.getTinhThanh());
+        hoaDon.setIdQuanHuyen(request.getIdQuanHuyen());
+        hoaDon.setQuanHuyen(request.getQuanHuyen());
+        hoaDon.setIdPhuongXa(request.getIdPhuongXa());
+        hoaDon.setPhuongXa(request.getPhuongXa());
+        hoaDon.setGhiChu(request.getGhiChu());
+    }
+
+    private ResponseEntity<?> getErro(String s){
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new erroResponse(s));
+    }
+
+    public ResponseEntity<?> hoaDonAddKhachHang(AddObject request) {
+        var hoaDon = repo.findById(request.getIdHoaDon()).orElse(null);
+        var khachHang = khachHangRepository.findById(request.getIdObject()).orElse(null);
+
+        if (hoaDon != null){
+            if(khachHang != null) {
+                hoaDon.setKhachHang(khachHang);
+                return ResponseEntity.ok(repo.save(hoaDon));
+            }
+            return getErro("Khách hàng không tồn tại");
+        }
+        return getErro("Hóa đơn không tồn tại");
+    }
+
+    public ResponseEntity<?> hoaDonAddVoucher(AddVoucher request) {
+        var hoaDon = repo.findById(request.getIdHoaDon()).orElse(null);
+        var idVouchers = request.getIdVouchers();
+
+        if(idVouchers.size() > 2) return getErro("Hóa đơn chỉ có 2 voucher");
+        var vouchers = getListVoucher(idVouchers);
+
+        if (hoaDon != null){
+            if(vouchers.get(0).getTrangThai() != vouchers.get(1).getTrangThai()) {
+                for (Voucher voucher:vouchers) {
+                    var addVoucher = new VoucherHoaDonRequest(hoaDon.getId(), voucher.getId());
+                    voucherHoaDonService.add(addVoucher);
+                }
+//
+//                tính tiền ở đây
+//
+            }
+            return getErro("Voucher cùng 1 loại");
+        }
+        return getErro("Hóa đơn không tồn tại");
+    }
+
+    private List<Voucher> getListVoucher(List<Long> idVouchers) {
+        var vouchers = new ArrayList<Voucher>();
+        for (int i = 0; i < 2; i++) {
+            var voucher = voucherRepository.findById(idVouchers.get(i)).orElse(null);
+            if(voucher != null){
+                vouchers.add(voucher);
+            }
+        }
+        return vouchers;
+    }
+
+    public ResponseEntity<?> hoaDonAddPhuongThucThanhToan(AddObject request) {
+        var hoaDon = repo.findById(request.getIdHoaDon()).orElse(null);
+        var phuongThucThanhToan = phuongThucThanhToanRepository.findById(request.getIdObject()).orElse(null);
+
+        if (hoaDon != null){
+            if(phuongThucThanhToan != null) {
+                hoaDon.setPhuongThucThanhToan(phuongThucThanhToan);
+                return ResponseEntity.ok(repo.save(hoaDon));
+            }
+            return getErro("Phương thức thanh toán không tồn tại");
+        }
+        return getErro("Hóa đơn không tồn tại");
+    }
+
 }

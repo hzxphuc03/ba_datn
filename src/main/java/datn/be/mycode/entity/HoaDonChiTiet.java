@@ -44,6 +44,6 @@ public class HoaDonChiTiet implements Serializable {
     private SanPhamChiTiet sanPhamChiTiet;
 
     public void AddSoluong(int sl){
-        soLuong = sl;
+        soLuong += sl;
     }
 }

@@ -12,10 +12,12 @@ import datn.be.mycode.request.customRequest.TableNhanVienRequest;
 import datn.be.mycode.response.LoginResponse;
 import datn.be.mycode.response.NormalTableResponse;
 import datn.be.mycode.response.UserLoginResponse;
+import datn.be.mycode.response.erroResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -144,31 +146,34 @@ public class NhanVienService {
         return repo.save(nhanvien);
     }
 
-    public Map<String, String> getAccount(loginTest loginRequest) {
+    public ResponseEntity<?> getAccount(loginTest loginRequest) {
 
         NhanVien nhanVien = repo.getAccount(loginRequest);
         Map<String, String> response = new HashMap<>();
-        UserLoginResponse user = UserLoginResponse.builder()
-                .id(nhanVien.getId())
-                .hoTen(nhanVien.getHoTen())
-                .ngaySinh(nhanVien.getNgaySinh()+"")
-                .ngayTao(nhanVien.getNgayTao()+"")
-                .soDienThoai(nhanVien.getSoDienThoai())
-                .gioiTinh(nhanVien.getGioiTinh())
-                .email(nhanVien.getEmail())
-                .taiKhoan(nhanVien.getTaiKhoan())
-                .matKhau(nhanVien.getMatKhau())
-                .chucVu(nhanVien.getChucVu().toMap())
-                .trangThai(nhanVien.getTrangThai())
-                .build();
 
         if (nhanVien != null) {
+
+            UserLoginResponse user = UserLoginResponse.builder()
+                    .id(nhanVien.getId())
+                    .hoTen(nhanVien.getHoTen())
+                    .ngaySinh(nhanVien.getNgaySinh()+"")
+                    .ngayTao(nhanVien.getNgayTao()+"")
+                    .soDienThoai(nhanVien.getSoDienThoai())
+                    .gioiTinh(nhanVien.getGioiTinh())
+                    .email(nhanVien.getEmail())
+                    .taiKhoan(nhanVien.getTaiKhoan())
+                    .matKhau(nhanVien.getMatKhau())
+                    .chucVu(nhanVien.getChucVu().toMap())
+                    .trangThai(nhanVien.getTrangThai())
+                    .build();
+
             String token = jwtTokenProvider.generateToken(nhanVien.getTaiKhoan(), nhanVien.getChucVu().getTen(), user);
             response.clear();
             response.put("token", token);
-            return response;
+            return ResponseEntity.ok(response);
         }
 
-        return null;
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new erroResponse("Tài khoản hoặc mật khẩu không chính xác"));
+
     }
 }
