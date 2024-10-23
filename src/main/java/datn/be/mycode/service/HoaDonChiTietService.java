@@ -9,6 +9,7 @@ import datn.be.mycode.repository.SanPhamChiTietRepository;
 import datn.be.mycode.request.HoaDonChiTietRequest;
 import datn.be.mycode.request.HoaDonRequest;
 import datn.be.mycode.request.NormalTableRequest;
+import datn.be.mycode.request.customRequest.BanHang.AddSoLuong;
 import datn.be.mycode.response.HoaDonChiTietResponse;
 import datn.be.mycode.response.HoaDonResponse;
 import datn.be.mycode.response.NormalTableResponse;
@@ -22,6 +23,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -49,21 +51,17 @@ public class HoaDonChiTietService {
         Page<HoaDonChiTiet> hoaDonResponsePage;
         List<HoaDonChiTiet> hoaDonChiTiets;
         var hoaDonNormalTableResponse = new NormalTableResponse<HoaDonChiTiet>();
-        for (int i = 0; i < 2; i++) {
-            hoaDonResponsePage = repo.findAllByHoaDon_Id(Long.valueOf(request.getKeyWord()), pageable);
-            hoaDonChiTiets = hoaDonResponsePage.getContent();
 
-            if(i != 1) {
-                CheckGiamGia(hoaDonChiTiets);
-            }else {
+        hoaDonResponsePage = repo.findAllByHoaDon_Id(Long.valueOf(request.getKeyWord()), pageable);
+        hoaDonChiTiets = hoaDonResponsePage.getContent();
 
-                hoaDonNormalTableResponse.setItem(hoaDonChiTiets);
-                hoaDonNormalTableResponse.setPage(request.getPage());
-                hoaDonNormalTableResponse.setPageSize(request.getPageSize());
-                hoaDonNormalTableResponse.setTotalItem(hoaDonResponsePage.getTotalElements());
-            }
+        CheckGiamGia(hoaDonChiTiets);
 
-        }
+        hoaDonNormalTableResponse.setItem(hoaDonChiTiets);
+        hoaDonNormalTableResponse.setPage(request.getPage());
+        hoaDonNormalTableResponse.setPageSize(request.getPageSize());
+        hoaDonNormalTableResponse.setTotalItem(hoaDonResponsePage.getTotalElements());
+
         return hoaDonNormalTableResponse;
     }
 
@@ -73,7 +71,7 @@ public class HoaDonChiTietService {
             var sanPham = sanPhamChiTiet.getSanPham();
             var giamGia = sanPham.getGiamGia();
 
-            if(giamGia.getNgayKetThuc().isBefore(LocalDateTime.now())){
+            if(giamGia!=null && giamGia.getNgayKetThuc().isBefore(LocalDateTime.now())){
                 giamGia.setTrangThai(3);
                 sanPham.setGiamGia(null);
 
@@ -112,8 +110,8 @@ public class HoaDonChiTietService {
         if(request.getSoLuong()>spct.getSoLuong()) return getErro("Số lượng sản phẩm không vượt quá số lượng đang có");
 
 
-        if(giamGia != null && giamGia.getNgayBatDau().isAfter(LocalDateTime.now()) && giamGia.getNgayKetThuc().isBefore(LocalDateTime.now())){
-            var mucGiam = BigDecimal.valueOf(giamGia.getMucGiam());
+        if(giamGia != null && giamGia.getNgayBatDau().isBefore(LocalDateTime.now()) && giamGia.getNgayKetThuc().isAfter(LocalDateTime.now())){
+            var mucGiam = BigDecimal.valueOf(giamGia.getMucGiam()).divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP);
             gia = gia.subtract(gia.multiply(mucGiam));
         }else {
             gia = spct.getGiaBan();
@@ -158,5 +156,18 @@ public class HoaDonChiTietService {
 
     private ResponseEntity<?> getErro(String s){
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new erroResponse(s));
+    }
+
+    public ResponseEntity<?> addSoLuong(AddSoLuong request) {
+        var hoaDonChiTiet = repo.findById(request.getIdHoaDonChiTiet()).orElse(null);
+        if(hoaDonChiTiet != null){
+            var spct = hoaDonChiTiet.getSanPhamChiTiet();
+            if(request.getSoLuong() <= 0) return getErro("Số lượng phải lớn hơn 0");
+            int soLuongSauThem = request.getSoLuong()+hoaDonChiTiet.getSoLuong();
+            if(soLuongSauThem>spct.getSoLuong()) return getErro("Số lượng vượt quá số lượng đang có");
+            hoaDonChiTiet.setSoLuong(soLuongSauThem);
+            return ResponseEntity.ok(repo.save(hoaDonChiTiet));
+        }
+        return getErro("Không tìm thấy hóa đơn chi tiết");
     }
 }

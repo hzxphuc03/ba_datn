@@ -3,6 +3,7 @@ package datn.be.mycode.RESTController;
 import datn.be.mycode.request.HoaDonChiTietRequest;
 import datn.be.mycode.request.HoaDonRequest;
 import datn.be.mycode.request.NormalTableRequest;
+import datn.be.mycode.request.customRequest.BanHang.AddSoLuong;
 import datn.be.mycode.request.customRequest.TableHoaDonRequest;
 import datn.be.mycode.service.HoaDonChiTietService;
 import datn.be.mycode.service.HoaDonService;
@@ -34,10 +35,13 @@ public class HoaDonChiTietCotroller {
 
     @PostMapping("/add")
     public ResponseEntity<?> add(@RequestBody HoaDonChiTietRequest request){
-        System.out.println(request);
         return hoaDonChiTietService.add(request);
     }
 
+    @PostMapping("/add-so-luong")
+    public ResponseEntity<?> addSoLuong(@RequestBody AddSoLuong request){
+        return hoaDonChiTietService.addSoLuong(request);
+    }
 //    , request.getStartDate(), request.getEndDate(), request.getIdKhachHang(), request.getIdNhanVien()
 //, LocalDateTime startDate, LocalDateTime endDate, Long idKhachHang, Long idNhanVien
 

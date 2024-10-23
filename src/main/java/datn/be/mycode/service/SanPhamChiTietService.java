@@ -34,19 +34,9 @@ public class SanPhamChiTietService {
 
 
     public NormalTableResponse<SanPhamChiTietResponse> getAll(TableSanPhamChiTietRequest request) {
-        if (request.getPage() == null) {
-            request.setPage(1);
-        }
-        if (request.getPageSize() == null) {
-            request.setPageSize(10);
-        }
-        if (request.getStatus() == null) {
-            request.setStatus(1);
-        }
-        if (request.getSort() == null) {
-            request.setSort(0);
-        }
-        NormalTableResponse<SanPhamChiTietResponse> sanPhamNormalTableResponse = new NormalTableResponse<>();
+
+        CheckRequest(request);
+
         Pageable pageable = PageRequest.of(request.getPage() - 1,request.getPageSize());
         Page<SanPhamChiTietResponse> sanPhamChiTietResponsePage;
         if (request.getSort() == 0) {
@@ -57,10 +47,7 @@ public class SanPhamChiTietService {
         }
         List<SanPhamChiTietResponse> sanPhamChiTietResponses = sanPhamChiTietResponsePage.getContent().stream().toList();
 
-        sanPhamNormalTableResponse.setItem(sanPhamChiTietResponses);
-        sanPhamNormalTableResponse.setPage(request.getPage());
-        sanPhamNormalTableResponse.setPageSize(request.getPageSize());
-        sanPhamNormalTableResponse.setTotalItem(sanPhamChiTietResponsePage.getTotalElements());
+        var sanPhamNormalTableResponse = new NormalTableResponse<>(sanPhamChiTietResponses,request.getPage(),request.getPageSize(),sanPhamChiTietResponsePage.getTotalElements());
 
         return sanPhamNormalTableResponse;
     }
@@ -93,6 +80,12 @@ public class SanPhamChiTietService {
 
         SanPhamChiTiet sanPhamChiTietR = sanPhamChiTietRepository.save(sanPhamChiTiet);
 
+        CheckPriceMinAndMax(sanPham, sanPhamChiTietR);
+
+        return sanPhamChiTietR;
+    }
+
+    private void CheckPriceMinAndMax(SanPham sanPham, SanPhamChiTiet sanPhamChiTietR) {
         if(sanPham.getGiaThapNhat().compareTo(sanPhamChiTietR.getGiaBan())>0){
             sanPham.setGiaThapNhat(sanPhamChiTietR.getGiaBan());
         }else if(sanPham.getGiaThapNhat().intValue() == 0){
@@ -101,11 +94,8 @@ public class SanPhamChiTietService {
         if(sanPham.getGiaCaoNhat().compareTo(sanPhamChiTietR.getGiaBan())<0){
             sanPham.setGiaCaoNhat(sanPhamChiTietR.getGiaBan());
         }
-            sanPham.setSoLuong(sanPham.getSoLuong() + sanPhamChiTietR.getSoLuong());
-            sanPhamRepository.save(sanPham);
-
-
-        return sanPhamChiTietR;
+        sanPham.setSoLuong(sanPham.getSoLuong() + sanPhamChiTietR.getSoLuong());
+        sanPhamRepository.save(sanPham);
     }
 
     public SanPhamChiTiet update(SanPhamChiTietRequest request){
@@ -184,19 +174,9 @@ public class SanPhamChiTietService {
     }
 
     public NormalTableResponse<SanPhamBanHang> getAllSanPham(TableSanPhamChiTietRequest request) {
-        if (request.getPage() == null) {
-            request.setPage(1);
-        }
-        if (request.getPageSize() == null) {
-            request.setPageSize(10);
-        }
-        if (request.getStatus() == null) {
-            request.setStatus(1);
-        }
-        if (request.getSort() == null) {
-            request.setSort(0);
-        }
-        NormalTableResponse<SanPhamBanHang> sanPhamNormalTableResponse = new NormalTableResponse<>();
+
+        CheckRequest(request);
+
         Pageable pageable = PageRequest.of(request.getPage() - 1,request.getPageSize());
         Page<SanPhamChiTietResponse> sanPhamChiTietResponsePage;
 
@@ -211,13 +191,27 @@ public class SanPhamChiTietService {
                 sanPhamBanHangs.add(sanPhamBanHang);
             }
         }
-        sanPhamNormalTableResponse.setItem(sanPhamBanHangs);
-        sanPhamNormalTableResponse.setPage(request.getPage());
-        sanPhamNormalTableResponse.setPageSize(request.getPageSize());
-        sanPhamNormalTableResponse.setTotalItem(sanPhamPage.getTotalElements());
+
+        var sanPhamNormalTableResponse = new NormalTableResponse<>(sanPhamBanHangs,request.getPage(),request.getPageSize(),sanPhamPage.getTotalElements());
+
 
         return sanPhamNormalTableResponse;
 
+    }
+
+    private void CheckRequest(TableSanPhamChiTietRequest request) {
+        if (request.getPage() == null) {
+            request.setPage(1);
+        }
+        if (request.getPageSize() == null) {
+            request.setPageSize(10);
+        }
+        if (request.getStatus() == null) {
+            request.setStatus(1);
+        }
+        if (request.getSort() == null) {
+            request.setSort(0);
+        }
     }
 
     List<SanPhamChiTietByIdSP> getSanPhamChiTietsBySanPham(List<SanPhamChiTiet> listSanPhamChiTiet){
