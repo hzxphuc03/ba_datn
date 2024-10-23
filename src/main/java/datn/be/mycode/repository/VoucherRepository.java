@@ -31,4 +31,6 @@ public interface VoucherRepository extends JpaRepository<Voucher,Long> {
     // Tìm kiếm theo phần trăm giảm
     @Query("SELECT v FROM Voucher v WHERE v.phanTramGiam = :phanTramGiam")
     Page<Voucher> searchByPhanTramGiam(int phanTramGiam, Pageable pageable);
+
+
 }

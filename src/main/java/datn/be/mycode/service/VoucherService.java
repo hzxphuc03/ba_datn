@@ -11,6 +11,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -100,4 +101,35 @@ public class VoucherService {
     public Voucher getVoucherById(Long idVoucher) {
         return repository.searchById(idVoucher).get();
     }
+
+    /**
+     * Cập nhật trạng thái của các voucher dựa trên ngày hiện tại.
+     * Trạng thái = 3 nếu voucher đã quá hạn (endDay < ngày hiện tại).
+     * Trạng thái = 0 nếu chưa đến sự kiện (startDay > ngày hiện tại).
+     * Trạng thái = 1 nếu đang trong thời gian sự kiện (startDay <= ngày hiện tại <= endDay).
+     */
+    @Transactional
+    public void capNhatTrangThaiVoucher() {
+        LocalDateTime now = LocalDateTime.now();
+        // Lấy tất cả voucher
+        List<Voucher> vouchers = repository.findAll();
+        for (Voucher voucher : vouchers) {
+            LocalDateTime startDay = voucher.getNgayBatDau();
+            LocalDateTime endDay = voucher.getNgayKetThuc();
+
+            if (endDay.isBefore(now)) {
+                // Voucher đã quá hạn
+                voucher.setTrangThai(3);
+            } else if (startDay.isAfter(now)) {
+                // Voucher chưa đến sự kiện
+                voucher.setTrangThai(0);
+            } else if (startDay.isBefore(now) || startDay.isEqual(now)) {
+                // Voucher đang trong thời gian sự kiện (startDay <= now <= endDay)
+                voucher.setTrangThai(1);
+            }
+            // Lưu lại voucher nếu trạng thái thay đổi
+            repository.save(voucher);
+        }
+    }
+
 }

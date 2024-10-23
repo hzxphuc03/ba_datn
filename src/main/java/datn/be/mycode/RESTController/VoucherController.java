@@ -59,5 +59,12 @@ public class VoucherController {
         return ResponseEntity.ok(service.udateTrangThai(id, status));
     }
 
+    @PutMapping("/update-trangthai-auto")
+    public ResponseEntity<?> capNhatTrangThaiVoucher() {
+        // Gọi phương thức service để thực thi logic cập nhật trạng thái
+        service.capNhatTrangThaiVoucher();
 
+        // Trả về phản hồi thành công
+        return ResponseEntity.ok("Cập nhật trạng thái voucher tự động thành công.");
+    }
 }
