@@ -84,7 +84,7 @@ public class SanPhamService {
                 .nguoiTao(request.getNguoiTao())
                 .soLuong(0)
                 .trangThai(1)
-                .giamGia(request.getIdGiamGia() != 0? giamGiaRepository.findById(request.getIdGiamGia()).get() : null)
+                .giamGia(giamGiaRepository.findById(request.getIdGiamGia()).orElse(null))
                 .thuongHieu(thuongHieuRepository.findById(request.getIdThuongHieu()).get())
                 .theLoai(theLoaiRepository.findById(request.getIdTheLoai()).get())
                 .loaiCo(loaiCoRepository.findById(request.getIdLoaiCo()).get())
@@ -109,7 +109,7 @@ public class SanPhamService {
         sanPham.setKieuDang(request.getKieuDang());
         sanPham.setNgaySua(LocalDateTime.now());
         sanPham.setTrangThai(request.getTrangThai());
-        sanPham.setGiamGia(request.getIdGiamGia() != 0? giamGiaRepository.findById(request.getIdGiamGia()).get() : null);
+        sanPham.setGiamGia(giamGiaRepository.findById(request.getIdGiamGia()).orElse(null));
         sanPham.setThuongHieu(thuongHieuRepository.findById(request.getIdThuongHieu()).get());
         sanPham.setTheLoai(theLoaiRepository.findById(request.getIdTheLoai()).get());
         sanPham.setLoaiCo(loaiCoRepository.findById(request.getIdLoaiCo()).get());
