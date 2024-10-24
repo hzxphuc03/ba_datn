@@ -238,19 +238,35 @@ public class HoaDonService {
         if(idVouchers.size() > 2) return getErro("Hóa đơn chỉ có 2 voucher");
         var vouchers = getListVoucher(idVouchers);
 
-        if (hoaDon != null){
-            if(vouchers.get(0).getTrangThai() != vouchers.get(1).getTrangThai()) {
-                for (Voucher voucher:vouchers) {
-                    var addVoucher = new VoucherHoaDonRequest(hoaDon.getId(), voucher.getId());
-                    voucherHoaDonService.add(addVoucher);
-                }
+        if (hoaDon == null) return getErro("Hóa đơn không tồn tại");
+
+        if(vouchers.get(0).getTrangThai() == vouchers.get(1).getTrangThai()) {
+            return getErro("Voucher cùng 1 loại");
+        }
+
+        var voucherHoaDons = voucherHoaDonService.getVoucherHoaDonByHoaDon(hoaDon.getId());
+
+
+        if (voucherHoaDons.size() == 2){
+            for (int i = 0; i < 2; i++) {
+                var voucherHoaDon = voucherHoaDons.get(i);
+                voucherHoaDon.setVoucher(vouchers.get(i));
+                var updateVoucher = new VoucherHoaDonRequest(voucherHoaDon.getId(),voucherHoaDon.getNgayTao(),voucherHoaDon.getNgaySua(),voucherHoaDon.getTrangThai(),voucherHoaDon.getVoucher().getId(),voucherHoaDon.getHoaDon().getId());
+                voucherHoaDonService.update(updateVoucher);
+            }
+            return ResponseEntity.ok(hoaDon);
+        }
+
+        for (Voucher voucher:vouchers) {
+            var addVoucher = new VoucherHoaDonRequest(voucher.getId(),hoaDon.getId());
+            voucherHoaDonService.add(addVoucher);
+
+        }
+
 //
 //                tính tiền ở đây
 //
-            }
-            return getErro("Voucher cùng 1 loại");
-        }
-        return getErro("Hóa đơn không tồn tại");
+        return ResponseEntity.ok(hoaDon);
     }
 
     private List<Voucher> getListVoucher(List<Long> idVouchers) {

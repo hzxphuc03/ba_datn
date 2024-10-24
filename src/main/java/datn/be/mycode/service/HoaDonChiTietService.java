@@ -154,10 +154,6 @@ public class HoaDonChiTietService {
         }
     }
 
-    private ResponseEntity<?> getErro(String s){
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new erroResponse(s));
-    }
-
     public ResponseEntity<?> addSoLuong(AddSoLuong request) {
         var hoaDonChiTiet = repo.findById(request.getIdHoaDonChiTiet()).orElse(null);
         if(hoaDonChiTiet != null){
@@ -170,4 +166,9 @@ public class HoaDonChiTietService {
         }
         return getErro("Không tìm thấy hóa đơn chi tiết");
     }
+
+    private ResponseEntity<?> getErro(String s){
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new erroResponse(s));
+    }
+
 }
