@@ -7,6 +7,7 @@ import datn.be.mycode.request.VoucherHoaDonRequest;
 import datn.be.mycode.request.customRequest.BanHang.AddObject;
 import datn.be.mycode.request.customRequest.BanHang.AddDiaChi;
 import datn.be.mycode.request.customRequest.BanHang.AddVoucher;
+import datn.be.mycode.request.customRequest.BanHang.updateGiaoHang;
 import datn.be.mycode.request.customRequest.TableHoaDonRequest;
 import datn.be.mycode.response.NormalTableResponse;
 import datn.be.mycode.response.erroResponse;
@@ -78,12 +79,15 @@ public class HoaDonService {
                 .tongTien(request.getTongTien())
                 .tongTienSanPhamChuaGiam(request.getTongTienSanPhamChuaGiam())
                 .tongTienGiam(request.getTongTienGiam())
+                .giaoHang(false)
+                .giaoHang(false)
                 .phuongThucThanhToan(phuongThucThanhToanRepository.findById(request.getIdPhuongThucThanhToan()).get())
                 .nhanVien(nhanVienRepository.findById(request.getIdNhanVien()).get())
                 .khachHang(khachHangRepository.findById(request.getIdKhachHang()).get())
                 .build();
 
         HoaDon hoaDonRes = repo.save(hoaDon);
+        hoaDonRes.setMa("HD"+hoaDonRes.getId());
         ThaoTacHoaDon thaoTacHoaDon = new ThaoTacHoaDon().builder()
                 .thaoTac("add")
                 .trangThai(1)
@@ -104,6 +108,8 @@ public class HoaDonService {
                 .tongTien(BigDecimal.valueOf(0))
                 .tongTienSanPhamChuaGiam(BigDecimal.valueOf(0))
                 .tongTienGiam(BigDecimal.valueOf(0))
+                .giaoHang(false)
+                .giaoHang(false)
                 .phuongThucThanhToan(phuongThucThanhToanRepository.findById(Long.valueOf(1)).get())
                 .nhanVien(nhanVien)
                 .trangThai(1)
@@ -232,14 +238,14 @@ public class HoaDonService {
     }
 
     public ResponseEntity<?> hoaDonAddVoucher(AddVoucher request) {
+
         var hoaDon = repo.findById(request.getIdHoaDon()).orElse(null);
-        var idVouchers = request.getIdVouchers();
-
-        if(idVouchers.size() > 2) return getErro("Hóa đơn chỉ có 2 voucher");
-        var vouchers = getListVoucher(idVouchers);
-
         if (hoaDon == null) return getErro("Hóa đơn không tồn tại");
 
+        var idVouchers = request.getIdVouchers();
+        if(idVouchers.size() > 2) return getErro("Hóa đơn chỉ có 2 voucher");
+
+        var vouchers = getListVoucher(idVouchers);
         if(vouchers.get(0).getTrangThai() == vouchers.get(1).getTrangThai()) {
             return getErro("Voucher cùng 1 loại");
         }
@@ -294,4 +300,15 @@ public class HoaDonService {
         return getErro("Hóa đơn không tồn tại");
     }
 
+    public ResponseEntity<?> isGiaoHangForHoaDon(updateGiaoHang request) {
+        var hoaDon = repo.findById(request.getIdHoaDon()).orElse(null);
+
+        if (hoaDon == null){
+            return getErro("Hóa đơn không tồn tại");
+        }
+
+        hoaDon.setGiaoHang(request.getGiaohang());
+
+        return ResponseEntity.ok(repo.save(hoaDon));
+    }
 }

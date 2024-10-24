@@ -81,6 +81,8 @@ public class KhachHangService {
         khachHang.setTaiKhoan(request.getTaiKhoan());
         khachHang.setMatKhau(request.getMatKhau());
 
+        khachHang = repository.save(khachHang);
+        khachHang.setMa("KH"+khachHang.getId());
         return repository.save(khachHang);
     }
 

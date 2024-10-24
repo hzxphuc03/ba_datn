@@ -116,6 +116,7 @@ public class HoaDonChiTietService {
         }else {
             gia = spct.getGiaBan();
         }
+        var tongTienSanPhamChuaGiam = hd.getTongTienSanPhamChuaGiam();
 
         if(hoaDonChiTiet==null) {
             if(hd!=null && spct!=null) {
@@ -134,11 +135,18 @@ public class HoaDonChiTietService {
         }
 
         else{
+            tongTienSanPhamChuaGiam = tongTienSanPhamChuaGiam.subtract(hoaDonChiTiet.getGiaDaGiam().multiply(BigDecimal.valueOf(hoaDonChiTiet.getSoLuong())));
             hoaDonChiTiet.AddSoluong(request.getSoLuong());
             if(hoaDonChiTiet.getSoLuong()>spct.getSoLuong()) return getErro("Số lượng sản phẩm trong hóa đơn không vượt quá số lượng sản phẩm đang có");
         }
 
         var hoaDonChiTietRes = new HoaDonChiTietResponse(repo.save(hoaDonChiTiet));
+
+
+        tongTienSanPhamChuaGiam = tongTienSanPhamChuaGiam.add(hoaDonChiTietRes.getTong());
+
+        hd.setTongTienSanPhamChuaGiam(tongTienSanPhamChuaGiam);
+        hoaDonRepository.save(hd);
 
         return ResponseEntity.ok(hoaDonChiTietRes);
     }
@@ -147,7 +155,11 @@ public class HoaDonChiTietService {
     public ResponseEntity<?> delete(Long id){
         try{
             var hoaDonChiTiet = repo.findById(id).get();
+            var hoaDon = hoaDonChiTiet.getHoaDon();
+            var tienSauKhiXoaSanPham = hoaDon.getTongTienSanPhamChuaGiam().subtract(hoaDonChiTiet.getGiaDaGiam().multiply(BigDecimal.valueOf(hoaDonChiTiet.getSoLuong())));
+            hoaDon.setTongTienSanPhamChuaGiam(tienSauKhiXoaSanPham);
             repo.delete(hoaDonChiTiet);
+            hoaDonRepository.save(hoaDon);
             return ResponseEntity.ok("Xóa thành công");
         }catch (Exception e){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new erroResponse(400,"Xóa thất bại"));

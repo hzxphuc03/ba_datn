@@ -5,6 +5,7 @@ import datn.be.mycode.request.HoaDonRequest;
 import datn.be.mycode.request.customRequest.BanHang.AddDiaChi;
 import datn.be.mycode.request.customRequest.BanHang.AddObject;
 import datn.be.mycode.request.customRequest.BanHang.AddVoucher;
+import datn.be.mycode.request.customRequest.BanHang.updateGiaoHang;
 import datn.be.mycode.request.customRequest.TableHoaDonRequest;
 import datn.be.mycode.service.HoaDonService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -71,6 +72,12 @@ public class HoaDonCotroller {
     public ResponseEntity<?> addDiaChi(@RequestBody() AddDiaChi request){
 
         return ResponseEntity.ok(hoaDonService.hoaDonAddDiaChi(request));
+    }
+
+    @PutMapping("/update-trang-thai-giao-hang")
+    public ResponseEntity<?> isGiaoHangForHoaDon(@RequestBody() updateGiaoHang request){
+
+        return ResponseEntity.ok(hoaDonService.isGiaoHangForHoaDon(request));
     }
 
     @PutMapping("/add-voucher")

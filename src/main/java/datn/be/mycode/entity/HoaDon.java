@@ -68,6 +68,12 @@ public class HoaDon implements Serializable {
     @Column(name = "tong_tien_giam")
     private BigDecimal tongTienGiam;
 
+    @Column(name = "thanh_toan")
+    private Boolean thanhToan;
+
+    @Column(name = "giao_hang")
+    private Boolean giaoHang;
+
     @Column(name = "trang_thai")
     private int trangThai;
 

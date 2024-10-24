@@ -91,8 +91,10 @@ public class SanPhamService {
                 .vatLieu(vatLieuRepository.findById(request.getIdVatLieu()).get())
                 .loaiDe(loaiDeRepository.findById(request.getIdLoaiDe()).get())
                 .build();
+        var sanPhamR = repo.save(sanPham);
+        sanPhamR.setMa("SP"+sanPham.getId());
 
-        return repo.save(sanPham);
+        return repo.save(sanPhamR);
     }
 
 
