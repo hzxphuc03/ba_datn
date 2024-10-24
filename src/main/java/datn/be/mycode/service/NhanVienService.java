@@ -94,18 +94,8 @@ public class NhanVienService {
                 .chucVu(chucVuRepository.findById(request.getIdChucVu()).get())
                 .trangThai(1)
                 .build();
-//        setMa(request);
-//        nhanvien.setHoTen(request);
-//        nhanvien.setNgaySinh(LocalDateTime.now());
-//        nhanvien.setNgayTao(LocalDateTime.now());
-//        nhanvien.setSoDienThoai(request);
-//        nhanvien.setGioiTinh(request);
-//        nhanvien.setDiaChi(request);
-//        nhanvien.setHinhAnh(request);
-//        nhanvien.setEmail(request);
-//        nhanvien.setTaiKhoan(request);
-//        nhanvien.setMatKhau(request);
-        //nhanvien.setTrangThai(1);
+        nhanvien = repo.save(nhanvien);
+        nhanvien.setMa("NV"+nhanvien.getId());
         return repo.save(nhanvien);
     }
 

@@ -60,6 +60,10 @@ public class VoucherHoaDonService {
         return voucherHoaDonNormalTableResponse;
     }
 
+    public List<VoucherHoaDon> getVoucherHoaDonByHoaDon(Long idHoaDon){
+        return vhRepo.findByHoaDonId(idHoaDon);
+    }
+
     public VoucherHoaDon add(VoucherHoaDonRequest request) {
         System.out.println("addDC1");
         System.out.println(request);
