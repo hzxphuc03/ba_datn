@@ -1,11 +1,15 @@
 package datn.be.mycode.RESTController;
 
+import datn.be.mycode.entity.VoucherHoaDon;
 import datn.be.mycode.request.NormalTableRequest;
 import datn.be.mycode.request.VoucherHoaDonRequest;
+import datn.be.mycode.request.customRequest.TableVoucherHoaDonRequest;
 import datn.be.mycode.service.VoucherHoaDonService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/voucher_hoa_don")
@@ -42,6 +46,25 @@ public class VoucherHoaDonController {
                                              @RequestParam(name = "status",required = true) Integer status
     ){
 
-        return ResponseEntity.ok(service.udateTrangThai(id, status));
+        return ResponseEntity.ok(service.updateTrangThai(id, status));
     }
+
+    @GetMapping("/Voucher-Hoa-Don")
+    public ResponseEntity<?> getVoucherHoaDon(
+            @RequestParam(name = "page",required = false) Integer page,
+            @RequestParam(name = "pageSize",required = false) Integer pageSize)
+    {
+        TableVoucherHoaDonRequest request = new TableVoucherHoaDonRequest(page,pageSize);
+        return ResponseEntity.ok(service.getVoucherHoaDon(request));
+    }
+
+    @GetMapping("/Voucher-Ship")
+    public ResponseEntity<?> getVoucherShip(
+            @RequestParam(name = "page",required = false) Integer page,
+            @RequestParam(name = "pageSize",required = false) Integer pageSize)
+    {
+        TableVoucherHoaDonRequest request = new TableVoucherHoaDonRequest(page,pageSize);
+        return ResponseEntity.ok(service.getVoucherShip(request));
+    }
+
 }

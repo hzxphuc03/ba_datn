@@ -32,5 +32,6 @@ public interface VoucherRepository extends JpaRepository<Voucher,Long> {
     @Query("SELECT v FROM Voucher v WHERE v.phanTramGiam = :phanTramGiam")
     Page<Voucher> searchByPhanTramGiam(int phanTramGiam, Pageable pageable);
 
+    Page<Voucher> findByNgayBatDauLessThanEqualAndNgayKetThucGreaterThanEqual(LocalDateTime today1, LocalDateTime today2,Pageable pageable);
 
 }
