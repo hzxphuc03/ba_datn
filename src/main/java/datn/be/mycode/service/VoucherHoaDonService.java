@@ -6,6 +6,7 @@ import datn.be.mycode.repository.VoucherHoaDonRepository;
 import datn.be.mycode.repository.VoucherRepository;
 import datn.be.mycode.request.NormalTableRequest;
 import datn.be.mycode.request.VoucherHoaDonRequest;
+import datn.be.mycode.request.customRequest.TableVoucherHoaDonRequest;
 import datn.be.mycode.response.NormalTableResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -34,19 +35,19 @@ public class VoucherHoaDonService {
         if (request.getPageSize() == null) {
             request.setPageSize(10);
         }
-        if (request.getStatus() == null) {
-            request.setStatus(1);
-        }
 
         NormalTableResponse<VoucherHoaDon> voucherHoaDonNormalTableResponse = new NormalTableResponse<>();
         Pageable pageable = PageRequest.of(request.getPage() - 1,request.getPageSize());
         Page<VoucherHoaDon> voucherPage;
-        if (request.getKeyWord() != null && vhRepo.searchByVoucherMa(request.getKeyWord(), pageable).hasContent()) {
+        if (request.getKeyWord() != null ) {
             voucherPage = vhRepo.searchByVoucherMa(request.getKeyWord(), pageable);
-        } else if (request.getKeyWord() != null && vhRepo.searchByVoucherTen(request.getKeyWord(), pageable).hasContent()) {
-            voucherPage = vhRepo.searchByVoucherTen(request.getKeyWord(), pageable);
-        }else {
+            if(voucherPage.getTotalElements() == 0) {
+                voucherPage = vhRepo.searchByVoucherTen(request.getKeyWord(), pageable);
+            }
+        } else if (request.getStatus() != null){
             voucherPage = vhRepo.findAllByTrangThai(request.getStatus(), pageable);
+        }else{
+            voucherPage = vhRepo.findAll(pageable);
         }
 
         List<VoucherHoaDon> voucherHoaDons = voucherPage.getContent().stream().toList();
@@ -66,7 +67,7 @@ public class VoucherHoaDonService {
         voucherHoaDon.setNgayTao(LocalDateTime.now());
         voucherHoaDon.setVoucher(vcherRepo.searchById(request.getVoucher()).get());
         voucherHoaDon.setHoaDon(hoaDonRepository.searchById(request.getHoaDon()).get());
-        voucherHoaDon.setTrangThai(1);
+        voucherHoaDon.setTrangThai(request.getTrangThai());
 
         return vhRepo.save(voucherHoaDon);
     }
@@ -80,9 +81,57 @@ public class VoucherHoaDonService {
         return vhRepo.save(voucherHoaDon);
     }
 
-    public VoucherHoaDon udateTrangThai(Long id, Integer status){
+    public VoucherHoaDon updateTrangThai(Long id, Integer status){
         VoucherHoaDon voucherHoaDon = vhRepo.findById(id).get();
         voucherHoaDon.setTrangThai(status);
         return vhRepo.save(voucherHoaDon);
     }
+
+    public NormalTableResponse<VoucherHoaDon> getVoucherHoaDon(TableVoucherHoaDonRequest request) {
+
+        if (request.getPage() ==  null) {
+            request.setPage(1);
+        }
+        if (request.getPageSize() == null) {
+            request.setPageSize(10);
+        }
+
+        NormalTableResponse<VoucherHoaDon> voucherHoaDonNormalTableResponse = new NormalTableResponse<>();
+        Pageable pageable = PageRequest.of(request.getPage() - 1,request.getPageSize());
+        Page<VoucherHoaDon> voucherPage;
+            voucherPage = vhRepo.findAllByTrangThai1(pageable);
+        List<VoucherHoaDon> voucherHoaDons = voucherPage.getContent().stream().toList();
+
+        voucherHoaDonNormalTableResponse.setItem(voucherHoaDons);
+        voucherHoaDonNormalTableResponse.setPage(request.getPage());
+        voucherHoaDonNormalTableResponse.setPageSize(request.getPageSize());
+        voucherHoaDonNormalTableResponse.setTotalItem(voucherPage.getTotalElements());
+
+        return voucherHoaDonNormalTableResponse;
+    }
+
+    public NormalTableResponse<VoucherHoaDon> getVoucherShip(TableVoucherHoaDonRequest request) {
+
+        if (request.getPage() ==  null) {
+            request.setPage(1);
+        }
+        if (request.getPageSize() == null) {
+            request.setPageSize(10);
+        }
+
+        NormalTableResponse<VoucherHoaDon> voucherHoaDonNormalTableResponse = new NormalTableResponse<>();
+        Pageable pageable = PageRequest.of(request.getPage() - 1,request.getPageSize());
+        Page<VoucherHoaDon> voucherPage;
+        voucherPage = vhRepo.findAllByTrangThai2(pageable);
+        List<VoucherHoaDon> voucherHoaDons = voucherPage.getContent().stream().toList();
+
+        voucherHoaDonNormalTableResponse.setItem(voucherHoaDons);
+        voucherHoaDonNormalTableResponse.setPage(request.getPage());
+        voucherHoaDonNormalTableResponse.setPageSize(request.getPageSize());
+        voucherHoaDonNormalTableResponse.setTotalItem(voucherPage.getTotalElements());
+
+        return voucherHoaDonNormalTableResponse;
+    }
+
+
 }

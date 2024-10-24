@@ -3,6 +3,7 @@ package datn.be.mycode.RESTController;
 
 import datn.be.mycode.request.VoucherRequest;
 import datn.be.mycode.request.customRequest.TableVoucherRequest;
+import datn.be.mycode.request.customRequest.TableVoucherStatusInRequest;
 import datn.be.mycode.service.VoucherService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -67,4 +68,16 @@ public class VoucherController {
         // Trả về phản hồi thành công
         return ResponseEntity.ok("Cập nhật trạng thái voucher tự động thành công.");
     }
+
+    @GetMapping("trong-su-kien")
+    public ResponseEntity<?> trongSuKien(
+            @RequestParam(name = "page",required = false) Integer page,
+            @RequestParam(name = "pageSize",required = false) Integer pageSize,
+            @RequestParam(name = "status",required = false) Integer status
+    ){
+
+        TableVoucherStatusInRequest request = new TableVoucherStatusInRequest(page,pageSize,status);
+        return ResponseEntity.ok(service.trongSuKien(request));
+    }
+
 }

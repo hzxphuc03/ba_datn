@@ -16,7 +16,7 @@ import java.util.Optional;
 @Repository
 public interface VoucherRepository extends JpaRepository<Voucher,Long> {
     Page<Voucher> findAllByTrangThai(int trangThai, Pageable pageable);
-
+    Page<Voucher> findAll(Pageable pageable);
     @Query("SELECT u FROM Voucher u WHERE u.ten LIKE %:query% OR u.ma LIKE %:query%")
     Page<Voucher> searchByTenOrMa(@Param("query") String query, Pageable pageable);
 
@@ -32,5 +32,6 @@ public interface VoucherRepository extends JpaRepository<Voucher,Long> {
     @Query("SELECT v FROM Voucher v WHERE v.phanTramGiam = :phanTramGiam")
     Page<Voucher> searchByPhanTramGiam(int phanTramGiam, Pageable pageable);
 
+    Page<Voucher> findByNgayBatDauLessThanEqualAndNgayKetThucGreaterThanEqual(LocalDateTime today1, LocalDateTime today2,Pageable pageable);
 
 }

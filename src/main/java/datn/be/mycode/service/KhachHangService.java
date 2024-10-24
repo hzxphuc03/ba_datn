@@ -29,23 +29,26 @@ public class KhachHangService {
         if (request.getPageSize() == null) {
             request.setPageSize(10);
         }
-        if (request.getStatus() == null) {
-            request.setStatus(1);
-        }
+
 
         NormalTableResponse<KhachHang> khachHangNormalTableResponse = new NormalTableResponse<>();
         Pageable pageable = PageRequest.of(request.getPage() - 1,request.getPageSize());
         Page<KhachHang> khachHangPage;
         if (request.getKeyWord() != null) {
             khachHangPage = repository.searchByTen(request.getKeyWord(), pageable);
-        } else if (request.getSoDienThoai() != null) {
-            khachHangPage = repository.searchBySoDienThoai(request.getSoDienThoai(), pageable);
-        } else if (request.getTaiKhoan() != null) {
-            khachHangPage = repository.searchByTaiKhoan(request.getTaiKhoan(), pageable);
-        } else if (request.getEmail() != null) {
-            khachHangPage = repository.searchByEmail(request.getEmail(), pageable);
-        } else {
+            if(khachHangPage.getTotalElements() == 0){
+                khachHangPage = repository.searchBySoDienThoai(request.getKeyWord(), pageable);
+                if(khachHangPage.getTotalElements() == 0){
+                    khachHangPage = repository.searchByTaiKhoan(request.getKeyWord(), pageable);
+                    if(khachHangPage.getTotalElements() == 0){
+                        khachHangPage = repository.searchByEmail(request.getKeyWord(), pageable);
+                    }
+                }
+            }
+        } else if (request.getStatus() != null){
             khachHangPage = repository.findAllByTrangThai(request.getStatus(), pageable);
+        }else{
+            khachHangPage = repository.findAll(pageable);
         }
 
         List<KhachHang> khachHangs = khachHangPage.getContent().stream().toList();
