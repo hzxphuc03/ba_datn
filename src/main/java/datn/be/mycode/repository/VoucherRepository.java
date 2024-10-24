@@ -16,7 +16,7 @@ import java.util.Optional;
 @Repository
 public interface VoucherRepository extends JpaRepository<Voucher,Long> {
     Page<Voucher> findAllByTrangThai(int trangThai, Pageable pageable);
-
+    Page<Voucher> findAll(Pageable pageable);
     @Query("SELECT u FROM Voucher u WHERE u.ten LIKE %:query% OR u.ma LIKE %:query%")
     Page<Voucher> searchByTenOrMa(@Param("query") String query, Pageable pageable);
 

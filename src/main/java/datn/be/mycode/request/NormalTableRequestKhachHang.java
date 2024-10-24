@@ -18,9 +18,4 @@ public class NormalTableRequestKhachHang {
 
     private Integer status;
 
-    private String soDienThoai;
-
-    private String taiKhoan;
-
-    private String email;
 }

@@ -19,14 +19,11 @@ public class KhachHangController {
             @RequestParam(name = "page",required = false) Integer page,
             @RequestParam(name = "pageSize",required = false) Integer pageSize,
             @RequestParam(name = "keyWord",required = false) String keyWord,
-            @RequestParam(name = "status",required = false) Integer status,
-            @RequestParam(name = "soDienThoai",required = false) String soDienThoai,
-            @RequestParam(name = "taiKhoan",required = false) String taiKhoan,
-            @RequestParam(name = "email",required = false) String email
+            @RequestParam(name = "status",required = false) Integer status
 
     ){
 
-        NormalTableRequestKhachHang request = new NormalTableRequestKhachHang(page,pageSize,keyWord,status,soDienThoai,taiKhoan,email);
+        NormalTableRequestKhachHang request = new NormalTableRequestKhachHang(page,pageSize,keyWord,status);
         return ResponseEntity.ok(khachHangService.getAll(request));
     }
 

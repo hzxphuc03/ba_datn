@@ -29,11 +29,11 @@ public class VoucherHoaDon implements Serializable {
     @Column(name = "trang_thai")
     private int trangThai;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne()
     @JoinColumn(name = "id_voucher", referencedColumnName = "id")
     private Voucher voucher;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne()
     @JoinColumn(name = "id_hoa_don", referencedColumnName = "id")
     private HoaDon hoaDon;
 

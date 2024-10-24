@@ -13,6 +13,7 @@ import java.util.List;
 public interface VoucherHoaDonRepository extends JpaRepository<VoucherHoaDon,Long> {
 
     Page<VoucherHoaDon> findAllByTrangThai(int trangThai, Pageable pageable);
+    Page<VoucherHoaDon> findAll(Pageable pageable);
 
     @Query("SELECT vhd FROM VoucherHoaDon vhd WHERE vhd.voucher.ma LIKE %:ma%")
     Page<VoucherHoaDon> searchByVoucherMa(String ma, Pageable pageable);

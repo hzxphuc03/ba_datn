@@ -31,9 +31,7 @@ public class VoucherService {
         if (request.getPageSize() == null) {
             request.setPageSize(10);
         }
-        if (request.getStatus() == null) {
-            request.setStatus(1);
-        }
+
 
         NormalTableResponse<Voucher> voucherNormalTableResponse = new NormalTableResponse<>();
         Pageable pageable = PageRequest.of(request.getPage() - 1,request.getPageSize());
@@ -44,8 +42,10 @@ public class VoucherService {
             voucherPage = repository.searchByNgayTao(request.getStartDate(),request.getEndDate(), pageable);
         }else if (request.getPhanTramGiam() != null ){
             voucherPage = repository.searchByPhanTramGiam(request.getPhanTramGiam(), pageable);
-        } else {
+        } else if (request.getStatus() != null){
             voucherPage = repository.findAllByTrangThai(request.getStatus(), pageable);
+        }else{
+            voucherPage = repository.findAll(pageable);
         }
 
         List<Voucher> vouchers = voucherPage.getContent().stream().toList();
