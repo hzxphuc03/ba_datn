@@ -7,8 +7,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
-
 @Repository
 public interface VoucherHoaDonRepository extends JpaRepository<VoucherHoaDon,Long> {
 
@@ -21,4 +19,11 @@ public interface VoucherHoaDonRepository extends JpaRepository<VoucherHoaDon,Lon
     Page<VoucherHoaDon> searchByVoucherTen(String ten, Pageable pageable);
 
     List<VoucherHoaDon> findByHoaDonId(Long idHoaDon);
+
+    @Query("SELECT v FROM VoucherHoaDon v WHERE v.trangThai = 1")
+    Page<VoucherHoaDon> findAllByTrangThai1(Pageable pageable);
+
+    @Query("SELECT v FROM VoucherHoaDon v WHERE v.trangThai = 2")
+    Page<VoucherHoaDon> findAllByTrangThai2(Pageable pageable);
+
 }
