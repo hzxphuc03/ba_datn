@@ -183,4 +183,17 @@ public class HoaDonChiTietService {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new erroResponse(s));
     }
 
+    public String checkSoLuong(Long idHoaDon) {
+        List<HoaDonChiTiet> hoaDonChiTietForHoaDon = repo.findAllByHoaDon_Id(idHoaDon);
+
+        for (HoaDonChiTiet hoaDonChiTiet:hoaDonChiTietForHoaDon) {
+            var soLuongHoaDonChiTiet = hoaDonChiTiet.getSoLuong();
+            var soLuongSanPham = hoaDonChiTiet.getSanPhamChiTiet().getSoLuong();
+            if(soLuongSanPham == 0) return "Sản phảm " + hoaDonChiTiet.getSanPhamChiTiet().getSanPham().getMa() +" đã hết";
+            if(soLuongHoaDonChiTiet > soLuongSanPham) {
+                return "Sản phảm " + hoaDonChiTiet.getSanPhamChiTiet().getSanPham().getMa() +" không đủ số lượng";
+            }
+        }
+        return null;
+    }
 }

@@ -2,10 +2,7 @@ package datn.be.mycode.RESTController;
 
 import datn.be.mycode.request.HoaDonRequest;
 
-import datn.be.mycode.request.customRequest.BanHang.AddDiaChi;
-import datn.be.mycode.request.customRequest.BanHang.AddObject;
-import datn.be.mycode.request.customRequest.BanHang.AddVoucher;
-import datn.be.mycode.request.customRequest.BanHang.updateGiaoHang;
+import datn.be.mycode.request.customRequest.BanHang.*;
 import datn.be.mycode.request.customRequest.TableHoaDonRequest;
 import datn.be.mycode.service.HoaDonService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -79,11 +76,16 @@ public class HoaDonCotroller {
 
         return ResponseEntity.ok(hoaDonService.isGiaoHangForHoaDon(request));
     }
+    @PutMapping("/thanh-toan-tai-quay")
+    public ResponseEntity<?> thanhToan(@RequestBody() ThanhToanRequest request){
+
+        return ResponseEntity.ok(hoaDonService.thanhToan(request));
+    }
 
     @DeleteMapping("/delete-voucher")
-    public ResponseEntity<?> deleteVoucher(@RequestBody() Long idHoaDon){
+    public ResponseEntity<?> deleteVoucher(@RequestBody() DeleteVoucher request){
 
-        return ResponseEntity.ok(hoaDonService.deleteVoucher(idHoaDon));
+        return ResponseEntity.ok(hoaDonService.deleteVoucher(request));
     }
 
     @PutMapping("/add-voucher")
