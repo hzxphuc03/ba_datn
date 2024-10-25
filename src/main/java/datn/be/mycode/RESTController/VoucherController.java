@@ -27,12 +27,13 @@ public class VoucherController {
             @RequestParam(name = "pageSize",required = false) Integer pageSize,
             @RequestParam(name = "keyWord",required = false) String keyWord,
             @RequestParam(name = "status",required = false) Integer status,
+            @RequestParam(name = "theLoai",required = false) Integer theLoai,
             @RequestParam(name = "startDate",required = false) LocalDateTime startDate,
             @RequestParam(name = "endDate",required = false) LocalDateTime endDate,
             @RequestParam(name = "phanTramGiam",required = false) Integer phanTramGiam
     ){
 
-        TableVoucherRequest request = new TableVoucherRequest(page,pageSize,keyWord,status,startDate,endDate,phanTramGiam);
+        TableVoucherRequest request = new TableVoucherRequest(page,pageSize,keyWord,status,theLoai,startDate,endDate,phanTramGiam);
         return ResponseEntity.ok(service.getAll(request));
     }
 
