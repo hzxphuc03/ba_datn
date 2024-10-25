@@ -18,6 +18,8 @@ public class TableVoucherRequest {
 
     private Integer status;
 
+    private Integer theLoai;
+
     private LocalDateTime startDate;
 
     private LocalDateTime endDate;

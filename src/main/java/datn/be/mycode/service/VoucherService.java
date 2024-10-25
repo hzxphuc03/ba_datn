@@ -46,6 +46,8 @@ public class VoucherService {
             voucherPage = repository.searchByPhanTramGiam(request.getPhanTramGiam(), pageable);
         } else if (request.getStatus() != null){
             voucherPage = repository.findAllByTrangThai(request.getStatus(), pageable);
+        }else if (request.getTheLoai() != null){
+            voucherPage = repository.findAllByTheLoai(request.getTheLoai(), pageable);
         }else{
             voucherPage = repository.findAll(pageable);
         }
@@ -124,10 +126,10 @@ public class VoucherService {
 
             if (endDay.isBefore(now)) {
                 // Voucher đã quá hạn
-                voucher.setTrangThai(2);
+                voucher.setTrangThai(0);
             } else if (startDay.isAfter(now)) {
                 // Voucher chưa đến sự kiện
-                voucher.setTrangThai(0);
+                voucher.setTrangThai(2);
             } else if (startDay.isBefore(now) || startDay.isEqual(now)) {
                 // Voucher đang trong thời gian sự kiện (startDay <= now <= endDay)
                 voucher.setTrangThai(1);
