@@ -242,48 +242,34 @@ public class HoaDonService {
         var hoaDon = repo.findById(request.getIdHoaDon()).orElse(null);
         if (hoaDon == null) return getErro("Hóa đơn không tồn tại");
 
-        var idVouchers = request.getIdVouchers();
-        if(idVouchers.size() > 2) return getErro("Hóa đơn chỉ có 2 voucher");
+        var idVoucher = request.getIdVoucher();
 
-        var vouchers = getListVoucher(idVouchers);
-        if(vouchers.get(0).getTrangThai() == vouchers.get(1).getTrangThai()) {
-            return getErro("Voucher cùng 1 loại");
+        var voucher = voucherRepository.findById(request.getIdVoucher()).orElse(null);
+        if(voucher == null || voucher.getTrangThai() != 1) {
+            return getErro("không tìm thấy voucher hoặc voucher không hoạt động");
         }
 
         var voucherHoaDons = voucherHoaDonService.getVoucherHoaDonByHoaDon(hoaDon.getId());
 
-
-        if (voucherHoaDons.size() == 2){
-            for (int i = 0; i < 2; i++) {
-                var voucherHoaDon = voucherHoaDons.get(i);
-                voucherHoaDon.setVoucher(vouchers.get(i));
+//        check xem hoaDon có voucher này chưa
+        boolean addNewVoucher = true;
+        for (VoucherHoaDon voucherHoaDon:voucherHoaDons) {
+            if(voucherHoaDon.getVoucher().getTheLoai() == voucher.getTheLoai()){
+                voucherHoaDon.setVoucher(voucher);
                 var updateVoucher = new VoucherHoaDonRequest(voucherHoaDon.getId(),voucherHoaDon.getNgayTao(),voucherHoaDon.getNgaySua(),voucherHoaDon.getTrangThai(),voucherHoaDon.getVoucher().getId(),voucherHoaDon.getHoaDon().getId());
                 voucherHoaDonService.update(updateVoucher);
+                addNewVoucher = false;
             }
-            return ResponseEntity.ok(hoaDon);
         }
-
-        for (Voucher voucher:vouchers) {
-            var addVoucher = new VoucherHoaDonRequest(voucher.getId(),hoaDon.getId());
+        if(addNewVoucher) {
+            var addVoucher = new VoucherHoaDonRequest(voucher.getId(), hoaDon.getId());
             voucherHoaDonService.add(addVoucher);
-
         }
 
 //
 //                tính tiền ở đây
 //
         return ResponseEntity.ok(hoaDon);
-    }
-
-    private List<Voucher> getListVoucher(List<Long> idVouchers) {
-        var vouchers = new ArrayList<Voucher>();
-        for (int i = 0; i < 2; i++) {
-            var voucher = voucherRepository.findById(idVouchers.get(i)).orElse(null);
-            if(voucher != null){
-                vouchers.add(voucher);
-            }
-        }
-        return vouchers;
     }
 
     public ResponseEntity<?> hoaDonAddPhuongThucThanhToan(AddObject request) {

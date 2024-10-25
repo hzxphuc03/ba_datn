@@ -14,5 +14,5 @@ public class AddVoucher {
 
     private Long idHoaDon;
 
-    private List<Long> idVouchers;
+    private Long idVoucher;
 }

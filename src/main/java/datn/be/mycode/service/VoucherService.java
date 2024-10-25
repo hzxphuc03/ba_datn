@@ -80,7 +80,9 @@ public class VoucherService {
         voucher.setGiaTriGiamToiThieu(request.getGiaTriGiamToiThieu());
         voucher.setTrangThai(request.getTrangThai());
 
-        return repository.save(voucher);
+        voucher = repository.save(voucher);
+        capNhatTrangThaiVoucher();
+        return voucher;
     }
 
     public Voucher update(VoucherRequest request) {
@@ -96,7 +98,10 @@ public class VoucherService {
         voucher.setGiamToiDa(request.getGiamToiDa());
         voucher.setGiaTriGiamToiThieu(request.getGiaTriGiamToiThieu());
         voucher.setTrangThai(request.getTrangThai());
-        return repository.save(voucher);
+
+        voucher = repository.save(voucher);
+        capNhatTrangThaiVoucher();
+        return voucher;
     }
 
     public Voucher udateTrangThai(Long id, Integer status){
