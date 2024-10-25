@@ -22,5 +22,6 @@ public class VoucherHoaDonRequest {
     public VoucherHoaDonRequest(Long voucher, Long hoaDon) {
         this.voucher = voucher;
         this.hoaDon = hoaDon;
+        this.trangThai = 1;
     }
 }
