@@ -9,6 +9,7 @@ import datn.be.mycode.request.customRequest.BanHang.AddDiaChi;
 import datn.be.mycode.request.customRequest.BanHang.AddVoucher;
 import datn.be.mycode.request.customRequest.BanHang.updateGiaoHang;
 import datn.be.mycode.request.customRequest.TableHoaDonRequest;
+import datn.be.mycode.response.HoaDonResponse;
 import datn.be.mycode.response.NormalTableResponse;
 import datn.be.mycode.response.erroResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,7 +43,7 @@ public class HoaDonService {
     @Autowired
     private VoucherHoaDonService voucherHoaDonService;
 
-    public NormalTableResponse<HoaDon> getAll(TableHoaDonRequest request) {
+    public NormalTableResponse<HoaDonResponse> getAll(TableHoaDonRequest request) {
         if (request.getPage() == null) {
             request.setPage(1);
         }
@@ -52,16 +53,22 @@ public class HoaDonService {
         if (request.getStatus() == null) {
             request.setStatus(1);
         }
-        NormalTableResponse<HoaDon> hoaDonNormalTableResponse = new NormalTableResponse<>();
+
         Pageable pageable = PageRequest.of(request.getPage() - 1,request.getPageSize());
         Page<HoaDon> hoaDonResponsePage;
         hoaDonResponsePage = repo.searchAll(request.getKeyWord(), request.getStartDate(), request.getEndDate(), request.getIdKhachHang(), request.getIdNhanVien(), pageable);
-        List<HoaDon> hoaDonResponses = hoaDonResponsePage.getContent().stream().toList();
 
-        hoaDonNormalTableResponse.setItem(hoaDonResponses);
-        hoaDonNormalTableResponse.setPage(request.getPage());
-        hoaDonNormalTableResponse.setPageSize(request.getPageSize());
-        hoaDonNormalTableResponse.setTotalItem(hoaDonResponsePage.getTotalElements());
+        List<HoaDon> hoaDons = hoaDonResponsePage.getContent().stream().toList();
+        List<HoaDonResponse> hoaDonResponses = new ArrayList<>();
+
+        for (HoaDon hoaDon :hoaDons) {
+            List<Voucher> vouchers = voucherHoaDonService.getVouchersByHoaDonId(hoaDon.getId());
+            HoaDonResponse hoaDonResponse = new HoaDonResponse(hoaDon,vouchers);
+            hoaDonResponses.add(hoaDonResponse);
+        }
+
+        var hoaDonNormalTableResponse = new NormalTableResponse<HoaDonResponse>(hoaDonResponses,request.getPage(),request.getPageSize(),hoaDonResponsePage.getTotalElements());
+
 
         return hoaDonNormalTableResponse;
     }
@@ -298,5 +305,15 @@ public class HoaDonService {
         hoaDon.setGiaoHang(request.getGiaohang());
 
         return ResponseEntity.ok(repo.save(hoaDon));
+    }
+
+    public ResponseEntity<?> deleteVoucher(Long request) {
+
+        HoaDon hoaDon = repo.findById(request).orElse(null);
+        if(hoaDon == null) return getErro("Hóa đơn không tồn tại");
+//        kiểm tra hoa don da thanh toan hay chua
+        if (hoaDon.getTrangThai() == 6) return getErro("Hóa đơn này không được thay đổi");
+        voucherHoaDonService.deleteByHoaDon(request);
+        return ResponseEntity.ok(hoaDon);
     }
 }

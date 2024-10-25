@@ -80,6 +80,12 @@ public class HoaDonCotroller {
         return ResponseEntity.ok(hoaDonService.isGiaoHangForHoaDon(request));
     }
 
+    @DeleteMapping("/delete-voucher")
+    public ResponseEntity<?> deleteVoucher(@RequestBody() Long idHoaDon){
+
+        return ResponseEntity.ok(hoaDonService.deleteVoucher(idHoaDon));
+    }
+
     @PutMapping("/add-voucher")
     public ResponseEntity<?> addVoucher(@RequestBody() AddVoucher request){
 
