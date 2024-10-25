@@ -4,10 +4,7 @@ import datn.be.mycode.entity.*;
 import datn.be.mycode.repository.*;
 import datn.be.mycode.request.HoaDonRequest;
 import datn.be.mycode.request.VoucherHoaDonRequest;
-import datn.be.mycode.request.customRequest.BanHang.AddObject;
-import datn.be.mycode.request.customRequest.BanHang.AddDiaChi;
-import datn.be.mycode.request.customRequest.BanHang.AddVoucher;
-import datn.be.mycode.request.customRequest.BanHang.updateGiaoHang;
+import datn.be.mycode.request.customRequest.BanHang.*;
 import datn.be.mycode.request.customRequest.TableHoaDonRequest;
 import datn.be.mycode.response.HoaDonResponse;
 import datn.be.mycode.response.NormalTableResponse;
@@ -42,6 +39,9 @@ public class HoaDonService {
     private VoucherRepository voucherRepository;
     @Autowired
     private VoucherHoaDonService voucherHoaDonService;
+
+    @Autowired
+    private HoaDonChiTietService hoaDonChiTietService;
 
     public NormalTableResponse<HoaDonResponse> getAll(TableHoaDonRequest request) {
         if (request.getPage() == null) {
@@ -226,10 +226,6 @@ public class HoaDonService {
         hoaDon.setGhiChu(request.getGhiChu());
     }
 
-    private ResponseEntity<?> getErro(String s){
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new erroResponse(s));
-    }
-
     public ResponseEntity<?> hoaDonAddKhachHang(AddObject request) {
         var hoaDon = repo.findById(request.getIdHoaDon()).orElse(null);
         var khachHang = khachHangRepository.findById(request.getIdObject()).orElse(null);
@@ -307,13 +303,62 @@ public class HoaDonService {
         return ResponseEntity.ok(repo.save(hoaDon));
     }
 
-    public ResponseEntity<?> deleteVoucher(Long request) {
+    public ResponseEntity<?> deleteVoucher(DeleteVoucher request) {
 
-        HoaDon hoaDon = repo.findById(request).orElse(null);
+        HoaDon hoaDon = repo.findById(request.getIdHoaDon()).orElse(null);
         if(hoaDon == null) return getErro("Hóa đơn không tồn tại");
 //        kiểm tra hoa don da thanh toan hay chua
         if (hoaDon.getTrangThai() == 6) return getErro("Hóa đơn này không được thay đổi");
-        voucherHoaDonService.deleteByHoaDon(request);
+        voucherHoaDonService.delete(request.getIdVoucher());
         return ResponseEntity.ok(hoaDon);
+    }
+
+    public ResponseEntity<?> thanhToan(ThanhToanRequest request) {
+        HoaDon hoaDon = repo.findById(request.getIdHoaDon()).orElse(null);
+        if(hoaDon == null) return getErro("Hóa đơn này không tồn tại");
+        if(checkVoucherForHoaDon(hoaDon)) return getErro("Có voucher đã hết hạn");
+
+        String messCheckSoLuong = hoaDonChiTietService.checkSoLuong(hoaDon.getId());
+        if(messCheckSoLuong != null) getErro(messCheckSoLuong);
+
+        setHoaDon(hoaDon, request);
+        hoaDon.setNgayThanhToan(LocalDateTime.now());
+        hoaDon.setThanhToan(true);
+
+        repo.save(hoaDon);
+        return ResponseEntity.ok("Thành công");
+    }
+
+    private void setHoaDon(HoaDon hoaDon, ThanhToanRequest request) {
+        hoaDon.setPhiShip(hoaDon.getGiaoHang() == true ? request.getPhiShip() : BigDecimal.valueOf(0));
+        hoaDon.setTongTien(request.getTongTien());
+        hoaDon.setTongTienSanPhamChuaGiam(request.getTongTienSanPhamChuaGiam());
+        hoaDon.setTongTienGiam(request.getTongTienGiam());
+
+    }
+
+    private boolean checkVoucherForHoaDon(HoaDon hoaDon) {
+        List<VoucherHoaDon> voucherHoaDonByHoaDons = voucherHoaDonService.getVoucherHoaDonByHoaDon(hoaDon.getId());
+        LocalDateTime now = LocalDateTime.now();
+
+        for (VoucherHoaDon voucherHoaDon:voucherHoaDonByHoaDons){
+
+            LocalDateTime endDay = voucherHoaDon.getVoucher().getNgayKetThuc();
+            if (endDay.isBefore(now)) {
+                // Voucher đã quá hạn
+                return false;
+            }
+            if (voucherHoaDon.getVoucher().getSoLuong()<=0) {
+                // Voucher đã quá hạn
+                return false;
+            }
+        }
+
+        return false;
+    }
+
+
+    private ResponseEntity<?> getErro(String s){
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new erroResponse(s));
     }
 }

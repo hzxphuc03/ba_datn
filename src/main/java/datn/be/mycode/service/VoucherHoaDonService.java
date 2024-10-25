@@ -98,7 +98,7 @@ public class VoucherHoaDonService {
     }
 
 
-    public void deleteByHoaDon(Long request) {
-        vhRepo.deleteAllByHoaDon_Id(request);
+    public void delete(Long request) {
+        vhRepo.delete(vhRepo.findById(request).get());
     }
 }
