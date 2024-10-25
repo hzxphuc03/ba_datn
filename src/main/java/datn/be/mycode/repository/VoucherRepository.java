@@ -39,7 +39,8 @@ public interface VoucherRepository extends JpaRepository<Voucher,Long> {
     Page<Voucher> findByNgayBatDauLessThanEqualAndNgayKetThucGreaterThanEqual(LocalDateTime today1, LocalDateTime today2,Pageable pageable);
 
     // Truy vấn lấy các voucher có thể loại và giá giảm phù hợp
-    @Query("SELECT v FROM Voucher v WHERE v.theLoai = :theLoai AND v.giaTriGiamToiThieu <= :giaGiam AND v.trangThai = 1")
+    @Query("SELECT v FROM Voucher v WHERE v.theLoai = :theLoai AND v.giaTriGiamToiThieu <= :giaGiam AND v.trangThai = 1 " +
+            "ORDER BY v.giamToiDa desc")
     Page<Voucher> findVoucherActive(@Param("theLoai") int theLoai, @Param("giaGiam") BigDecimal giaGiam, Pageable pageable);
 
     @Query("SELECT v FROM Voucher v " +
