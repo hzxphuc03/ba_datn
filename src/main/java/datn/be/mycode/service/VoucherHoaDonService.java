@@ -1,5 +1,6 @@
 package datn.be.mycode.service;
 
+import datn.be.mycode.entity.Voucher;
 import datn.be.mycode.entity.VoucherHoaDon;
 import datn.be.mycode.repository.HoaDonRepository;
 import datn.be.mycode.repository.VoucherHoaDonRepository;
@@ -91,50 +92,9 @@ public class VoucherHoaDonService {
         return vhRepo.save(voucherHoaDon);
     }
 
-    public NormalTableResponse<VoucherHoaDon> getVoucherHoaDon(TableVoucherHoaDonRequest request) {
-
-        if (request.getPage() ==  null) {
-            request.setPage(1);
-        }
-        if (request.getPageSize() == null) {
-            request.setPageSize(10);
-        }
-
-        NormalTableResponse<VoucherHoaDon> voucherHoaDonNormalTableResponse = new NormalTableResponse<>();
-        Pageable pageable = PageRequest.of(request.getPage() - 1,request.getPageSize());
-        Page<VoucherHoaDon> voucherPage;
-            voucherPage = vhRepo.findAllByTrangThai1(pageable);
-        List<VoucherHoaDon> voucherHoaDons = voucherPage.getContent().stream().toList();
-
-        voucherHoaDonNormalTableResponse.setItem(voucherHoaDons);
-        voucherHoaDonNormalTableResponse.setPage(request.getPage());
-        voucherHoaDonNormalTableResponse.setPageSize(request.getPageSize());
-        voucherHoaDonNormalTableResponse.setTotalItem(voucherPage.getTotalElements());
-
-        return voucherHoaDonNormalTableResponse;
-    }
-
-    public NormalTableResponse<VoucherHoaDon> getVoucherShip(TableVoucherHoaDonRequest request) {
-
-        if (request.getPage() ==  null) {
-            request.setPage(1);
-        }
-        if (request.getPageSize() == null) {
-            request.setPageSize(10);
-        }
-
-        NormalTableResponse<VoucherHoaDon> voucherHoaDonNormalTableResponse = new NormalTableResponse<>();
-        Pageable pageable = PageRequest.of(request.getPage() - 1,request.getPageSize());
-        Page<VoucherHoaDon> voucherPage;
-        voucherPage = vhRepo.findAllByTrangThai2(pageable);
-        List<VoucherHoaDon> voucherHoaDons = voucherPage.getContent().stream().toList();
-
-        voucherHoaDonNormalTableResponse.setItem(voucherHoaDons);
-        voucherHoaDonNormalTableResponse.setPage(request.getPage());
-        voucherHoaDonNormalTableResponse.setPageSize(request.getPageSize());
-        voucherHoaDonNormalTableResponse.setTotalItem(voucherPage.getTotalElements());
-
-        return voucherHoaDonNormalTableResponse;
+    // Lấy danh sách Voucher dựa trên idHoaDon
+    public List<Voucher> getVouchersByHoaDonId(Long idHoaDon) {
+        return vhRepo.findAllByHoaDonId(idHoaDon);
     }
 
 

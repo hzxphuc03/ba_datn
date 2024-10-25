@@ -1,5 +1,6 @@
 package datn.be.mycode.request;
 
+import jakarta.persistence.Column;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
@@ -16,6 +17,7 @@ public class VoucherRequest {
     @NotBlank(message = "ko dc trong")
     private String ma;
     private String ten;
+    private int theLoai;
     private LocalDateTime ngayBatDau;
     private LocalDateTime ngayKetThuc;
     private LocalDateTime ngayTao;

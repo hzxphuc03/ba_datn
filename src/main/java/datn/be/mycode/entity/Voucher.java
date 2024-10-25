@@ -27,6 +27,9 @@ public class Voucher implements Serializable {
     @Column(name = "ten_voucher")
     private String ten;
 
+    @Column(name = "the_loai")
+    private int theLoai;
+
     @Column(name = "ngay_bat_dau")
     private LocalDateTime ngayBatDau;
 

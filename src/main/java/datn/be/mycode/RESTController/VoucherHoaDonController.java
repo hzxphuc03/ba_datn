@@ -1,5 +1,6 @@
 package datn.be.mycode.RESTController;
 
+import datn.be.mycode.entity.Voucher;
 import datn.be.mycode.entity.VoucherHoaDon;
 import datn.be.mycode.request.NormalTableRequest;
 import datn.be.mycode.request.VoucherHoaDonRequest;
@@ -49,22 +50,10 @@ public class VoucherHoaDonController {
         return ResponseEntity.ok(service.updateTrangThai(id, status));
     }
 
-    @GetMapping("/Voucher-Hoa-Don")
-    public ResponseEntity<?> getVoucherHoaDon(
-            @RequestParam(name = "page",required = false) Integer page,
-            @RequestParam(name = "pageSize",required = false) Integer pageSize)
-    {
-        TableVoucherHoaDonRequest request = new TableVoucherHoaDonRequest(page,pageSize);
-        return ResponseEntity.ok(service.getVoucherHoaDon(request));
-    }
-
-    @GetMapping("/Voucher-Ship")
-    public ResponseEntity<?> getVoucherShip(
-            @RequestParam(name = "page",required = false) Integer page,
-            @RequestParam(name = "pageSize",required = false) Integer pageSize)
-    {
-        TableVoucherHoaDonRequest request = new TableVoucherHoaDonRequest(page,pageSize);
-        return ResponseEntity.ok(service.getVoucherShip(request));
+    @GetMapping("/get-by-id/{idHoaDon}")
+    public ResponseEntity<List<Voucher>> getVouchersByHoaDon(@PathVariable Long idHoaDon) {
+        List<Voucher> vouchers = service.getVouchersByHoaDonId(idHoaDon);
+        return ResponseEntity.ok(vouchers);
     }
 
 }

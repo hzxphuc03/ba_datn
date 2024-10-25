@@ -2,6 +2,8 @@ package datn.be.mycode.RESTController;
 
 
 import datn.be.mycode.request.VoucherRequest;
+import datn.be.mycode.request.customRequest.TableVoucherActiveRequest;
+import datn.be.mycode.request.customRequest.TableVoucherHoaDonRequest;
 import datn.be.mycode.request.customRequest.TableVoucherRequest;
 import datn.be.mycode.request.customRequest.TableVoucherStatusInRequest;
 import datn.be.mycode.service.VoucherService;
@@ -9,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 
@@ -78,6 +81,45 @@ public class VoucherController {
 
         TableVoucherStatusInRequest request = new TableVoucherStatusInRequest(page,pageSize,status);
         return ResponseEntity.ok(service.trongSuKien(request));
+    }
+    @GetMapping("get-voucher-active")
+    public ResponseEntity<?> getVoucherActive(
+            @RequestParam(name = "page",required = false) Integer page,
+            @RequestParam(name = "pageSize",required = false) Integer pageSize,
+            @RequestParam(name = "giaTriGiamToiThieu",required = false) BigDecimal giaTriGiamToiThieu,
+            @RequestParam(name = "theLoai",required = false) Integer theLoai
+    ){
+
+        TableVoucherActiveRequest request = new TableVoucherActiveRequest(page,pageSize,giaTriGiamToiThieu,theLoai);
+        return ResponseEntity.ok(service.getVoucherActive(request));
+    }
+
+    @GetMapping("the-loai-status-active")
+    public ResponseEntity<?> checkVoucherActive(
+            @RequestParam(name = "page",required = false) Integer page,
+            @RequestParam(name = "pageSize",required = false) Integer pageSize,
+            @RequestParam(name = "theLoai",required = false) Integer theLoai
+    ){
+        TableVoucherStatusInRequest request = new TableVoucherStatusInRequest(page,pageSize,theLoai);
+        return ResponseEntity.ok(service.checkVouchers(request));
+    }
+
+    @GetMapping("/Voucher-Hoa-Don")
+    public ResponseEntity<?> getVoucherHoaDon(
+            @RequestParam(name = "page",required = false) Integer page,
+            @RequestParam(name = "pageSize",required = false) Integer pageSize)
+    {
+        TableVoucherHoaDonRequest request = new TableVoucherHoaDonRequest(page,pageSize);
+        return ResponseEntity.ok(service.getVoucherHoaDon(request));
+    }
+
+    @GetMapping("/Voucher-Ship")
+    public ResponseEntity<?> getVoucherShip(
+            @RequestParam(name = "page",required = false) Integer page,
+            @RequestParam(name = "pageSize",required = false) Integer pageSize)
+    {
+        TableVoucherHoaDonRequest request = new TableVoucherHoaDonRequest(page,pageSize);
+        return ResponseEntity.ok(service.getVoucherShip(request));
     }
 
 }
