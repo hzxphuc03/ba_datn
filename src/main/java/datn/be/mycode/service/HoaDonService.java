@@ -248,7 +248,9 @@ public class HoaDonService {
         if(voucher == null || voucher.getTrangThai() != 1) {
             return getErro("không tìm thấy voucher hoặc voucher không hoạt động");
         }
-
+        if(voucher.getSoLuong() <= 0){
+            return getErro("Voucher này đã hết");
+        }
         var voucherHoaDons = voucherHoaDonService.getVoucherHoaDonByHoaDon(hoaDon.getId());
 
 //        check xem hoaDon có voucher này chưa
