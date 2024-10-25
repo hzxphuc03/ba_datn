@@ -12,5 +12,5 @@ public class TableVoucherStatusInRequest {
 
     private Integer pageSize;
 
-    private Integer status;
+    private Integer theLoai;
 }

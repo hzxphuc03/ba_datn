@@ -4,6 +4,8 @@ package datn.be.mycode.service;
 import datn.be.mycode.entity.Voucher;
 import datn.be.mycode.repository.VoucherRepository;
 import datn.be.mycode.request.VoucherRequest;
+import datn.be.mycode.request.customRequest.TableVoucherActiveRequest;
+import datn.be.mycode.request.customRequest.TableVoucherHoaDonRequest;
 import datn.be.mycode.request.customRequest.TableVoucherRequest;
 import datn.be.mycode.request.customRequest.TableVoucherStatusInRequest;
 import datn.be.mycode.response.NormalTableResponse;
@@ -66,6 +68,7 @@ public class VoucherService {
         Voucher voucher = new Voucher();
         voucher.setMa(request.getMa());
         voucher.setTen(request.getTen());
+        voucher.setTheLoai(request.getTheLoai());
         voucher.setNgayBatDau(request.getNgayBatDau());
         voucher.setNgayKetThuc(request.getNgayKetThuc());
         voucher.setNgayTao(LocalDateTime.now());
@@ -82,6 +85,7 @@ public class VoucherService {
         Voucher voucher = repository.findById(request.getId()).get();
         voucher.setMa(request.getMa());
         voucher.setTen(request.getTen());
+        voucher.setTheLoai(request.getTheLoai());
         voucher.setNgayBatDau(request.getNgayBatDau());
         voucher.setNgayKetThuc(request.getNgayKetThuc());
         voucher.setNgaySua(LocalDateTime.now());
@@ -105,7 +109,7 @@ public class VoucherService {
 
     /**
      * Cập nhật trạng thái của các voucher dựa trên ngày hiện tại.
-     * Trạng thái = 3 nếu voucher đã quá hạn (endDay < ngày hiện tại).
+     * Trạng thái = 2 nếu voucher đã quá hạn (endDay < ngày hiện tại).
      * Trạng thái = 0 nếu chưa đến sự kiện (startDay > ngày hiện tại).
      * Trạng thái = 1 nếu đang trong thời gian sự kiện (startDay <= ngày hiện tại <= endDay).
      */
@@ -120,7 +124,7 @@ public class VoucherService {
 
             if (endDay.isBefore(now)) {
                 // Voucher đã quá hạn
-                voucher.setTrangThai(3);
+                voucher.setTrangThai(2);
             } else if (startDay.isAfter(now)) {
                 // Voucher chưa đến sự kiện
                 voucher.setTrangThai(0);
@@ -142,7 +146,6 @@ public class VoucherService {
             request.setPageSize(10);
         }
 
-
         LocalDateTime today = LocalDateTime.now();
         NormalTableResponse<Voucher> voucherNormalTableResponse = new NormalTableResponse<>();
         Pageable pageable = PageRequest.of(request.getPage() - 1,request.getPageSize());
@@ -151,6 +154,85 @@ public class VoucherService {
 
         List<Voucher> vouchers = voucherPage.getContent().stream().toList();
 
+        voucherNormalTableResponse.setItem(vouchers);
+        voucherNormalTableResponse.setPage(request.getPage());
+        voucherNormalTableResponse.setPageSize(request.getPageSize());
+        voucherNormalTableResponse.setTotalItem(voucherPage.getTotalElements());
+
+        return voucherNormalTableResponse;
+    }
+
+    public NormalTableResponse<Voucher> getVoucherActive(TableVoucherActiveRequest request) {
+        if (request.getPage() ==  null) {
+            request.setPage(1);
+        }
+        if (request.getPageSize() == null) {
+            request.setPageSize(10);
+        }
+        NormalTableResponse<Voucher> voucherNormalTableResponse = new NormalTableResponse<>();
+        Pageable pageable = PageRequest.of(request.getPage() - 1,request.getPageSize());
+        Page<Voucher> voucherPage;
+        voucherPage = repository.findVoucherActive(request.getTheLoai(),request.getGiaTriGiamToiThieu(), pageable);
+        List<Voucher> vouchers = voucherPage.getContent().stream().toList();
+        voucherNormalTableResponse.setItem(vouchers);
+        voucherNormalTableResponse.setPage(request.getPage());
+        voucherNormalTableResponse.setPageSize(request.getPageSize());
+        voucherNormalTableResponse.setTotalItem(voucherPage.getTotalElements());
+
+        return voucherNormalTableResponse;
+    }
+    // Lấy danh sách các voucher active và đang trong sự kiện
+    public NormalTableResponse<Voucher> checkVouchers(TableVoucherStatusInRequest request) {
+        if (request.getPage() ==  null) {
+            request.setPage(1);
+        }
+        if (request.getPageSize() == null) {
+            request.setPageSize(10);
+        }
+        LocalDateTime currentDate = LocalDateTime.now();
+        NormalTableResponse<Voucher> voucherNormalTableResponse = new NormalTableResponse<>();
+        Pageable pageable = PageRequest.of(request.getPage() - 1,request.getPageSize());
+        Page<Voucher> voucherPage;
+        voucherPage = repository.findTheLoaiActiveVouchers(request.getTheLoai(),currentDate, pageable);
+        List<Voucher> vouchers = voucherPage.getContent().stream().toList();
+        voucherNormalTableResponse.setItem(vouchers);
+        voucherNormalTableResponse.setPage(request.getPage());
+        voucherNormalTableResponse.setPageSize(request.getPageSize());
+        voucherNormalTableResponse.setTotalItem(voucherPage.getTotalElements());
+
+        return voucherNormalTableResponse;
+    }
+    public NormalTableResponse<Voucher> getVoucherHoaDon(TableVoucherHoaDonRequest request) {
+        if (request.getPage() ==  null) {
+            request.setPage(1);
+        }
+        if (request.getPageSize() == null) {
+            request.setPageSize(10);
+        }
+        NormalTableResponse<Voucher> voucherNormalTableResponse = new NormalTableResponse<>();
+        Pageable pageable = PageRequest.of(request.getPage() - 1,request.getPageSize());
+        Page<Voucher> voucherPage;
+        voucherPage = repository.getVoucherHoaDon( pageable);
+        List<Voucher> vouchers = voucherPage.getContent().stream().toList();
+        voucherNormalTableResponse.setItem(vouchers);
+        voucherNormalTableResponse.setPage(request.getPage());
+        voucherNormalTableResponse.setPageSize(request.getPageSize());
+        voucherNormalTableResponse.setTotalItem(voucherPage.getTotalElements());
+
+        return voucherNormalTableResponse;
+    }
+    public NormalTableResponse<Voucher> getVoucherShip(TableVoucherHoaDonRequest request) {
+        if (request.getPage() ==  null) {
+            request.setPage(1);
+        }
+        if (request.getPageSize() == null) {
+            request.setPageSize(10);
+        }
+        NormalTableResponse<Voucher> voucherNormalTableResponse = new NormalTableResponse<>();
+        Pageable pageable = PageRequest.of(request.getPage() - 1,request.getPageSize());
+        Page<Voucher> voucherPage;
+        voucherPage = repository.getVoucherShip( pageable);
+        List<Voucher> vouchers = voucherPage.getContent().stream().toList();
         voucherNormalTableResponse.setItem(vouchers);
         voucherNormalTableResponse.setPage(request.getPage());
         voucherNormalTableResponse.setPageSize(request.getPageSize());
