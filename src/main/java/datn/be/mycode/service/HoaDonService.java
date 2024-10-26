@@ -328,14 +328,14 @@ public class HoaDonService {
         hoaDon.setThanhToan(true);
 
         var phuongThucThanhToan = hoaDon.getPhuongThucThanhToan();
-        if(phuongThucThanhToan.getId() != 2 ){
+        if(phuongThucThanhToan.getId() == 2 ){
             hoaDon.setThanhToan(false);
             repo.save(hoaDon);
 
             return ResponseEntity.ok(taoThanhToan(hoaDon.getTongTien().intValue(), hoaDon.getId()+""));
         }
         if(phuongThucThanhToan.getId() == 1 ){
-            if(hoaDon.getGiaoHang() && hoaDon.getTrangThai() == 2) {
+            if(hoaDon.getGiaoHang() && hoaDon.getTrangThai() != 2) {
                 hoaDon.setThanhToan(false);
                 repo.save(hoaDon);
 
