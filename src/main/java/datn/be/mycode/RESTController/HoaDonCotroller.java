@@ -102,8 +102,8 @@ public class HoaDonCotroller {
         return ResponseEntity.ok(hoaDonService.udateTrangThai(id, status));
     }
 
-    @PostMapping("/update-trang-thai-thanh_toan")
-    public ResponseEntity<?> updateTrangThaiThanhToan(@RequestBody() Long idHoaDon){
+    @PutMapping("/update-trang-thai-thanh_toan-online/{idHoaDon}")
+    public ResponseEntity<?> updateTrangThaiThanhToan(@PathVariable() Long idHoaDon){
 
         return ResponseEntity.ok(hoaDonService.updateTrangThaiThanhToan(idHoaDon));
     }
