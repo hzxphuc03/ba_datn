@@ -82,7 +82,7 @@ public class HoaDonCotroller {
         return ResponseEntity.ok(hoaDonService.thanhToan(request));
     }
 
-    @DeleteMapping("/delete-voucher")
+    @PostMapping("/delete-voucher")
     public ResponseEntity<?> deleteVoucher(@RequestBody() DeleteVoucher request){
 
         return ResponseEntity.ok(hoaDonService.deleteVoucher(request));
