@@ -101,4 +101,11 @@ public class HoaDonCotroller {
 
         return ResponseEntity.ok(hoaDonService.udateTrangThai(id, status));
     }
+
+    @GetMapping("/tao-thanh-toan")
+    public ResponseEntity<?> updateTrangThai(@RequestParam("amount") int orderTotal
+    ){
+
+        return ResponseEntity.ok(hoaDonService.taoThanhToan(orderTotal,"1"));
+    }
 }
