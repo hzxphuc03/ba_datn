@@ -21,5 +21,6 @@ public class ThanhToanRequest {
     private BigDecimal tongTien;
     private BigDecimal tongTienSanPhamChuaGiam;
     private BigDecimal tongTienGiam;
+    private int trangThai;
 
 }
