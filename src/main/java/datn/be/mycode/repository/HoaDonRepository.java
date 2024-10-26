@@ -22,7 +22,8 @@ public interface HoaDonRepository extends JpaRepository<HoaDon, Long> {
             "(:startDate IS NULL OR hd.ngayTao >= :startDate) AND " +
             "(:endDate IS NULL OR hd.ngayTao <= :endDate) AND " +
             "(:idKhachHang IS NULL OR hd.khachHang.id = :idKhachHang) AND " +
-            "(:idNhanVien IS NULL OR hd.nhanVien.id = :idNhanVien)"
+            "(:idNhanVien IS NULL OR hd.nhanVien.id = :idNhanVien) AND " +
+            "hd.trangThai = 1"
     )
     Page<HoaDon> searchAll(String ma, LocalDateTime startDate, LocalDateTime endDate, Long idKhachHang, Long idNhanVien, Pageable pageable);
 
