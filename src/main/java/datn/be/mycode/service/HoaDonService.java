@@ -335,7 +335,7 @@ public class HoaDonService {
             return ResponseEntity.ok(taoThanhToan(hoaDon.getTongTien().intValue(), hoaDon.getId()+""));
         }
         if(phuongThucThanhToan.getId() == 1 ){
-            if(hoaDon.getGiaoHang()) {
+            if(hoaDon.getGiaoHang() && hoaDon.getTrangThai() != 2) {
                 hoaDon.setThanhToan(false);
                 repo.save(hoaDon);
 
