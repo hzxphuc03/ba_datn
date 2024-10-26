@@ -392,4 +392,13 @@ public class HoaDonService {
         return vnPayService.createOrder(orderTotal,maHoaDon);
 
     }
+
+    public ResponseEntity<?> updateTrangThaiThanhToan(Long idHoaDon) {
+        HoaDon hoaDon = repo.findById(idHoaDon).orElse(null);
+        if(hoaDon == null) return getErro("Hóa đơn không tồn tại");
+
+        hoaDon.setThanhToan(true);
+        repo.save(hoaDon);
+        return ResponseEntity.ok("thành công");
+    }
 }
