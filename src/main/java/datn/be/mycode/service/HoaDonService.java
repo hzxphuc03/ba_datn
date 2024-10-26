@@ -60,7 +60,7 @@ public class HoaDonService {
         Page<HoaDon> hoaDonResponsePage;
         hoaDonResponsePage = repo.searchAll(request.getKeyWord(), request.getStartDate(), request.getEndDate(), request.getIdKhachHang(), request.getIdNhanVien(), pageable);
 
-        List<HoaDon> hoaDons = hoaDonResponsePage.getContent().stream().toList();
+        List<HoaDon> hoaDons = hoaDonResponsePage.getContent();
         List<HoaDonResponse> hoaDonResponses = new ArrayList<>();
 
         for (HoaDon hoaDon :hoaDons) {
@@ -73,6 +73,16 @@ public class HoaDonService {
 
 
         return hoaDonNormalTableResponse;
+    }
+
+    public ResponseEntity<?> getById(Long idHoaHon){
+        var hoaDon = repo.findById(idHoaHon).orElse(null);
+        if (hoaDon == null ) return getErro("Hóa đơn này không tồn tại");
+
+        var voucher = voucherHoaDonService.getVouchersByHoaDonId(hoaDon.getId());
+        HoaDonResponse hoaDonResponse = new HoaDonResponse(hoaDon,voucher);
+
+        return ResponseEntity.ok(hoaDonResponse);
     }
 
     public HoaDon add(HoaDonRequest request){
@@ -330,6 +340,7 @@ public class HoaDonService {
         var phuongThucThanhToan = hoaDon.getPhuongThucThanhToan();
         if(phuongThucThanhToan.getId() == 2 ){
             hoaDon.setThanhToan(false);
+            hoaDon.setTrangThai(2);
             repo.save(hoaDon);
 
             return ResponseEntity.ok(taoThanhToan(hoaDon.getTongTien().intValue(), hoaDon.getId()+""));
@@ -337,6 +348,7 @@ public class HoaDonService {
         if(phuongThucThanhToan.getId() == 1 ){
             if(hoaDon.getGiaoHang() && hoaDon.getTrangThai() != 2) {
                 hoaDon.setThanhToan(false);
+                hoaDon.setTrangThai(2);
                 repo.save(hoaDon);
 
                 return ResponseEntity.ok(taoThanhToan(hoaDon.getTongTien().intValue(), hoaDon.getId()+""));
@@ -346,12 +358,21 @@ public class HoaDonService {
         if(phuongThucThanhToan.getId() == 3 ){
             if(hoaDon.getGiaoHang()) {
                 hoaDon.setThanhToan(false);
+                hoaDon.setTrangThai(2);
                 repo.save(hoaDon);
 
             }
         }
+//        subtract quantity pruduct
+        if(hoaDon.getTrangThai() == 6 || hoaDon.getThanhToan() == true){
+            setSoLuongSanPham(hoaDon);
+        }
         repo.save(hoaDon);
         return ResponseEntity.ok("Thành công");
+    }
+
+    private void setSoLuongSanPham(HoaDon hoaDon) {
+        hoaDonChiTietService.setSoLuongAfterPayment(hoaDon.getId());
     }
 
     private void setHoaDon(HoaDon hoaDon, ThanhToanRequest request) {
@@ -398,6 +419,7 @@ public class HoaDonService {
         if(hoaDon == null) return getErro("Hóa đơn không tồn tại");
 
         hoaDon.setThanhToan(true);
+        setSoLuongSanPham(hoaDon);
         repo.save(hoaDon);
         return ResponseEntity.ok("thành công");
     }

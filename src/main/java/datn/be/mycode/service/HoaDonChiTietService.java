@@ -65,6 +65,19 @@ public class HoaDonChiTietService {
         return hoaDonNormalTableResponse;
     }
 
+    public List<HoaDonChiTiet> getListByHoaDonId(Long id){
+        return repo.findAllByHoaDon_Id(id);
+    }
+
+    public void setSoLuongAfterPayment(Long id){
+        var hoaDonChiTiets = getListByHoaDonId(id);
+        for (HoaDonChiTiet hoaDonChiTiet:hoaDonChiTiets) {
+            var sanPhamChiTiet = hoaDonChiTiet.getSanPhamChiTiet();
+            sanPhamChiTiet.setSoLuong(sanPhamChiTiet.getSoLuong()-hoaDonChiTiet.getSoLuong());
+            sanPhamChiTietRepository.save(sanPhamChiTiet);
+        }
+    }
+
     private void CheckGiamGia(List<HoaDonChiTiet> hoaDonChiTiets) {
         for (HoaDonChiTiet hoaDonChiTiet :hoaDonChiTiets) {
             var sanPhamChiTiet = hoaDonChiTiet.getSanPhamChiTiet();
@@ -171,7 +184,7 @@ public class HoaDonChiTietService {
         if(hoaDonChiTiet != null){
             var spct = hoaDonChiTiet.getSanPhamChiTiet();
             if(request.getSoLuong() <= 0) return getErro("Số lượng phải lớn hơn 0");
-            int soLuongSauThem = request.getSoLuong()+hoaDonChiTiet.getSoLuong();
+            int soLuongSauThem = request.getSoLuong();
             if(soLuongSauThem>spct.getSoLuong()) return getErro("Số lượng vượt quá số lượng đang có");
             hoaDonChiTiet.setSoLuong(soLuongSauThem);
             return ResponseEntity.ok(repo.save(hoaDonChiTiet));
