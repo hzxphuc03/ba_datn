@@ -309,7 +309,7 @@ public class HoaDonService {
         if(hoaDon == null) return getErro("Hóa đơn không tồn tại");
 //        kiểm tra hoa don da thanh toan hay chua
         if (hoaDon.getTrangThai() == 6) return getErro("Hóa đơn này không được thay đổi");
-        voucherHoaDonService.delete(request.getIdVoucher());
+        voucherHoaDonService.delete(request.getIdHoaDon(),request.getIdVoucher());
         return ResponseEntity.ok(hoaDon);
     }
 
@@ -334,6 +334,7 @@ public class HoaDonService {
         hoaDon.setTongTien(request.getTongTien());
         hoaDon.setTongTienSanPhamChuaGiam(request.getTongTienSanPhamChuaGiam());
         hoaDon.setTongTienGiam(request.getTongTienGiam());
+        hoaDon.setTrangThai(request.getTrangThai());
 
     }
 

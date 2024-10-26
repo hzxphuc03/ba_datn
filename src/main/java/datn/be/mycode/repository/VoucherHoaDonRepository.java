@@ -28,6 +28,6 @@ public interface VoucherHoaDonRepository extends JpaRepository<VoucherHoaDon,Lon
     @Query("SELECT vhd.voucher FROM VoucherHoaDon vhd WHERE vhd.hoaDon.id = :idHoaDon")
     List<Voucher> findAllByHoaDonId(@Param("idHoaDon") Long idHoaDon);
 
-    void deleteAllByHoaDon_Id(Long id);
+    VoucherHoaDon findByHoaDonIdAndVoucherId(Long idHoadon, Long idVoucher);
 
 }
