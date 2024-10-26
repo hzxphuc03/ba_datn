@@ -332,14 +332,14 @@ public class HoaDonService {
             hoaDon.setThanhToan(false);
             repo.save(hoaDon);
 
-            return ResponseEntity.ok(taoThanhToan(hoaDon.getTongTien().intValue(), hoaDon.getMa()));
+            return ResponseEntity.ok(taoThanhToan(hoaDon.getTongTien().intValue(), hoaDon.getId()+""));
         }
         if(phuongThucThanhToan.getId() == 1 ){
             if(hoaDon.getGiaoHang()) {
                 hoaDon.setThanhToan(false);
                 repo.save(hoaDon);
 
-                return ResponseEntity.ok(taoThanhToan(hoaDon.getTongTien().intValue(), hoaDon.getMa()));
+                return ResponseEntity.ok(taoThanhToan(hoaDon.getTongTien().intValue(), hoaDon.getId()+""));
             }
 
         }
