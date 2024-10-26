@@ -39,6 +39,8 @@ public class HoaDonService {
     private VoucherRepository voucherRepository;
     @Autowired
     private VoucherHoaDonService voucherHoaDonService;
+    @Autowired
+    private VNPayService vnPayService;
 
     @Autowired
     private HoaDonChiTietService hoaDonChiTietService;
@@ -325,6 +327,29 @@ public class HoaDonService {
         hoaDon.setNgayThanhToan(LocalDateTime.now());
         hoaDon.setThanhToan(true);
 
+        var phuongThucThanhToan = hoaDon.getPhuongThucThanhToan();
+        if(phuongThucThanhToan.getId() == 2 ){
+            hoaDon.setThanhToan(false);
+            repo.save(hoaDon);
+
+            return ResponseEntity.ok(taoThanhToan(hoaDon.getTongTien().intValue(), hoaDon.getId()+""));
+        }
+        if(phuongThucThanhToan.getId() == 1 ){
+            if(hoaDon.getGiaoHang()) {
+                hoaDon.setThanhToan(false);
+                repo.save(hoaDon);
+
+                return ResponseEntity.ok(taoThanhToan(hoaDon.getTongTien().intValue(), hoaDon.getId()+""));
+            }
+
+        }
+        if(phuongThucThanhToan.getId() == 3 ){
+            if(hoaDon.getGiaoHang()) {
+                hoaDon.setThanhToan(false);
+                repo.save(hoaDon);
+
+            }
+        }
         repo.save(hoaDon);
         return ResponseEntity.ok("Thành công");
     }
@@ -361,5 +386,10 @@ public class HoaDonService {
 
     private ResponseEntity<?> getErro(String s){
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new erroResponse(s));
+    }
+
+    public String taoThanhToan(int orderTotal,String maHoaDon) {
+        return vnPayService.createOrder(orderTotal,maHoaDon);
+
     }
 }
