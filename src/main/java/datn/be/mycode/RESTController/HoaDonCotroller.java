@@ -35,7 +35,7 @@ public class HoaDonCotroller {
         return ResponseEntity.ok(hoaDonService.getAll(request));
     }
 
-    @GetMapping("/get-hoa-don-by-id=hoa-don/{idHoaDon}")
+    @GetMapping("/get-hoa-don-by-id-hoa-don/{idHoaDon}")
     public ResponseEntity<?> getByIdHoaDon(
             @PathVariable(name = "idHoaDon",required = false) Long idHoaDon
     ){
