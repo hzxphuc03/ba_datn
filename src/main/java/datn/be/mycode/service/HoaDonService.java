@@ -328,7 +328,7 @@ public class HoaDonService {
         hoaDon.setThanhToan(true);
 
         var phuongThucThanhToan = hoaDon.getPhuongThucThanhToan();
-        if(phuongThucThanhToan.getId() == 2 ){
+        if(phuongThucThanhToan.getId() != 2 ){
             hoaDon.setThanhToan(false);
             repo.save(hoaDon);
 
