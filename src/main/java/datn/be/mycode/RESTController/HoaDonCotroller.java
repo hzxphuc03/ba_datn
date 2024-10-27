@@ -1,5 +1,6 @@
 package datn.be.mycode.RESTController;
 
+import datn.be.mycode.request.HoaDon.NextStep;
 import datn.be.mycode.request.HoaDonRequest;
 
 import datn.be.mycode.request.customRequest.BanHang.*;
@@ -117,10 +118,10 @@ public class HoaDonCotroller {
         return ResponseEntity.ok(hoaDonService.hoaDonAddVoucher(request));
     }
 
-    @PutMapping("/next-step/{idHoaDon}")
-    public ResponseEntity<?> nextStep(@PathVariable Long idHoaDon){
+    @PutMapping("/next-step")
+    public ResponseEntity<?> nextStep(@RequestBody() NextStep request){
 
-        return ResponseEntity.ok(hoaDonService.nextSetp(idHoaDon));
+        return ResponseEntity.ok(hoaDonService.nextSetp(request));
     }
 
     @PutMapping("/update-trang-thai/{id}")

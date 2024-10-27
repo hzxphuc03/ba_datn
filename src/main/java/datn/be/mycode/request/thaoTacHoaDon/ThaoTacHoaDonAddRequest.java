@@ -1,4 +1,4 @@
-package datn.be.mycode.request;
+package datn.be.mycode.request.thaoTacHoaDon;
 
 
 import datn.be.mycode.entity.HoaDon;
@@ -13,15 +13,10 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-public class ThaoTacHoaDonRequest {
-
-    private Long id;
+@Builder
+public class ThaoTacHoaDonAddRequest {
 
     private String thaoTac;
-
-    private LocalDateTime ngayTao;
-
-    private int trangThai;
 
     private Long idHoaDon;
 

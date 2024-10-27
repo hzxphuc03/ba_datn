@@ -1,15 +1,10 @@
 package datn.be.mycode.RESTController;
 
-import datn.be.mycode.request.SanPhamRequest;
-import datn.be.mycode.request.ThaoTacHoaDonRequest;
 import datn.be.mycode.request.customRequest.TableThaoTacHoaDonRequest;
-import datn.be.mycode.service.SanPhamService;
 import datn.be.mycode.service.ThaoTacHoaDonService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.time.LocalDateTime;
 
 @CrossOrigin("*")
 @RestController
@@ -33,7 +28,7 @@ public class ThaoTacHoaDonController {
     }
 
 //    @PostMapping("/add")
-//    public ResponseEntity<?> add(@RequestBody ThaoTacHoaDonRequest thaoTacHoaDonRequest){
+//    public ResponseEntity<?> add(@RequestBody ThaoTacHoaDonAddRequest thaoTacHoaDonRequest){
 //
 //        return ResponseEntity.ok(thaoTacHoaDonService.add(thaoTacHoaDonRequest));
 //    }
