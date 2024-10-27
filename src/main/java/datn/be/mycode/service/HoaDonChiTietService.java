@@ -1,17 +1,13 @@
 package datn.be.mycode.service;
 
-import datn.be.mycode.entity.HoaDon;
-import datn.be.mycode.entity.HoaDonChiTiet;
-import datn.be.mycode.entity.ThaoTacHoaDon;
+import datn.be.mycode.entity.*;
 import datn.be.mycode.repository.HoaDonChiTietRepository;
 import datn.be.mycode.repository.HoaDonRepository;
 import datn.be.mycode.repository.SanPhamChiTietRepository;
 import datn.be.mycode.request.HoaDonChiTietRequest;
-import datn.be.mycode.request.HoaDonRequest;
 import datn.be.mycode.request.NormalTableRequest;
 import datn.be.mycode.request.customRequest.BanHang.AddSoLuong;
 import datn.be.mycode.response.HoaDonChiTietResponse;
-import datn.be.mycode.response.HoaDonResponse;
 import datn.be.mycode.response.NormalTableResponse;
 import datn.be.mycode.response.erroResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -67,6 +63,11 @@ public class HoaDonChiTietService {
 
     public List<HoaDonChiTiet> getListByHoaDonId(Long id){
         return repo.findAllByHoaDon_Id(id);
+    }
+
+    public SanPhamChiTiet getSanPhamForHoaDonChiTiet(HoaDonChiTiet hoaDonChiTiet){
+        var sanPhamChiTiet = hoaDonChiTiet.getSanPhamChiTiet();
+        return sanPhamChiTiet;
     }
 
     public void setSoLuongAfterPayment(Long id){

@@ -32,6 +32,22 @@ public class HoaDonCotroller {
     ){
 
         TableHoaDonRequest request = new TableHoaDonRequest(page,pageSize,keyWord,startDate,endDate,idKhachHang,idNhanVien,status);
+        return ResponseEntity.ok(hoaDonService.getAllByTrangThai1(request));
+    }
+
+    @GetMapping("/get-all")
+    public ResponseEntity<?> getAllByTrangThai(
+            @RequestParam(name = "page",required = false) Integer page,
+            @RequestParam(name = "pageSize",required = false) Integer pageSize,
+            @RequestParam(name = "keyWord",required = false) String keyWord,
+            @RequestParam(name = "startDate",required = false) LocalDateTime startDate,
+            @RequestParam(name = "endDate",required = false) LocalDateTime endDate,
+            @RequestParam(name = "idKhachHang",required = false) Long idKhachHang,
+            @RequestParam(name = "idNhanVien",required = false) Long idNhanVien,
+            @RequestParam(name = "status",required = false) Integer status
+    ){
+
+        TableHoaDonRequest request = new TableHoaDonRequest(page,pageSize,keyWord,startDate,endDate,idKhachHang,idNhanVien,status);
         return ResponseEntity.ok(hoaDonService.getAll(request));
     }
 
