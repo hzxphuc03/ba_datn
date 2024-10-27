@@ -6,9 +6,10 @@ import datn.be.mycode.request.HoaDonRequest;
 import datn.be.mycode.request.VoucherHoaDonRequest;
 import datn.be.mycode.request.customRequest.BanHang.*;
 import datn.be.mycode.request.customRequest.TableHoaDonRequest;
-import datn.be.mycode.response.HoaDonResponse;
+import datn.be.mycode.response.hoaDon.HoaDonResponse;
 import datn.be.mycode.response.NormalTableResponse;
 import datn.be.mycode.response.erroResponse;
+import datn.be.mycode.response.hoaDon.HoaDonThanhToanXong;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -45,6 +46,36 @@ public class HoaDonService {
     @Autowired
     private HoaDonChiTietService hoaDonChiTietService;
 
+    public NormalTableResponse<HoaDonResponse> getAllByTrangThai1(TableHoaDonRequest request) {
+        if (request.getPage() == null) {
+            request.setPage(1);
+        }
+        if (request.getPageSize() == null) {
+            request.setPageSize(10);
+        }
+        if (request.getStatus() == null) {
+            request.setStatus(1);
+        }
+
+        Pageable pageable = PageRequest.of(request.getPage() - 1,request.getPageSize());
+        Page<HoaDon> hoaDonResponsePage;
+        hoaDonResponsePage = repo.searchAll(request.getKeyWord(), request.getStartDate(), request.getEndDate(), request.getIdKhachHang(), request.getIdNhanVien(), 1, pageable);
+
+        List<HoaDon> hoaDons = hoaDonResponsePage.getContent();
+        List<HoaDonResponse> hoaDonResponses = new ArrayList<>();
+
+        for (HoaDon hoaDon :hoaDons) {
+            List<Voucher> vouchers = voucherHoaDonService.getVouchersByHoaDonId(hoaDon.getId());
+            HoaDonResponse hoaDonResponse = new HoaDonResponse(hoaDon,vouchers);
+            hoaDonResponses.add(hoaDonResponse);
+        }
+
+        var hoaDonNormalTableResponse = new NormalTableResponse<HoaDonResponse>(hoaDonResponses,request.getPage(),request.getPageSize(),hoaDonResponsePage.getTotalElements());
+
+
+        return hoaDonNormalTableResponse;
+    }
+
     public NormalTableResponse<HoaDonResponse> getAll(TableHoaDonRequest request) {
         if (request.getPage() == null) {
             request.setPage(1);
@@ -58,7 +89,7 @@ public class HoaDonService {
 
         Pageable pageable = PageRequest.of(request.getPage() - 1,request.getPageSize());
         Page<HoaDon> hoaDonResponsePage;
-        hoaDonResponsePage = repo.searchAll(request.getKeyWord(), request.getStartDate(), request.getEndDate(), request.getIdKhachHang(), request.getIdNhanVien(), pageable);
+        hoaDonResponsePage = repo.searchAll(request.getKeyWord(), request.getStartDate(), request.getEndDate(), request.getIdKhachHang(), request.getIdNhanVien(), request.getStatus(), pageable);
 
         List<HoaDon> hoaDons = hoaDonResponsePage.getContent();
         List<HoaDonResponse> hoaDonResponses = new ArrayList<>();
@@ -78,9 +109,16 @@ public class HoaDonService {
     public ResponseEntity<?> getById(Long idHoaHon){
         var hoaDon = repo.findById(idHoaHon).orElse(null);
         if (hoaDon == null ) return getErro("Hóa đơn này không tồn tại");
+        var hoaDonChiTiets = hoaDonChiTietService.getListByHoaDonId(hoaDon.getId());
+        List<SanPhamChiTiet> sanPhamChiTiets = new ArrayList<>();
+        for (HoaDonChiTiet hoaDonChiTiet:hoaDonChiTiets) {
+            var sanPhamChiTiet = hoaDonChiTietService.getSanPhamForHoaDonChiTiet(hoaDonChiTiet);
+            sanPhamChiTiets.add(sanPhamChiTiet);
+        }
+
 
         var voucher = voucherHoaDonService.getVouchersByHoaDonId(hoaDon.getId());
-        HoaDonResponse hoaDonResponse = new HoaDonResponse(hoaDon,voucher);
+        HoaDonThanhToanXong hoaDonResponse = new HoaDonThanhToanXong(hoaDon,voucher,sanPhamChiTiets);
 
         return ResponseEntity.ok(hoaDonResponse);
     }
