@@ -2,10 +2,12 @@ package datn.be.mycode.service;
 
 import datn.be.mycode.entity.*;
 import datn.be.mycode.repository.*;
+import datn.be.mycode.request.HoaDon.NextStep;
 import datn.be.mycode.request.HoaDonRequest;
 import datn.be.mycode.request.VoucherHoaDonRequest;
 import datn.be.mycode.request.customRequest.BanHang.*;
 import datn.be.mycode.request.customRequest.TableHoaDonRequest;
+import datn.be.mycode.request.thaoTacHoaDon.ThaoTacHoaDonAddRequest;
 import datn.be.mycode.response.hoaDon.HoaDonResponse;
 import datn.be.mycode.response.NormalTableResponse;
 import datn.be.mycode.response.erroResponse;
@@ -145,11 +147,10 @@ public class HoaDonService {
 
         HoaDon hoaDonRes = repo.save(hoaDon);
         hoaDonRes.setMa("HD"+hoaDonRes.getId());
-        ThaoTacHoaDon thaoTacHoaDon = new ThaoTacHoaDon().builder()
+        ThaoTacHoaDonAddRequest thaoTacHoaDon = new ThaoTacHoaDonAddRequest().builder()
                 .thaoTac("add")
-                .trangThai(1)
-                .hoaDon(hoaDonRes)
-                .nhanVien(hoaDon.getNhanVien())
+                .idHoaDon(hoaDonRes.getId())
+                .idNhanVien(hoaDon.getNhanVien().getId())
                 .build();
 
         thaoTacHoaDonService.add(thaoTacHoaDon);
@@ -174,12 +175,11 @@ public class HoaDonService {
 
         HoaDon hoaDonRes = repo.save(hoaDon);
         hoaDonRes.setMa("HD" + hoaDonRes.getId());
-        ThaoTacHoaDon thaoTacHoaDon = new ThaoTacHoaDon().builder()
-                .thaoTac("add")
-                .trangThai(1)
-                .hoaDon(hoaDonRes)
-                .nhanVien(hoaDon.getNhanVien())
-                .build();
+        ThaoTacHoaDonAddRequest thaoTacHoaDon = new ThaoTacHoaDonAddRequest().builder()
+                    .thaoTac("add")
+                    .idHoaDon(hoaDonRes.getId())
+                    .idNhanVien(hoaDon.getNhanVien().getId())
+                    .build();
 
         thaoTacHoaDonService.add(thaoTacHoaDon);
 
@@ -206,11 +206,10 @@ public class HoaDonService {
                 .build();
 
         HoaDon hoaDonRes = repo.save(hoaDon);
-        ThaoTacHoaDon thaoTacHoaDon = new ThaoTacHoaDon().builder()
+        ThaoTacHoaDonAddRequest thaoTacHoaDon = new ThaoTacHoaDonAddRequest().builder()
                 .thaoTac("update")
-                .trangThai(1)
-                .hoaDon(hoaDonRes)
-                .nhanVien(hoaDon.getNhanVien())
+                .idHoaDon(hoaDonRes.getId())
+                .idNhanVien(hoaDon.getNhanVien().getId())
                 .build();
 
         thaoTacHoaDonService.add(thaoTacHoaDon);
@@ -223,11 +222,10 @@ public class HoaDonService {
         hoaDon.setTrangThai(status);
 
         HoaDon hoaDonRes = repo.save(hoaDon);
-        ThaoTacHoaDon thaoTacHoaDon = new ThaoTacHoaDon().builder()
+        ThaoTacHoaDonAddRequest thaoTacHoaDon = new ThaoTacHoaDonAddRequest().builder()
                 .thaoTac("delete")
-                .trangThai(1)
-                .hoaDon(hoaDonRes)
-                .nhanVien(hoaDon.getNhanVien())
+                .idHoaDon(hoaDonRes.getId())
+                .idNhanVien(hoaDon.getNhanVien().getId())
                 .build();
 
         thaoTacHoaDonService.add(thaoTacHoaDon);
@@ -463,15 +461,23 @@ public class HoaDonService {
         return ResponseEntity.ok("thành công");
     }
 
-    public ResponseEntity<?> nextSetp(Long request) {
-        HoaDon hoaDon = repo.findById(request).orElse(null);
+    public ResponseEntity<?> nextSetp(NextStep request) {
+        HoaDon hoaDon = repo.findById(request.getIdHoaDon()).orElse(null);
         if(hoaDon == null) return getErro("Hóa đơn này không tồn tại");
         if(hoaDon.getTrangThai() == 6) return getErro("Hóa đơn này đã hoàn thành không để chỉnh sửa");
+        var thaoTacHoaDon = new ThaoTacHoaDonAddRequest();
+
+        thaoTacHoaDon.setThaoTac("update trang thai");
+        thaoTacHoaDon.setIdHoaDon(hoaDon.getId());
+        thaoTacHoaDon.setIdNhanVien(request.getIdNhanVien());
+
+
         var trangThai = hoaDon.getTrangThai();
 
         trangThai += 1;
+        hoaDon.setTrangThai(trangThai);
         hoaDon = repo.save(hoaDon);
 
-        return ResponseEntity.ok(hoaDon);
+        return ResponseEntity.ok("ThanhCong");
     }
 }

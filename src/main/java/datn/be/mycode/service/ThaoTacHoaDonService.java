@@ -4,14 +4,17 @@ import datn.be.mycode.entity.ThaoTacHoaDon;
 import datn.be.mycode.repository.HoaDonRepository;
 import datn.be.mycode.repository.NhanVienRepository;
 import datn.be.mycode.repository.ThaoTacHoaDonRepository;
-import datn.be.mycode.request.ThaoTacHoaDonRequest;
 import datn.be.mycode.request.customRequest.TableThaoTacHoaDonRequest;
+import datn.be.mycode.request.thaoTacHoaDon.ThaoTacHoaDonAddRequest;
 import datn.be.mycode.response.ThaoTacHoaDonResponse;
 import datn.be.mycode.response.NormalTableResponse;
+import datn.be.mycode.response.erroResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -51,15 +54,24 @@ public class ThaoTacHoaDonService {
         return hoaDonNormalTableResponse;
     }
 
-    public ThaoTacHoaDon add(ThaoTacHoaDon request){
+    public ResponseEntity<?> add(ThaoTacHoaDonAddRequest request){
+        var hoaDon = hoaDonRepository.findById(request.getIdHoaDon()).orElse(null);
+        if(hoaDon == null) return getErro("Không tìm thấy hóa đơn");
+        var nhanVien = nhanVienRepository.findById(request.getIdNhanVien()).orElse(null);
+        if(nhanVien == null) return getErro("Nhân viên này không tôn tại");
 
         ThaoTacHoaDon thaoTacHoaDon = new ThaoTacHoaDon().builder()
                 .thaoTac(request.getThaoTac())
                 .ngayTao(LocalDateTime.now())
-                .trangThai(request.getTrangThai())
-                .hoaDon(hoaDonRepository.findById(request.getHoaDon().getId()).get())
-                .nhanVien(nhanVienRepository.findById(request.getNhanVien().getId()).get())
+                .trangThai(1)
+                .hoaDon(hoaDon)
+                .nhanVien(nhanVien)
                 .build();
-        return thaoTacHoaDonRepository.save(thaoTacHoaDon);
+        thaoTacHoaDonRepository.save(thaoTacHoaDon);
+        return ResponseEntity.ok("");
+    }
+
+    private ResponseEntity<?> getErro(String s){
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new erroResponse(s));
     }
 }
