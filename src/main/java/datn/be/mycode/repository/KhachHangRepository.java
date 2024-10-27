@@ -31,5 +31,5 @@ public interface KhachHangRepository extends JpaRepository<KhachHang, Long> {
     @Query("SELECT u FROM KhachHang u WHERE u.id = :id")
     Optional<KhachHang> searchById(@Param("id") Long id);
 
-
+    Optional<KhachHang> findByTaiKhoanAndMatKhauAndTrangThai(String taiKhoan, String matKhau,int trangThai);
 }
