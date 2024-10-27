@@ -5,6 +5,7 @@ import datn.be.mycode.config.JwtTokenProvider;
 import datn.be.mycode.entity.loginTest;
 import datn.be.mycode.response.LoginResponse;
 import datn.be.mycode.response.erroResponse;
+import datn.be.mycode.service.KhachHangService;
 import datn.be.mycode.service.NhanVienService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
@@ -21,11 +22,19 @@ public class LoginController {
 
     @Autowired
     private NhanVienService nhanVienService;
+    @Autowired
+    private KhachHangService khachHangService;
 
     @PostMapping("/nhan_vien_login")
     public ResponseEntity<?> login(@RequestBody loginTest loginRequest) {
 
         return nhanVienService.getAccount(loginRequest);
+    }
+
+    @PostMapping("/khach_hang_login")
+    public ResponseEntity<?> loginKhachHang(@RequestBody loginTest loginRequest) {
+
+        return khachHangService.getAccount(loginRequest);
     }
 
 }

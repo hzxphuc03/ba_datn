@@ -117,6 +117,12 @@ public class HoaDonCotroller {
         return ResponseEntity.ok(hoaDonService.hoaDonAddVoucher(request));
     }
 
+    @PutMapping("/next-step/{idHoaDon}")
+    public ResponseEntity<?> nextStep(@PathVariable Long idHoaDon){
+
+        return ResponseEntity.ok(hoaDonService.nextSetp(idHoaDon));
+    }
+
     @PutMapping("/update-trang-thai/{id}")
     public ResponseEntity<?> updateTrangThai(@PathVariable("id") Long id,
                                              @RequestParam(name = "status",required = true) Integer status

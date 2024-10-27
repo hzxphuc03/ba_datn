@@ -1,25 +1,35 @@
 package datn.be.mycode.service;
 
+import datn.be.mycode.config.JwtTokenProvider;
 import datn.be.mycode.entity.KhachHang;
 import datn.be.mycode.entity.NhanVien;
+import datn.be.mycode.entity.loginTest;
 import datn.be.mycode.repository.KhachHangRepository;
 import datn.be.mycode.request.KhachHangRequest;
 import datn.be.mycode.request.NormalTableRequest;
 import datn.be.mycode.request.NormalTableRequestKhachHang;
 import datn.be.mycode.response.NormalTableResponse;
+import datn.be.mycode.response.UserLoginResponse;
+import datn.be.mycode.response.erroResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class KhachHangService {
     @Autowired
     private KhachHangRepository repository;
+    @Autowired
+    private JwtTokenProvider jwtTokenProvider;
 
     public NormalTableResponse<KhachHang> getAll(NormalTableRequestKhachHang request) {
 
@@ -120,5 +130,32 @@ public class KhachHangService {
         KhachHang khachHang = repository.findById(id).get();
         khachHang.setTrangThai(status);
         return repository.save(khachHang);
+    }
+
+    public ResponseEntity<?> getAccount(loginTest loginRequest) {
+        KhachHang khachHang = repository.findByTaiKhoanAndMatKhauAndTrangThai(loginRequest.getUsername(), loginRequest.getPass(), 1).orElse(null);
+        Map<String, String> response = new HashMap<>();
+
+        if (khachHang == null) return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new erroResponse("Tài khoản hoặc mật khẩu không chính xác"));
+
+
+        UserLoginResponse user = UserLoginResponse.builder()
+                    .id(khachHang.getId())
+                    .hoTen(khachHang.getHoTen())
+                    .ngaySinh(khachHang.getNgaySinh()+"")
+                    .ngayTao(khachHang.getNgayTao()+"")
+                    .soDienThoai(khachHang.getSoDienThoai())
+                    .gioiTinh(khachHang.getGioiTinh())
+                    .email(khachHang.getEmail())
+                    .taiKhoan(khachHang.getTaiKhoan())
+                    .matKhau(khachHang.getMatKhau())
+                    .trangThai(khachHang.getTrangThai())
+                    .build();
+
+            String token = jwtTokenProvider.generateToken(khachHang.getTaiKhoan(), "KhachHang", user);
+            response.clear();
+            response.put("token", token);
+            return ResponseEntity.ok(response);
+
     }
 }
