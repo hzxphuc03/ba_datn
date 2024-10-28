@@ -68,4 +68,15 @@ public interface SanPhamChiTietRepository extends JpaRepository<SanPhamChiTiet, 
     )
     BigDecimal findGiaMaxByIdSanPham(Long idSanPham);
 
+    @Query("SELECT COUNT(s) > 0 FROM SanPhamChiTiet s " +
+            "WHERE s.sanPham.id = :sanPhamId " +
+            "AND s.kichCo.id = :kichCoId " +
+            "AND s.mauSac.id = :mauSacId " +
+            "AND (:sanPhamChiTietId IS NULL OR s.id != :sanPhamChiTietId)")
+    boolean existsBySanPhamAndKichCoAndMauSac(
+            @Param("sanPhamId") Long sanPhamId,
+            @Param("kichCoId") Long kichCoId,
+            @Param("mauSacId") Long mauSacId,
+            @Param("sanPhamChiTietId") Long sanPhamChiTietId);
+
 }
