@@ -1,5 +1,6 @@
 package datn.be.mycode.service;
 
+import datn.be.mycode.entity.GiamGia;
 import datn.be.mycode.entity.SanPham;
 import datn.be.mycode.entity.SanPhamChiTiet;
 import datn.be.mycode.repository.*;
@@ -11,6 +12,7 @@ import datn.be.mycode.response.customResponse.SanPhamChiTiet.SanPhamBanHang;
 import datn.be.mycode.response.customResponse.SanPhamChiTiet.SanPhamChiTietByIdSP;
 import datn.be.mycode.response.customResponse.SanPhamChiTiet.SanPhamChiTietByIdSanPhamRes;
 import datn.be.mycode.response.erroResponse;
+import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -37,7 +39,6 @@ public class SanPhamChiTietService {
 
 
     public NormalTableResponse<SanPhamChiTietResponse> getAll(TableSanPhamChiTietRequest request) {
-
         CheckRequest(request);
 
         Pageable pageable = PageRequest.of(request.getPage() - 1,request.getPageSize());
@@ -57,7 +58,7 @@ public class SanPhamChiTietService {
 
     public SanPhamChiTietByIdSanPhamRes getByIdSanPham(Long idSanPham){
 
-        List<SanPhamChiTiet> listSanPhamChiTiet = sanPhamChiTietRepository.findAllBySanPham_Id(idSanPham);
+        List<SanPhamChiTiet> listSanPhamChiTiet = sanPhamChiTietRepository.findAllBySanPham_IdAndTrangThai(idSanPham,1);
 
         List<SanPhamChiTietByIdSP> listSanPhamChiTietRes = getSanPhamChiTietsBySanPham(listSanPhamChiTiet);
 

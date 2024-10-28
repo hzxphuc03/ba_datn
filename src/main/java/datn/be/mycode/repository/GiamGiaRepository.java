@@ -7,11 +7,13 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface GiamGiaRepository extends JpaRepository<GiamGia,Long> {
     Page<GiamGia> findByTen(String name, Pageable pageable);
 
     Page<GiamGia> findAllByTrangThai(int trangThai, Pageable pageable);
 
-
+    List<GiamGia> findAllByTrangThai(int trangThai);
 }

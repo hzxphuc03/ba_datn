@@ -368,13 +368,11 @@ public class HoaDonService {
         if(messCheckSoLuong != null) getErro(messCheckSoLuong);
 
         setHoaDon(hoaDon, request);
-        hoaDon.setNgayThanhToan(LocalDateTime.now());
         hoaDon.setThanhToan(true);
 
         var phuongThucThanhToan = hoaDon.getPhuongThucThanhToan();
         if(phuongThucThanhToan.getId() == 2 ){
             hoaDon.setThanhToan(false);
-//            hoaDon.setTrangThai(2);
             repo.save(hoaDon);
 
             return ResponseEntity.ok(taoThanhToan(hoaDon.getTongTien().intValue(), hoaDon.getId()+""));
@@ -382,7 +380,6 @@ public class HoaDonService {
         if(phuongThucThanhToan.getId() == 1 ){
             if(hoaDon.getGiaoHang() && hoaDon.getTrangThai() != 2) {
                 hoaDon.setThanhToan(false);
-//                hoaDon.setTrangThai(2);
                 repo.save(hoaDon);
 
                 return ResponseEntity.ok(taoThanhToan(hoaDon.getTongTien().intValue(), hoaDon.getId()+""));
@@ -400,9 +397,20 @@ public class HoaDonService {
 //        subtract quantity pruduct
         if(hoaDon.getTrangThai() == 6 || hoaDon.getThanhToan() == true){
             setSoLuongSanPham(hoaDon);
+            setVoucher(hoaDon);
         }
+        hoaDon.setNgayThanhToan(LocalDateTime.now());
         repo.save(hoaDon);
         return ResponseEntity.ok("Thành công");
+    }
+
+    private void setVoucher(HoaDon hoaDon) {
+        var voucherHoaDons = voucherHoaDonService.getVoucherHoaDonByHoaDon(hoaDon.getId());
+        for (VoucherHoaDon voucherHoaDon:voucherHoaDons) {
+            var voucher = voucherHoaDon.getVoucher();
+            voucher.setSoLuong(voucher.getSoLuong()-1);
+            voucherRepository.save(voucher);
+        }
     }
 
     private void setSoLuongSanPham(HoaDon hoaDon) {
@@ -454,7 +462,9 @@ public class HoaDonService {
 
         hoaDon.setThanhToan(true);
         hoaDon.setTrangThai(2);
+        hoaDon.setNgayThanhToan(LocalDateTime.now());
         setSoLuongSanPham(hoaDon);
+        setVoucher(hoaDon);
         repo.save(hoaDon);
         return ResponseEntity.ok("thành công");
     }

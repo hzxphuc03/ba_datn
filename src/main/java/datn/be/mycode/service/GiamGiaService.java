@@ -10,6 +10,7 @@ import datn.be.mycode.request.KichCoRequest;
 import datn.be.mycode.request.NormalTableRequest;
 import datn.be.mycode.request.TheLoaiRequest;
 import datn.be.mycode.response.NormalTableResponse;
+import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -23,6 +24,26 @@ import java.util.List;
 public class GiamGiaService {
     @Autowired
     private GiamGiaRepository repository;
+
+    @PostConstruct
+    public void loadGiamGia(){
+        var giamGias = repository.findAllByTrangThai(1);
+        var now = LocalDateTime.now();
+        for (GiamGia giamGia:giamGias) {
+            var endDay = giamGia.getNgayKetThuc();
+            var startDay = giamGia.getNgayBatDau();
+            if (endDay.isBefore(now)) {
+                // Voucher đã quá hạn
+                giamGia.setTrangThai(3);
+            } else if (startDay.isAfter(now)) {
+                // Voucher chưa đến sự kiện
+                giamGia.setTrangThai(2);
+            } else if (startDay.isBefore(now) || startDay.isEqual(now)) {
+                // Voucher đang trong thời gian sự kiện (startDay <= now <= endDay)
+                giamGia.setTrangThai(1);
+            }
+        }
+    }
 
     public NormalTableResponse<GiamGia> getAll(NormalTableRequest request){
         if (request.getPage() == null) {
@@ -85,12 +106,6 @@ public class GiamGiaService {
         repository.delete(giamGia);
     }
 
-
-    public GiamGia deleteById(Long id) {
-        GiamGia giamGia = repository.findById(id).get();
-        giamGia.setTrangThai(0);
-        return repository.save(giamGia);
-    }
 
     public GiamGia udateTrangThai(Long id, Integer status){
        GiamGia giamGia = repository.findById(id).get();

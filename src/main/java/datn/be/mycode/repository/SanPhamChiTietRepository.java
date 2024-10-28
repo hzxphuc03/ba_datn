@@ -51,6 +51,8 @@ public interface SanPhamChiTietRepository extends JpaRepository<SanPhamChiTiet, 
     Page<SanPhamChiTietResponse> searchAllSortedBySoLuong(@Param("request") TableSanPhamChiTietRequest request, Pageable pageable);
 
 
+    List<SanPhamChiTiet> findAllBySanPham_IdAndTrangThai(Long idSanPham, int trangThai);
+
     List<SanPhamChiTiet> findAllBySanPham_Id(Long idSanPham);
 
     @Query("SELECT min(spct.giaBan) " +
@@ -67,6 +69,8 @@ public interface SanPhamChiTietRepository extends JpaRepository<SanPhamChiTiet, 
             "(:idSanPham IS NULL OR spct.sanPham.id = :idSanPham) "
     )
     BigDecimal findGiaMaxByIdSanPham(Long idSanPham);
+
+    List<SanPhamChiTiet> findAllBySoLuong(int soLuong);
 
     @Query("SELECT COUNT(s) > 0 FROM SanPhamChiTiet s " +
             "WHERE s.sanPham.id = :sanPhamId " +
