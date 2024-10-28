@@ -10,10 +10,13 @@ import datn.be.mycode.response.SanPhamChiTietResponse;
 import datn.be.mycode.response.customResponse.SanPhamChiTiet.SanPhamBanHang;
 import datn.be.mycode.response.customResponse.SanPhamChiTiet.SanPhamChiTietByIdSP;
 import datn.be.mycode.response.customResponse.SanPhamChiTiet.SanPhamChiTietByIdSanPhamRes;
+import datn.be.mycode.response.erroResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -64,7 +67,26 @@ public class SanPhamChiTietService {
         return sanPhamChiTietByIdSanPhamRes;
     }
 
-    public SanPhamChiTiet addSPCT(SanPhamChiTietRequest request){
+    public boolean  checkTrungKichCoVaMauSac(Long sanPhamId, Long kichCoId, Long mauSacId, Long sanPhamChiTietId){
+        return sanPhamChiTietRepository.existsBySanPhamAndKichCoAndMauSac(sanPhamId, kichCoId, mauSacId, sanPhamChiTietId);
+    }
+    private ResponseEntity<?> getErro(String string){
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new erroResponse(string));
+    }
+    public Boolean checkTrungKichCoVaMauSacAddandupdate(SanPhamChiTietRequest request ){
+        var sanPhamId = request.getSanPham() ;
+        var kichCoId = request.getKichCo() ;
+        var mauSacId = request.getMauSac() ;
+        Long sanPhamChiTietId = request.getId() ;
+
+        if (checkTrungKichCoVaMauSac(sanPhamId, kichCoId, mauSacId, sanPhamChiTietId)){
+            return false;
+        }else {
+            return true;
+        }
+    }
+
+    public ResponseEntity<?> addSPCT(SanPhamChiTietRequest request){
         SanPhamChiTiet sanPhamChiTiet = new SanPhamChiTiet();
         SanPham sanPham = sanPhamRepository.findById(request.getSanPham()).get();
 
@@ -78,11 +100,16 @@ public class SanPhamChiTietService {
         sanPhamChiTiet.setMauSac(mauSacRepository.findById(request.getMauSac()).get());
         sanPhamChiTiet.setKichCo(kichcoRepository.findById(request.getKichCo()).get());
 
-        SanPhamChiTiet sanPhamChiTietR = sanPhamChiTietRepository.save(sanPhamChiTiet);
+        if (checkTrungKichCoVaMauSacAddandupdate(request)==false) {
+            return getErro("Có Kích cỡ và Màu sắc trùng lặp trong sản phẩm này");
+        } else{
+            SanPhamChiTiet sanPhamChiTietR = sanPhamChiTietRepository.save(sanPhamChiTiet);
 
-        CheckPriceMinAndMax(sanPham, sanPhamChiTietR);
+            CheckPriceMinAndMax(sanPham, sanPhamChiTietR);
 
-        return sanPhamChiTietR;
+            return ResponseEntity.ok(sanPhamChiTietR);
+        }
+
     }
 
     private void CheckPriceMinAndMax(SanPham sanPham, SanPhamChiTiet sanPhamChiTietR) {
@@ -98,7 +125,7 @@ public class SanPhamChiTietService {
         sanPhamRepository.save(sanPham);
     }
 
-    public SanPhamChiTiet update(SanPhamChiTietRequest request){
+    public ResponseEntity<?> update(SanPhamChiTietRequest request){
         SanPhamChiTiet sanPhamChiTiet = sanPhamChiTietRepository.findById(request.getId()).get();
         int trangThai = sanPhamChiTiet.getTrangThai();
         int soLuong = sanPhamChiTiet.getSoLuong();
@@ -114,6 +141,9 @@ public class SanPhamChiTietService {
         sanPhamChiTiet.setMauSac(mauSacRepository.findById(request.getMauSac()).get());
         sanPhamChiTiet.setKichCo(kichcoRepository.findById(request.getKichCo()).get());
 
+        if (checkTrungKichCoVaMauSacAddandupdate(request)==false) {
+            return getErro("Có Kích cỡ và Màu sắc trùng lặp trong sản phẩm này");
+        }
 
         sanPhamChiTiet = sanPhamChiTietRepository.save(sanPhamChiTiet);
 
@@ -148,7 +178,7 @@ public class SanPhamChiTietService {
             sanPhamRepository.save(sanPham);
         }
 
-        return sanPhamChiTiet;
+        return ResponseEntity.ok(sanPhamChiTiet);
     }
 
     public SanPhamChiTiet udateTrangThai(Long id, Integer status){
