@@ -1,5 +1,6 @@
 package datn.be.mycode.RESTController;
 
+import datn.be.mycode.request.HoaDon.HuyHoaDonRequest;
 import datn.be.mycode.request.HoaDon.NextStep;
 import datn.be.mycode.request.HoaDonRequest;
 
@@ -130,6 +131,12 @@ public class HoaDonCotroller {
     ){
 
         return ResponseEntity.ok(hoaDonService.udateTrangThai(id, status));
+    }
+
+    @PostMapping("/huy-hoa-don")
+    public ResponseEntity<?> huyHoaDon(@RequestBody HuyHoaDonRequest request){
+
+        return ResponseEntity.ok(hoaDonService.huyHoaDon(request));
     }
 
     @PutMapping("/update-trang-thai-thanh_toan-online/{idHoaDon}")

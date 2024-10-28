@@ -2,6 +2,7 @@ package datn.be.mycode.service;
 
 import datn.be.mycode.entity.*;
 import datn.be.mycode.repository.*;
+import datn.be.mycode.request.HoaDon.HuyHoaDonRequest;
 import datn.be.mycode.request.HoaDon.NextStep;
 import datn.be.mycode.request.HoaDonRequest;
 import datn.be.mycode.request.VoucherHoaDonRequest;
@@ -44,6 +45,8 @@ public class HoaDonService {
     private VoucherHoaDonService voucherHoaDonService;
     @Autowired
     private VNPayService vnPayService;
+    @Autowired
+    private SanPhamChiTietRepository sanPhamChiTietRepository;
 
     @Autowired
     private HoaDonChiTietService hoaDonChiTietService;
@@ -472,6 +475,59 @@ public class HoaDonService {
         trangThai += 1;
         hoaDon.setTrangThai(trangThai);
         hoaDon = repo.save(hoaDon);
+        thaoTacHoaDonService.add(thaoTacHoaDon);
+
+        return ResponseEntity.ok("ThanhCong");
+    }
+
+    public ResponseEntity<?> huyHoaDon(HuyHoaDonRequest request) {
+
+        HoaDon hoaDon = repo.findById(request.getIdHoaDon()).orElse(null);
+        if(hoaDon == null) return getErro("Hóa đơn này không tồn tại");
+        var trangThai = hoaDon.getTrangThai();
+        if(trangThai == 6) return getErro("Hóa đơn này đã hoàn thành không để chỉnh sửa");
+        if(trangThai == 0) return getErro("Hóa đơn này đã hủy");
+
+        var thaoTacHoaDon = new ThaoTacHoaDonAddRequest();
+        switch (trangThai){
+            case 1:
+                thaoTacHoaDon.setThaoTac("(Hóa đơn khởi tạo => Hóa đơn đã hủy)( "+request.getGhiChu()+")");
+                break;
+            case 2:
+                thaoTacHoaDon.setThaoTac("(Hóa đơn chờ sử lý => Hóa đơn đã hủy)( "+request.getGhiChu()+")");
+                break;
+            case 3:
+                thaoTacHoaDon.setThaoTac("(Hóa đơn đã nhận => Hóa đơn đã hủy)( "+request.getGhiChu()+")");
+                break;
+            case 4:
+                thaoTacHoaDon.setThaoTac("(Đóng gói hóa đơn => Hóa đơn đã hủy)( "+request.getGhiChu()+")");
+                break;
+            case 5:
+                thaoTacHoaDon.setThaoTac("(Hóa đơn vận chuyển => Hóa đơn đã hủy)( "+request.getGhiChu()+")");
+                break;
+
+        }
+
+        thaoTacHoaDon.setIdHoaDon(hoaDon.getId());
+        thaoTacHoaDon.setIdNhanVien(request.getIdNhanVien());
+
+        hoaDon.setTrangThai(0);
+
+        List<HoaDonChiTiet> hoaDonChiTiets = hoaDonChiTietService.getListByHoaDonId(hoaDon.getId());
+        if(trangThai > 2){
+            for (HoaDonChiTiet hoaDonChiTiet: hoaDonChiTiets) {
+                var soLuongBan = hoaDonChiTiet.getSoLuong();
+                var sanPhamChiTiet = hoaDonChiTiet.getSanPhamChiTiet();
+                var soLuongSauHuy = sanPhamChiTiet.getSoLuong() + soLuongBan;
+                sanPhamChiTiet.setSoLuong(soLuongSauHuy);
+
+                sanPhamChiTietRepository.save(sanPhamChiTiet);
+            }
+        }
+
+        hoaDon = repo.save(hoaDon);
+        thaoTacHoaDonService.add(thaoTacHoaDon);
+
 
         return ResponseEntity.ok("ThanhCong");
     }
