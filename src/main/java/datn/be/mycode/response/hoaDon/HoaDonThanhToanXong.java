@@ -35,13 +35,13 @@ public class HoaDonThanhToanXong {
     private Boolean thanhToan;
     private Boolean giaoHang;
     private List<Voucher> vouchers;
-    private List<SanPhamChiTiet> sanPhamChiTiets;
+    private List<HoaDonChiTiet> hoaDonChiTiets;
     private PhuongThucThanhToan phuongThucThanhToan;
     private NhanVien nhanVien;
     private KhachHang khachHang;
     private int trangThai;
 
-    public HoaDonThanhToanXong(HoaDon hoaDon, List<Voucher> vouchers, List<SanPhamChiTiet> sanPhamChiTiets) {
+    public HoaDonThanhToanXong(HoaDon hoaDon, List<Voucher> vouchers, List<HoaDonChiTiet> hoaDonChiTiets) {
         this.id = hoaDon.getId();
         this.ma = hoaDon.getMa();
         this.ngayTao = hoaDon.getNgayTao();
@@ -62,7 +62,7 @@ public class HoaDonThanhToanXong {
         this.thanhToan = hoaDon.getThanhToan();
         this.giaoHang = hoaDon.getGiaoHang();
         this.vouchers = vouchers;
-        this.sanPhamChiTiets = sanPhamChiTiets;
+        this.hoaDonChiTiets = hoaDonChiTiets;
         this.phuongThucThanhToan = hoaDon.getPhuongThucThanhToan();
         this.nhanVien = hoaDon.getNhanVien();
         this.khachHang = hoaDon.getKhachHang();

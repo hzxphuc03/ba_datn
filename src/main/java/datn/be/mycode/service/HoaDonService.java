@@ -112,15 +112,10 @@ public class HoaDonService {
         var hoaDon = repo.findById(idHoaHon).orElse(null);
         if (hoaDon == null ) return getErro("Hóa đơn này không tồn tại");
         var hoaDonChiTiets = hoaDonChiTietService.getListByHoaDonId(hoaDon.getId());
-        List<SanPhamChiTiet> sanPhamChiTiets = new ArrayList<>();
-        for (HoaDonChiTiet hoaDonChiTiet:hoaDonChiTiets) {
-            var sanPhamChiTiet = hoaDonChiTietService.getSanPhamForHoaDonChiTiet(hoaDonChiTiet);
-            sanPhamChiTiets.add(sanPhamChiTiet);
-        }
 
 
         var voucher = voucherHoaDonService.getVouchersByHoaDonId(hoaDon.getId());
-        HoaDonThanhToanXong hoaDonResponse = new HoaDonThanhToanXong(hoaDon,voucher,sanPhamChiTiets);
+        HoaDonThanhToanXong hoaDonResponse = new HoaDonThanhToanXong(hoaDon,voucher,hoaDonChiTiets);
 
         return ResponseEntity.ok(hoaDonResponse);
     }
