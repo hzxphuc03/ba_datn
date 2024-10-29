@@ -78,7 +78,7 @@ public class VoucherService {
         voucher.setPhanTramGiam(request.getPhanTramGiam());
         voucher.setGiamToiDa(request.getGiamToiDa());
         voucher.setGiaTriGiamToiThieu(request.getGiaTriGiamToiThieu());
-        voucher.setTrangThai(request.getTrangThai());
+        voucher.setTrangThai(1);
 
         voucher = repository.save(voucher);
         capNhatTrangThaiVoucher();

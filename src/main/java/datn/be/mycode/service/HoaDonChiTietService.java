@@ -74,8 +74,17 @@ public class HoaDonChiTietService {
         var hoaDonChiTiets = getListByHoaDonId(id);
         for (HoaDonChiTiet hoaDonChiTiet:hoaDonChiTiets) {
             var sanPhamChiTiet = hoaDonChiTiet.getSanPhamChiTiet();
+            var sanPham = sanPhamChiTiet.getSanPham();
             sanPhamChiTiet.setSoLuong(sanPhamChiTiet.getSoLuong()-hoaDonChiTiet.getSoLuong());
+            if(sanPhamChiTiet.getSoLuong() == 0) sanPhamChiTiet.setTrangThai(0);
+
             sanPhamChiTietRepository.save(sanPhamChiTiet);
+
+            var sanPhamChiTiets = sanPhamChiTietRepository.findAllBySanPham_IdAndTrangThai(sanPham.getId(), 1);
+            if(sanPhamChiTiets.isEmpty() ){
+                sanPham.setTrangThai(0);
+                sanPhamService.update(sanPham);
+            }
         }
     }
 
