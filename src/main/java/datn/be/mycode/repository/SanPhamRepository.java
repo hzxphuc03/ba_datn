@@ -68,4 +68,15 @@ public interface SanPhamRepository extends JpaRepository<SanPham, Long> {
             "GROUP BY sp.id, sp.ma, sp.ten, sp.moTa, sp.hinhAnh, sp.trongLuong, sp.beMatSuDung, sp.congNghe, sp.kieuDang, sp.giaThapNhat, sp.giaCaoNhat, sp.ngayTao, sp.ngaySua, sp.nguoiTao, sp.trangThai, sp.giamGia, sp.thuongHieu, sp.theLoai, sp.loaiCo, sp.vatLieu, sp.loaiDe "
     )
     SanPhamResponse searchById(Long id);
+
+    @Query("SELECT sp.id FROM SanPham sp JOIN SanPhamChiTiet spct ON spct.sanPham.id = sp.id " +
+            "JOIN HoaDonChiTiet hdct ON hdct.sanPhamChiTiet.id = spct.id " +
+            "GROUP BY sp.id ORDER BY SUM(hdct.soLuong) DESC")
+    List<Long> top5SanPhamBanChay();
+
+    @Query("SELECT sp.id FROM SanPham sp " +
+            "JOIN sp.giamGia gg " +
+            "WHERE gg.trangThai = 1 AND gg.ngayBatDau <= CURRENT_DATE AND gg.ngayKetThuc >= CURRENT_DATE " +
+            "ORDER BY gg.mucGiam DESC")
+    List<Long> top5SanPhamGiamGia();
 }

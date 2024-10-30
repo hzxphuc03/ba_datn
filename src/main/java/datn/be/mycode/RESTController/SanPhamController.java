@@ -1,5 +1,6 @@
 package datn.be.mycode.RESTController;
 
+import datn.be.mycode.entity.SanPham;
 import datn.be.mycode.request.SanPhamRequest;
 import datn.be.mycode.request.customRequest.TableSanPhamRequest;
 import datn.be.mycode.service.ChucVuService;
@@ -9,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @CrossOrigin("*")
 @RestController
@@ -44,6 +46,15 @@ public class SanPhamController {
             @RequestParam(name = "idSanPham",required = false) Long idSanPham
     ){
         return ResponseEntity.ok(sanPhamService.getSanPhamById(idSanPham));
+    }
+    @GetMapping("/top5-ban-chay")
+    public List<SanPham> getTop5SanPhamBanChay() {
+        return sanPhamService.top5SanPhamBanChay();
+    }
+
+    @GetMapping("/top5-giam-gia")
+    public List<SanPham> top5SanPhamGiamGia() {
+        return sanPhamService.top5SanPhamGiamGia();
     }
 
     @PostMapping("/add")
