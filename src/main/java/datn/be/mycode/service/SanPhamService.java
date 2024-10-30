@@ -149,4 +149,9 @@ public class SanPhamService {
         return repo.findAllById(topSanPhamIds.stream().limit(5).toList());
     }
 
+    public List<SanPham> top5SanPhamMoi() {
+        Pageable pageable = PageRequest.of(0, 5);
+        List<SanPham> topSanPhams = repo.top5SanPhamMoi(pageable);
+        return topSanPhams;
+    }
 }
