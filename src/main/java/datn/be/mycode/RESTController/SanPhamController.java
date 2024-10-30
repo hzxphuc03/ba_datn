@@ -57,6 +57,11 @@ public class SanPhamController {
         return sanPhamService.top5SanPhamGiamGia();
     }
 
+    @GetMapping("/top5-moi")
+    public List<SanPham> top5SanPhamMoi() {
+        return sanPhamService.top5SanPhamMoi();
+    }
+
     @PostMapping("/add")
     public ResponseEntity<?> add(@RequestBody SanPhamRequest sanPhamRequest){
 
