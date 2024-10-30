@@ -138,4 +138,15 @@ public class SanPhamService {
     public void update(SanPham sanPham) {
         repo.save(sanPham);
     }
+
+    public List<SanPham> top5SanPhamBanChay() {
+    List<Long> topSanPhamIds = repo.top5SanPhamBanChay();
+    return repo.findAllById(topSanPhamIds);
+    }
+
+    public List<SanPham> top5SanPhamGiamGia() {
+        List<Long> topSanPhamIds = repo.top5SanPhamGiamGia();
+        return repo.findAllById(topSanPhamIds.stream().limit(5).toList());
+    }
+
 }
