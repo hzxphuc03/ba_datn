@@ -23,6 +23,8 @@ import java.util.List;
 public class VoucherService {
     @Autowired
     VoucherRepository repository;
+    @Autowired
+    private GiamGiaService giamGiaService;
 
 
     public NormalTableResponse<Voucher> getAll(TableVoucherRequest request) {
@@ -142,6 +144,7 @@ public class VoucherService {
             // Lưu lại voucher nếu trạng thái thay đổi
             repository.save(voucher);
         }
+        giamGiaService.loadGiamGia();
     }
 
     public NormalTableResponse<Voucher> trongSuKien(TableVoucherStatusInRequest request) {

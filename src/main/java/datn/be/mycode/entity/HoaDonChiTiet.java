@@ -1,12 +1,11 @@
 package datn.be.mycode.entity;
 
-import datn.be.mycode.request.HoaDonChiTietRequest;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.math.RoundingMode;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -45,5 +44,10 @@ public class HoaDonChiTiet implements Serializable {
 
     public void AddSoluong(int sl){
         soLuong += sl;
+    }
+
+    public void setGiaDaGiamUpdate(int phanTramGiam) {
+        var mucGiam = BigDecimal.valueOf(phanTramGiam).divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP);
+        this.giaDaGiam = this.giaHienHanh.subtract(this.giaHienHanh.multiply(mucGiam));
     }
 }

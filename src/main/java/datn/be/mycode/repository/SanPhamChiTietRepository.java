@@ -58,7 +58,8 @@ public interface SanPhamChiTietRepository extends JpaRepository<SanPhamChiTiet, 
     @Query("SELECT min(spct.giaBan) " +
             "FROM SanPhamChiTiet spct " +
             "WHERE " +
-            "(:idSanPham IS NULL OR spct.sanPham.id = :idSanPham) "
+            "spct.sanPham.id = :idSanPham AND " +
+            "spct.trangThai = 1"
     )
     BigDecimal findGiaMinByIdSanPham(Long idSanPham);
 
@@ -66,9 +67,18 @@ public interface SanPhamChiTietRepository extends JpaRepository<SanPhamChiTiet, 
     @Query("SELECT max(spct.giaBan) " +
             "FROM SanPhamChiTiet spct " +
             "WHERE " +
-            "(:idSanPham IS NULL OR spct.sanPham.id = :idSanPham) "
+            "spct.sanPham.id = :idSanPham AND " +
+            "spct.trangThai = 1"
     )
     BigDecimal findGiaMaxByIdSanPham(Long idSanPham);
+
+    @Query("SELECT SUM(spct.soLuong) " +
+            "FROM SanPhamChiTiet spct " +
+            "WHERE " +
+            "spct.sanPham.id = :idSanPham AND " +
+            "spct.trangThai = 1"
+    )
+    int sumSoLuongByTrangThai(Long idSanPham);
 
     List<SanPhamChiTiet> findAllBySoLuong(int soLuong);
 

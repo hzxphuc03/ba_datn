@@ -82,4 +82,7 @@ public interface SanPhamRepository extends JpaRepository<SanPham, Long> {
 
     @Query(value = "SELECT s FROM SanPham s ORDER BY s.ngayTao DESC")
     List<SanPham> top5SanPhamMoi(Pageable pageable);
+
+
+    List<SanPham> findAllByGiamGiaId(Long idGiamGia);
 }
