@@ -7,6 +7,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface TheLoaiRepository extends JpaRepository<TheLoai, Long> {
 
@@ -16,5 +18,5 @@ public interface TheLoaiRepository extends JpaRepository<TheLoai, Long> {
 
     @Query("SELECT u FROM TheLoai u WHERE u.ten LIKE %:name%")
     Page<TheLoai> searchByTen(String name, Pageable pageable);
-
+    List<TheLoai> findAll();
 }

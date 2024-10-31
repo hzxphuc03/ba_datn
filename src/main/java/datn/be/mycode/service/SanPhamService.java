@@ -145,7 +145,7 @@ public class SanPhamService {
     }
 
     public List<SanPham> top5SanPhamGiamGia() {
-        List<Long> topSanPhamIds = repo.top5SanPhamGiamGia();
+        List<Long> topSanPhamIds = repo.topSanPhamGiamGia();
         return repo.findAllById(topSanPhamIds.stream().limit(5).toList());
     }
 
@@ -153,5 +153,18 @@ public class SanPhamService {
         Pageable pageable = PageRequest.of(0, 5);
         List<SanPham> topSanPhams = repo.top5SanPhamMoi(pageable);
         return topSanPhams;
+    }
+
+    public List<SanPham> top3SanPhamGiamGia() {
+        List<Long> topSanPhamIds = repo.topSanPhamGiamGia();
+        return repo.findAllById(topSanPhamIds.stream().limit(3).toList());
+    }
+    public SanPham getSanPhamGiamGiaSauNhat() {
+        List<SanPham> sanPhams = repo.findSanPhamGiamGiaSauNhat(PageRequest.of(0, 1));
+        return sanPhams.isEmpty() ? null : sanPhams.get(0);
+    }
+    public List<SanPham> getTop12SanPhamByUpdatedDate() {
+        List<SanPham> allSanPham = repo.findTop12SanPhamByUpdatedDate();
+        return allSanPham.size() > 12 ? allSanPham.subList(0, 12) : allSanPham; // Đảm bảo lấy tối đa 12 sản phẩm
     }
 }

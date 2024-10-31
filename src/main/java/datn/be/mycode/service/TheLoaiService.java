@@ -85,4 +85,7 @@ public class TheLoaiService {
         theLoai.setTrangThai(status);
         return repo.save(theLoai);
     }
+    public List<TheLoai> findAllTheLoai() {
+        return repo.findAll();
+    }
 }
