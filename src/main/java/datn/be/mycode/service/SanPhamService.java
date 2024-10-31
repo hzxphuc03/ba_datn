@@ -1,7 +1,9 @@
 package datn.be.mycode.service;
 
 
+import datn.be.mycode.entity.HoaDonChiTiet;
 import datn.be.mycode.entity.SanPham;
+import datn.be.mycode.entity.SanPhamChiTiet;
 import datn.be.mycode.repository.*;
 import datn.be.mycode.request.SanPhamRequest;
 import datn.be.mycode.request.customRequest.TableSanPhamRequest;
@@ -15,6 +17,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -36,6 +39,8 @@ public class SanPhamService {
     private LoaiDeRepository loaiDeRepository;
     @Autowired
     private SanPhamChiTietRepository sanPhamChiTietRepository;
+    @Autowired
+    private HoaDonChiTietRepository hoaDonChiTietRepository;
 
     public NormalTableResponse<SanPhamResponse> getAll(TableSanPhamRequest request) {
         if (request.getPage() == null) {
@@ -68,6 +73,9 @@ public class SanPhamService {
         return sanPhamNormalTableResponse;
     }
 
+    public List<SanPham> findAllByGiamGiaId(Long idGiamGia){
+        return repo.findAllByGiamGiaId(idGiamGia);
+    }
 
     public SanPham add(SanPhamRequest request) {
         SanPham sanPham = SanPham.builder()
@@ -100,6 +108,9 @@ public class SanPhamService {
 
     public SanPham update(SanPhamRequest request) {
         SanPham sanPham = repo.findById(request.getId()).get();
+        var idGiamGiaAfter = sanPham.getGiamGia() == null ? null :sanPham.getGiamGia().getId();
+        var giamGia = giamGiaRepository.findById(request.getIdGiamGia()).orElse(null);
+        if(giamGia!= null && giamGia.getTrangThai()!=1) giamGia = null;
 
         sanPham.setMa(request.getMa());
         sanPham.setTen(request.getTen());
@@ -111,13 +122,33 @@ public class SanPhamService {
         sanPham.setKieuDang(request.getKieuDang());
         sanPham.setNgaySua(LocalDateTime.now());
         sanPham.setTrangThai(request.getTrangThai());
-        sanPham.setGiamGia(giamGiaRepository.findById(request.getIdGiamGia()).orElse(null));
+        sanPham.setGiamGia(giamGia);
         sanPham.setThuongHieu(thuongHieuRepository.findById(request.getIdThuongHieu()).get());
         sanPham.setTheLoai(theLoaiRepository.findById(request.getIdTheLoai()).get());
         sanPham.setLoaiCo(loaiCoRepository.findById(request.getIdLoaiCo()).get());
         sanPham.setVatLieu(vatLieuRepository.findById(request.getIdVatLieu()).get());
         sanPham.setLoaiDe(loaiDeRepository.findById(request.getIdLoaiDe()).get());
-        return repo.save(sanPham);
+
+        sanPham = repo.save(sanPham);
+
+
+//        kiem tra xem giam gia co thay doi
+        if(idGiamGiaAfter != request.getIdGiamGia() || idGiamGiaAfter == null && request.getIdGiamGia() != null){
+            List<HoaDonChiTiet> hoaDonChiTietsForSanPham = new ArrayList<>();
+            var sanPhamChiTietList = sanPhamChiTietRepository.findAllBySanPham_Id(sanPham.getId());
+            var mucGiam = sanPham.getGiamGia() == null ? 0 : sanPham.getGiamGia().getMucGiam();
+            for (SanPhamChiTiet sanPhamChiTiet:sanPhamChiTietList) {
+                var hoaDonChiTiets = hoaDonChiTietRepository.findAllBySanPhamChiTiet_IdAndTrangThai(sanPhamChiTiet.getId(),1);
+                for (HoaDonChiTiet hoaDonChiTiet:hoaDonChiTiets) {
+                    hoaDonChiTiet.setGiaDaGiamUpdate(mucGiam);
+                    hoaDonChiTietsForSanPham.add(hoaDonChiTiet);
+                }
+            }
+            if (hoaDonChiTietsForSanPham != null && !hoaDonChiTietsForSanPham.isEmpty()){
+                hoaDonChiTietRepository.saveAll(hoaDonChiTietsForSanPham);
+            }
+        }
+        return sanPham;
     }
 
 
@@ -131,8 +162,24 @@ public class SanPhamService {
 
     public SanPham udateTrangThai(Long id, Integer status){
         SanPham sanPham = repo.findById(id).get();
+        var trangThaiBefore = sanPham.getTrangThai();
         sanPham.setTrangThai(status);
+        if(sanPham.getTrangThai()!= trangThaiBefore && sanPham.getTrangThai() == 0){
+            var sanPhamChiTietList = sanPhamChiTietRepository.findAllBySanPham_Id(sanPham.getId());
+            for (SanPhamChiTiet sanPhamChiTiet:sanPhamChiTietList) {
+                var hoaDonChiTiets = hoaDonChiTietRepository.findAllBySanPhamChiTiet_IdAndTrangThai(sanPhamChiTiet.getId(),1);
+
+                hoaDonChiTietRepository.deleteAll(hoaDonChiTiets);
+
+            }
+
+        }
         return repo.save(sanPham);
+    }
+
+    public void updateSoLuong(SanPham sanPham) {
+        sanPham.setSoLuong(sanPhamChiTietRepository.sumSoLuongByTrangThai(sanPham.getId()));
+        repo.save(sanPham);
     }
 
     public void update(SanPham sanPham) {

@@ -70,8 +70,8 @@ public class HoaDonChiTietService {
         return sanPhamChiTiet;
     }
 
-    public void setSoLuongAfterPayment(Long id){
-        var hoaDonChiTiets = getListByHoaDonId(id);
+    public void setSoLuongAfterPayment(Long idHoaDonChiTiet){
+        var hoaDonChiTiets = getListByHoaDonId(idHoaDonChiTiet);
         for (HoaDonChiTiet hoaDonChiTiet:hoaDonChiTiets) {
             var sanPhamChiTiet = hoaDonChiTiet.getSanPhamChiTiet();
             var sanPham = sanPhamChiTiet.getSanPham();
@@ -79,7 +79,7 @@ public class HoaDonChiTietService {
             if(sanPhamChiTiet.getSoLuong() == 0) sanPhamChiTiet.setTrangThai(0);
 
             sanPhamChiTietRepository.save(sanPhamChiTiet);
-
+            sanPhamService.updateSoLuong(sanPham);
             var sanPhamChiTiets = sanPhamChiTietRepository.findAllBySanPham_IdAndTrangThai(sanPham.getId(), 1);
             if(sanPhamChiTiets.isEmpty() ){
                 sanPham.setTrangThai(0);
@@ -128,6 +128,7 @@ public class HoaDonChiTietService {
         var spct = sanPhamChiTietRepository.findById(request.getIdSanPhamChiTiet()).orElse(null);
         var giamGia = spct.getSanPham().getGiamGia();
         var gia = spct.getGiaBan();
+        var giaDaGiam = new BigDecimal(gia.toString());
 
         if(request.getSoLuong() <= 0) return getErro("Số lượng phải lớn hơn 0");
         if(request.getSoLuong()>spct.getSoLuong()) return getErro("Số lượng sản phẩm không vượt quá số lượng đang có");
@@ -135,9 +136,7 @@ public class HoaDonChiTietService {
 
         if(giamGia != null && giamGia.getNgayBatDau().isBefore(LocalDateTime.now()) && giamGia.getNgayKetThuc().isAfter(LocalDateTime.now())){
             var mucGiam = BigDecimal.valueOf(giamGia.getMucGiam()).divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP);
-            gia = gia.subtract(gia.multiply(mucGiam));
-        }else {
-            gia = spct.getGiaBan();
+            giaDaGiam = gia.subtract(gia.multiply(mucGiam));
         }
         var tongTienSanPhamChuaGiam = hd.getTongTienSanPhamChuaGiam();
 
@@ -146,7 +145,7 @@ public class HoaDonChiTietService {
                 hoaDonChiTiet = new HoaDonChiTiet().builder()
                         .soLuong(request.getSoLuong())
                         .giaHienHanh(gia)
-                        .giaDaGiam(gia)
+                        .giaDaGiam(giaDaGiam)
                         .trangThai(1)
                         .hoaDon(hd)
                         .sanPhamChiTiet(spct)
@@ -218,5 +217,14 @@ public class HoaDonChiTietService {
             }
         }
         return null;
+    }
+
+    public void setTrangThaiByHoaDonDone(HoaDon hoaDon) {
+        var hoaDonCHiTiets = repo.findAllByHoaDon_Id(hoaDon.getId());
+
+        for (HoaDonChiTiet hoaDonChiTiet:hoaDonCHiTiets) {
+            hoaDonChiTiet.setTrangThai(0);
+        }
+        repo.saveAll(hoaDonCHiTiets);
     }
 }

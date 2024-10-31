@@ -2,13 +2,12 @@ package datn.be.mycode.service;
 
 import datn.be.mycode.entity.GiamGia;
 import datn.be.mycode.entity.KichCo;
+import datn.be.mycode.entity.SanPham;
 import datn.be.mycode.entity.TheLoai;
 import datn.be.mycode.repository.GiamGiaRepository;
 import datn.be.mycode.repository.KichcoRepository;
-import datn.be.mycode.request.GiamGiaRequest;
-import datn.be.mycode.request.KichCoRequest;
-import datn.be.mycode.request.NormalTableRequest;
-import datn.be.mycode.request.TheLoaiRequest;
+import datn.be.mycode.repository.SanPhamRepository;
+import datn.be.mycode.request.*;
 import datn.be.mycode.response.NormalTableResponse;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,23 +23,41 @@ import java.util.List;
 public class GiamGiaService {
     @Autowired
     private GiamGiaRepository repository;
+    @Autowired
+    private SanPhamService sanPhamService;
 
-    @PostConstruct
+//    @PostConstruct
     public void loadGiamGia(){
         var giamGias = repository.findAllByTrangThai(1);
         var now = LocalDateTime.now();
         for (GiamGia giamGia:giamGias) {
             var endDay = giamGia.getNgayKetThuc();
             var startDay = giamGia.getNgayBatDau();
+            var trangThai = giamGia.getTrangThai();
             if (endDay.isBefore(now)) {
                 // Voucher đã quá hạn
-                giamGia.setTrangThai(3);
-            } else if (startDay.isAfter(now)) {
+                if(trangThai != 3) {
+                    giamGia.setTrangThai(3);
+                    repository.save(giamGia);
+                    loadSanPham(giamGia);
+                }
+            }
+            if (startDay.isAfter(now)) {
                 // Voucher chưa đến sự kiện
-                giamGia.setTrangThai(2);
-            } else if (startDay.isBefore(now) || startDay.isEqual(now)) {
+                if(trangThai != 2) {
+                    giamGia.setTrangThai(2);
+                    repository.save(giamGia);
+                }
+            }
+            if (startDay.isBefore(now) || startDay.isEqual(now)) {
                 // Voucher đang trong thời gian sự kiện (startDay <= now <= endDay)
-                giamGia.setTrangThai(1);
+                if(trangThai != 1) {
+                    giamGia.setTrangThai(1);
+                    repository.save(giamGia);
+                }
+            }
+            if(trangThai == 3) {
+                loadSanPham(giamGia);
             }
         }
     }
@@ -92,13 +109,44 @@ public class GiamGiaService {
 
     public GiamGia update(GiamGiaRequest request) {
         GiamGia giamGia = repository.findById(request.getId()).get();
+        var trangThaiBefore = giamGia.getTrangThai();
         giamGia.setTen(request.getTen());
         giamGia.setNgayBatDau(request.getNgayBatDau());
         giamGia.setNgayKetThuc(request.getNgayKetThuc());
         giamGia.setMucGiam(request.getMucGiam());
-        giamGia.setTrangThai(request.getTrangThai());
         giamGia.setNgaySua(LocalDateTime.now());
+        checkGiamGia(giamGia);
+        if(trangThaiBefore == 1 && trangThaiBefore != giamGia.getTrangThai()){
+            loadSanPham(giamGia);
+        }
         return repository.save(giamGia);
+    }
+
+    private void checkGiamGia(GiamGia giamGia) {
+        var endDay = giamGia.getNgayKetThuc();
+        var startDay = giamGia.getNgayBatDau();
+        var now = LocalDateTime.now();
+        if (endDay.isBefore(now)) {
+            // Voucher đã quá hạn
+            giamGia.setTrangThai(3);
+        } else if (startDay.isAfter(now)) {
+            // Voucher chưa đến sự kiện
+            giamGia.setTrangThai(2);
+        } else if (startDay.isBefore(now) || startDay.isEqual(now)) {
+            // Voucher đang trong thời gian sự kiện (startDay <= now <= endDay)
+            giamGia.setTrangThai(1);
+        }
+    }
+
+    private void loadSanPham(GiamGia giamGia){
+        var sanPhams = sanPhamService.findAllByGiamGiaId(giamGia.getId());
+        if(sanPhams.isEmpty()) return;
+        for (SanPham sanPham:sanPhams) {
+            sanPham.setGiamGia(null);
+            SanPhamRequest sanPhamRequest = new SanPhamRequest();
+            sanPhamRequest.setSanPhamRequest(sanPham);
+            sanPhamService.update(sanPhamRequest);
+        }
     }
 
 
