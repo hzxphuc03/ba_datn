@@ -1,6 +1,7 @@
 package datn.be.mycode.service;
 
 import datn.be.mycode.entity.GiamGia;
+import datn.be.mycode.entity.HoaDonChiTiet;
 import datn.be.mycode.entity.SanPham;
 import datn.be.mycode.entity.SanPhamChiTiet;
 import datn.be.mycode.repository.*;
@@ -21,6 +22,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -36,6 +38,8 @@ public class SanPhamChiTietService {
     private MauSacRepository mauSacRepository;
     @Autowired
     private KichcoRepository kichcoRepository;
+    @Autowired
+    private HoaDonChiTietRepository hoaDonChiTietRepository;
 
 
     public NormalTableResponse<SanPhamChiTietResponse> getAll(TableSanPhamChiTietRequest request) {
@@ -59,6 +63,7 @@ public class SanPhamChiTietService {
     public SanPhamChiTietByIdSanPhamRes getByIdSanPham(Long idSanPham){
 
         List<SanPhamChiTiet> listSanPhamChiTiet = sanPhamChiTietRepository.findAllBySanPham_IdAndTrangThai(idSanPham,1);
+        if(listSanPhamChiTiet.isEmpty()) return null;
 
         List<SanPhamChiTietByIdSP> listSanPhamChiTietRes = getSanPhamChiTietsBySanPham(listSanPhamChiTiet);
 
@@ -106,30 +111,28 @@ public class SanPhamChiTietService {
         } else{
             SanPhamChiTiet sanPhamChiTietR = sanPhamChiTietRepository.save(sanPhamChiTiet);
 
-            CheckPriceMinAndMax(sanPham, sanPhamChiTietR);
+            CheckPriceMinAndMax(sanPham);
 
             return ResponseEntity.ok(sanPhamChiTietR);
         }
 
     }
 
-    private void CheckPriceMinAndMax(SanPham sanPham, SanPhamChiTiet sanPhamChiTietR) {
-        if(sanPham.getGiaThapNhat().compareTo(sanPhamChiTietR.getGiaBan())>0){
-            sanPham.setGiaThapNhat(sanPhamChiTietR.getGiaBan());
-        }else if(sanPham.getGiaThapNhat().intValue() == 0){
-            sanPham.setGiaThapNhat(sanPhamChiTietR.getGiaBan());
-        }
-        if(sanPham.getGiaCaoNhat().compareTo(sanPhamChiTietR.getGiaBan())<0){
-            sanPham.setGiaCaoNhat(sanPhamChiTietR.getGiaBan());
-        }
-        sanPham.setSoLuong(sanPham.getSoLuong() + sanPhamChiTietR.getSoLuong());
+    private void CheckPriceMinAndMax(SanPham sanPham) {
+        var soLuong = sanPhamChiTietRepository.sumSoLuongByTrangThai(sanPham.getId());
+        var giaThapNhat = sanPhamChiTietRepository.findGiaMinByIdSanPham(sanPham.getId());
+        var giaCaoNhat = sanPhamChiTietRepository.findGiaMaxByIdSanPham(sanPham.getId());
+
+        sanPham.setGiaThapNhat(giaThapNhat);
+        sanPham.setGiaCaoNhat(giaCaoNhat);
+        sanPham.setSoLuong(soLuong);
+
         sanPhamRepository.save(sanPham);
     }
 
     public ResponseEntity<?> update(SanPhamChiTietRequest request){
         SanPhamChiTiet sanPhamChiTiet = sanPhamChiTietRepository.findById(request.getId()).get();
-        int trangThai = sanPhamChiTiet.getTrangThai();
-        int soLuong = sanPhamChiTiet.getSoLuong();
+        var giaBan = new BigDecimal(sanPhamChiTiet.getGiaBan().toString());
         SanPham sanPham = sanPhamRepository.findById(request.getSanPham()).get();
 
         sanPhamChiTiet.setNgaySua(LocalDateTime.now());
@@ -148,36 +151,23 @@ public class SanPhamChiTietService {
 
         sanPhamChiTiet = sanPhamChiTietRepository.save(sanPhamChiTiet);
 
-        boolean check = false;
-        if(sanPham.getGiaThapNhat().compareTo(sanPhamChiTiet.getGiaBan())>0){
-            sanPham.setGiaThapNhat(sanPhamChiTiet.getGiaBan());
-            check = true;
-        }else if(sanPham.getGiaThapNhat().intValue() == 0){
-            sanPham.setGiaThapNhat(sanPhamChiTiet.getGiaBan());
-            check = true;
-        }
-
-        if(sanPham.getGiaCaoNhat().compareTo(sanPhamChiTiet.getGiaBan())<0){
-            sanPham.setGiaCaoNhat(sanPhamChiTiet.getGiaBan());
-            check = true;
-        }
-        if(trangThai != sanPhamChiTiet.getTrangThai()) {
-            check = true;
-
-            if (sanPhamChiTiet.getTrangThai() == 0) {
-                sanPham.setSoLuong(sanPham.getSoLuong() - soLuong);
-            }else {
-                sanPham.setSoLuong(sanPham.getSoLuong() + sanPhamChiTiet.getSoLuong());
-            }
-        } else if( trangThai ==1){
-            if (soLuong != sanPhamChiTiet.getSoLuong()) {
-                    sanPham.setSoLuong(sanPham.getSoLuong() + sanPhamChiTiet.getSoLuong() - soLuong);
-                    check = true;
+//        kiem tra xem co thay doi gia ban
+        if(sanPhamChiTiet.getGiaBan().compareTo(giaBan) != 0){
+            var check = sanPhamChiTiet.getGiaBan().equals(giaBan);
+            var hoaDonChiTietsForSanPhamChiTiet = hoaDonChiTietRepository.findAllBySanPhamChiTiet_IdAndTrangThai(sanPhamChiTiet.getId(), 1);
+            var giamGia = sanPham.getGiamGia() == null ? 0 :sanPham.getGiamGia().getMucGiam();
+            for (HoaDonChiTiet hoaDonChiTiet:hoaDonChiTietsForSanPhamChiTiet) {
+                if (hoaDonChiTiet.getTrangThai() == 1) {
+                    hoaDonChiTiet.setGiaHienHanh(sanPhamChiTiet.getGiaBan());
+                    hoaDonChiTiet.setGiaDaGiamUpdate(giamGia);
+                    hoaDonChiTietRepository.save(hoaDonChiTiet);
                 }
+            }
+
         }
-        if(check) {
-            sanPhamRepository.save(sanPham);
-        }
+
+//        gia nho nhat va lon nhat cua san pham
+        CheckPriceMinAndMax(sanPham);
 
         return ResponseEntity.ok(sanPhamChiTiet);
     }
