@@ -64,6 +64,7 @@ public class VoucherKhachHangService {
         VoucherKhachHang voucherKhachHang = new VoucherKhachHang();
         voucherKhachHang.setKhachHang(khachHangRepository.searchById(request.getKhachHang()).get());
         voucherKhachHang.setVoucher(voucherRepository.searchById(request.getVoucher()).get());
+        voucherKhachHang.setKeySuKien(request.getKeySuKien());
         voucherKhachHang.setTrangThai(1);
         voucherKhachHang.setNgayTao(LocalDateTime.now());
         return voucherKhachHangRepository.save(voucherKhachHang);
@@ -74,6 +75,7 @@ public class VoucherKhachHangService {
         VoucherKhachHang voucherKhachHang = voucherKhachHangRepository.findById(request.getId()).get();
         voucherKhachHang.setKhachHang(khachHangRepository.searchById(request.getKhachHang()).get());
         voucherKhachHang.setVoucher(voucherRepository.searchById(request.getVoucher()).get());
+        voucherKhachHang.setKeySuKien(request.getKeySuKien());
         voucherKhachHang.setTrangThai(request.getTrangThai());
         voucherKhachHang.setNgaySua(LocalDateTime.now());
         return voucherKhachHangRepository.save(voucherKhachHang);

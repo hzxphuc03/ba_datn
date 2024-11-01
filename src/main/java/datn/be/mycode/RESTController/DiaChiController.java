@@ -2,7 +2,7 @@ package datn.be.mycode.RESTController;
 
 import datn.be.mycode.request.DiaChiRequest;
 import datn.be.mycode.request.customRequest.TableDiaChiKhachHangRequest;
-import datn.be.mycode.request.customRequest.TableDiaChiRequest;
+import datn.be.mycode.request.customRequest.TableLongRequest;
 import datn.be.mycode.service.DiaChiService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -22,7 +22,7 @@ public class DiaChiController {
             @RequestParam(name = "status",required = false) Integer status
     ){
 
-        TableDiaChiRequest request = new TableDiaChiRequest(page,pageSize,keyWord,status);
+        TableLongRequest request = new TableLongRequest(page,pageSize,keyWord,status);
         return ResponseEntity.ok(diaChiService.getAll(request));
     }
 
