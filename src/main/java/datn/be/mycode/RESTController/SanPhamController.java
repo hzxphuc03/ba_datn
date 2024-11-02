@@ -61,6 +61,18 @@ public class SanPhamController {
     public List<SanPham> top5SanPhamMoi() {
         return sanPhamService.top5SanPhamMoi();
     }
+    @GetMapping("/top3-giam-gia")
+    public List<SanPham> top3SanPhamGiamGia() {
+        return sanPhamService.top3SanPhamGiamGia();
+    }
+    @GetMapping("/giam-gia-sau-nhat")
+    public SanPham getSanPhamGiamGiaSauNhat() {
+        return sanPhamService.getSanPhamGiamGiaSauNhat();
+    }
+    @GetMapping("/12-san-pham-update-gan-nhat")
+    public List<SanPham> getTop12SanPhamByUpdatedDate() {
+        return sanPhamService.getTop12SanPhamByUpdatedDate();
+    }
 
     @PostMapping("/add")
     public ResponseEntity<?> add(@RequestBody SanPhamRequest sanPhamRequest){

@@ -26,6 +26,15 @@ public class VoucherKhachHang implements Serializable {
     @Column(name = "ngay_sua")
     private LocalDateTime ngaySua;
 
+    @Column(name = "ngay_bat_dau")
+    private LocalDateTime ngayBatDau;
+
+    @Column(name = "ngay_ket_thuc")
+    private LocalDateTime ngayKetThuc;
+
+    @Column(name = "key_su_kien")
+    private String keySuKien;
+
     @Column(name = "so_luong")
     private int soLuong;
 

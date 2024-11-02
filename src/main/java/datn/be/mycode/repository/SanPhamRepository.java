@@ -78,11 +78,21 @@ public interface SanPhamRepository extends JpaRepository<SanPham, Long> {
             "JOIN sp.giamGia gg " +
             "WHERE gg.trangThai = 1 AND gg.ngayBatDau <= CURRENT_DATE AND gg.ngayKetThuc >= CURRENT_DATE " +
             "ORDER BY gg.mucGiam DESC")
-    List<Long> top5SanPhamGiamGia();
+    List<Long> topSanPhamGiamGia();
 
     @Query(value = "SELECT s FROM SanPham s ORDER BY s.ngayTao DESC")
     List<SanPham> top5SanPhamMoi(Pageable pageable);
 
 
     List<SanPham> findAllByGiamGiaId(Long idGiamGia);
+
+    @Query("SELECT sp FROM SanPham sp " +
+            "JOIN sp.giamGia gg " +
+            "JOIN SanPhamChiTiet spct ON spct.sanPham = sp " +
+            "WHERE gg.trangThai = 1 AND gg.ngayBatDau <= CURRENT_DATE AND gg.ngayKetThuc >= CURRENT_DATE " +
+            "ORDER BY gg.mucGiam DESC, spct.giaBan ASC")
+    List<SanPham> findSanPhamGiamGiaSauNhat(Pageable pageable);
+
+    @Query("SELECT sp FROM SanPham sp ORDER BY sp.ngaySua DESC")
+    List<SanPham> findTop12SanPhamByUpdatedDate();
 }

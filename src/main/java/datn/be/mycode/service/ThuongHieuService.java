@@ -91,5 +91,8 @@ public class ThuongHieuService {
         thuongHieu.setTrangThai(status);
         return repository.save(thuongHieu);
     }
+    public List<ThuongHieu> findAllThuongHieu() {
+        return repository.findAll();
+    }
 
 }

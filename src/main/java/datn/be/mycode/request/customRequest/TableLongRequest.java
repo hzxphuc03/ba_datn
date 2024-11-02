@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @ToString
-public class TableDiaChiRequest {
+public class TableLongRequest {
     private Integer page;
 
     private Integer pageSize;

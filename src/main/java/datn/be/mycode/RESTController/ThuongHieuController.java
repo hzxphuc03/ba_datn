@@ -30,6 +30,11 @@ public class ThuongHieuController {
         NormalTableRequest request = new NormalTableRequest(page,pageSize,keyWord,status);
         return ResponseEntity.ok(thuongHieuService.getAll(request));
     }
+    @GetMapping("/get-all-thuong-hieu")
+    public List<ThuongHieu> findAllThuongHieu() {
+        return thuongHieuService.findAllThuongHieu();
+    }
+
     @PostMapping("/add")
     public ResponseEntity<?> add(@RequestBody String tenThuongHieuRequest){
         System.out.println(tenThuongHieuRequest);

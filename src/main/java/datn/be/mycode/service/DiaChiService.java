@@ -5,7 +5,7 @@ import datn.be.mycode.repository.DiaChiRepository;
 import datn.be.mycode.repository.KhachHangRepository;
 import datn.be.mycode.request.DiaChiRequest;
 import datn.be.mycode.request.customRequest.TableDiaChiKhachHangRequest;
-import datn.be.mycode.request.customRequest.TableDiaChiRequest;
+import datn.be.mycode.request.customRequest.TableLongRequest;
 import datn.be.mycode.response.NormalTableResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -25,7 +25,7 @@ public class DiaChiService {
     @Autowired
     private KhachHangRepository khRepo;
 
-    public NormalTableResponse<DiaChi> getAll(TableDiaChiRequest request) {
+    public NormalTableResponse<DiaChi> getAll(TableLongRequest request) {
 
         if (request.getPage() ==  null) {
             request.setPage(1);

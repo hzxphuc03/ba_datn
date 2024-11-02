@@ -7,6 +7,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface ThuongHieuRepository extends JpaRepository<ThuongHieu,Long> {
 
@@ -16,6 +18,6 @@ public interface ThuongHieuRepository extends JpaRepository<ThuongHieu,Long> {
 
     @Query("SELECT u FROM ThuongHieu u WHERE u.ten LIKE %:name%")
     Page<ThuongHieu> searchByTen(String name, Pageable pageable);
-
+    List<ThuongHieu> findAll();
 
 }
