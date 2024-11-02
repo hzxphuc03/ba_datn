@@ -230,6 +230,6 @@ public class SanPhamService {
         sanPhamNormalTableResponse.setPageSize(request.getPageSize());
         sanPhamNormalTableResponse.setTotalItem(sanPhamResponsePage.getTotalElements());
 
-        return ResponseEntity.ok(sanPhamResponses);
+        return ResponseEntity.ok(sanPhamNormalTableResponse);
     }
 }
