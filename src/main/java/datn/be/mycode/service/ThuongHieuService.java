@@ -92,7 +92,7 @@ public class ThuongHieuService {
         return repository.save(thuongHieu);
     }
     public List<ThuongHieu> findAllThuongHieu() {
-        return repository.findAll();
+        return repository.findAllByTrangThai(1);
     }
 
 }

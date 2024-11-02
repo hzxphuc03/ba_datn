@@ -28,6 +28,12 @@ public class LoaiDeController {
         NormalTableRequest request = new NormalTableRequest(page,pageSize,keyWord,status);
         return ResponseEntity.ok(loaiDeService.getAll(request));
     }
+
+    @GetMapping("/get-all-loai-de")
+    public ResponseEntity<?> getAllLoaiDe(){
+        return ResponseEntity.ok(loaiDeService.getAll());
+    }
+
     @PostMapping("/add")
     public ResponseEntity<?> add(@RequestBody String tenThuongHieuRequest){
         System.out.println(tenThuongHieuRequest);

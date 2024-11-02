@@ -1,9 +1,11 @@
 package datn.be.mycode.service;
 
 import datn.be.mycode.config.JwtTokenProvider;
+import datn.be.mycode.entity.GioHang;
 import datn.be.mycode.entity.KhachHang;
 import datn.be.mycode.entity.NhanVien;
 import datn.be.mycode.entity.loginTest;
+import datn.be.mycode.repository.GioHangRepository;
 import datn.be.mycode.repository.KhachHangRepository;
 import datn.be.mycode.request.KhachHangRequest;
 import datn.be.mycode.request.NormalTableRequest;
@@ -19,6 +21,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
@@ -30,6 +33,8 @@ public class KhachHangService {
     private KhachHangRepository repository;
     @Autowired
     private JwtTokenProvider jwtTokenProvider;
+    @Autowired
+    private GioHangRepository gioHangRepository;
 
     public NormalTableResponse<KhachHang> getAll(NormalTableRequestKhachHang request) {
 
@@ -76,10 +81,9 @@ public class KhachHangService {
     }
 
     public KhachHang add(KhachHangRequest request) {
-        System.out.println("addKH1");
-        System.out.println(request);
+
         KhachHang khachHang = new KhachHang();
-        khachHang.setMa(request.getMa());
+        khachHang.setMa(null);
         khachHang.setHoTen(request.getHoTen());
         khachHang.setHinhAnh(request.getHinhAnh());
         khachHang.setNgaySinh(request.getNgaySinh());
@@ -93,10 +97,26 @@ public class KhachHangService {
 
         khachHang = repository.save(khachHang);
         khachHang.setMa("KH"+khachHang.getId());
+        creatGioHang(khachHang);
+
         return repository.save(khachHang);
     }
 
-
+    private void creatGioHang(KhachHang khachHang) {
+        var setGia = BigDecimal.valueOf(0);
+        GioHang gioHang = GioHang.builder()
+                .ngayTao(LocalDateTime.now())
+                .phiShip(setGia)
+                .tongTien(setGia)
+                .tongTienGiam(setGia)
+                .tongTienGiam(setGia)
+                .trangThai(1)
+                .khachHang(khachHang)
+                .build();
+        gioHang = gioHangRepository.save(gioHang);
+        gioHang.setMa("GH"+gioHang.getId());
+        gioHangRepository.save(gioHang);
+    }
 
 
     public KhachHang update(KhachHangRequest request) {

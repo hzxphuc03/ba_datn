@@ -30,6 +30,12 @@ public class LoaiCoController {
         NormalTableRequest request = new NormalTableRequest(page,pageSize,keyWord,status);
         return ResponseEntity.ok(loaiCoService.getAll(request));
     }
+
+    @GetMapping("/get-all-loai-co")
+    public ResponseEntity<?> getAllLoaCO(){
+        return ResponseEntity.ok(loaiCoService.getAll());
+    }
+
     @PostMapping("/add")
     public ResponseEntity<?> add(@RequestBody String tenThuongHieuRequest){
         System.out.println(tenThuongHieuRequest);

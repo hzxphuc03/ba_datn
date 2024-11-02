@@ -53,6 +53,8 @@ public interface SanPhamChiTietRepository extends JpaRepository<SanPhamChiTiet, 
 
     List<SanPhamChiTiet> findAllBySanPham_IdAndTrangThai(Long idSanPham, int trangThai);
 
+    List<SanPhamChiTiet> findAllBySanPham_IdAndMauSacId(Long idSanPham, Long idMau);
+
     List<SanPhamChiTiet> findAllBySanPham_Id(Long idSanPham);
 
     @Query("SELECT min(spct.giaBan) " +

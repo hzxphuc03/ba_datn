@@ -7,12 +7,14 @@ import datn.be.mycode.entity.SanPhamChiTiet;
 import datn.be.mycode.repository.*;
 import datn.be.mycode.request.SanPhamRequest;
 import datn.be.mycode.request.customRequest.TableSanPhamRequest;
+import datn.be.mycode.request.sanPham.SanPhamByAllReq;
 import datn.be.mycode.response.NormalTableResponse;
 import datn.be.mycode.response.SanPhamResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -213,5 +215,21 @@ public class SanPhamService {
     public List<SanPham> getTop12SanPhamByUpdatedDate() {
         List<SanPham> allSanPham = repo.findTop12SanPhamByUpdatedDate();
         return allSanPham.size() > 12 ? allSanPham.subList(0, 12) : allSanPham; // Đảm bảo lấy tối đa 12 sản phẩm
+    }
+
+    public ResponseEntity<?> getByAll(SanPhamByAllReq request) {
+
+        Pageable pageable = PageRequest.of(request.getPage() - 1,request.getPageSize());
+        Page<SanPham> sanPhamResponsePage = repo.searchAllSortedByAll(request, pageable);
+
+        List<SanPham> sanPhamResponses = sanPhamResponsePage.getContent().stream().toList();
+
+        NormalTableResponse<SanPham> sanPhamNormalTableResponse = new NormalTableResponse<>();
+        sanPhamNormalTableResponse.setItem(sanPhamResponses);
+        sanPhamNormalTableResponse.setPage(request.getPage());
+        sanPhamNormalTableResponse.setPageSize(request.getPageSize());
+        sanPhamNormalTableResponse.setTotalItem(sanPhamResponsePage.getTotalElements());
+
+        return ResponseEntity.ok(sanPhamResponses);
     }
 }

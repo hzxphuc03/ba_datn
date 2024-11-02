@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -88,6 +89,11 @@ public class GiamGiaService {
         GiamGiaNormalTableResponse.setTotalItem(Page.getTotalElements());
         return GiamGiaNormalTableResponse;
 
+    }
+
+    public ResponseEntity<?> getAll (){
+
+        return ResponseEntity.ok(repository.findAllByTrangThai(1));
     }
 
     public GiamGia getById(Long id){

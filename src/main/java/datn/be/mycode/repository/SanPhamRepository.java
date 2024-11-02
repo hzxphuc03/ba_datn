@@ -3,6 +3,7 @@ package datn.be.mycode.repository;
 import datn.be.mycode.entity.GiamGia;
 import datn.be.mycode.entity.SanPham;
 import datn.be.mycode.request.customRequest.TableSanPhamRequest;
+import datn.be.mycode.request.sanPham.SanPhamByAllReq;
 import datn.be.mycode.response.SanPhamResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -95,4 +96,21 @@ public interface SanPhamRepository extends JpaRepository<SanPham, Long> {
 
     @Query("SELECT sp FROM SanPham sp ORDER BY sp.ngaySua DESC")
     List<SanPham> findTop12SanPhamByUpdatedDate();
+
+    @Query("SELECT sp " +
+            "FROM SanPham sp " +
+            "WHERE " +
+            "(:#{#request.giaCaoNhat} IS NULL OR sp.giaThapNhat <= :#{#request.giaCaoNhat}) AND " +
+            "(:#{#request.giaThapNhat} IS NULL OR sp.giaThapNhat >= :#{#request.giaThapNhat}) AND " +
+            "(:#{#request.idGiamGia} IS NULL OR sp.giamGia.id = :#{#request.idGiamGia}) AND " +
+            "(:#{#request.idThuongHieu} IS NULL OR sp.thuongHieu.id = :#{#request.idThuongHieu}) AND " +
+            "(:#{#request.idTheLoai} IS NULL OR sp.theLoai.id = :#{#request.idTheLoai}) AND " +
+            "(:#{#request.idLoaiCo} IS NULL OR sp.loaiCo.id = :#{#request.idLoaiCo}) AND " +
+            "(:#{#request.idVatLieu} IS NULL OR sp.vatLieu.id = :#{#request.idVatLieu}) AND " +
+            "(:#{#request.idLoaiDe} IS NULL OR sp.loaiDe.id = :#{#request.idLoaiDe}) AND " +
+            "sp.trangThai = 1 " +
+            "GROUP BY sp.id, sp.ma, sp.ten, sp.moTa, sp.hinhAnh, sp.trongLuong, sp.beMatSuDung, sp.congNghe, sp.kieuDang, sp.giaThapNhat, sp.giaCaoNhat, sp.ngayTao, sp.ngaySua, sp.nguoiTao, sp.soLuong, sp.trangThai, sp.giamGia, sp.thuongHieu, sp.theLoai, sp.loaiCo, sp.vatLieu, sp.loaiDe " +
+            "ORDER BY CASE WHEN sp.giamGia.id IS NOT NULL THEN 0 ELSE 1 END, sp.giaThapNhat ASC"
+    )
+    Page<SanPham> searchAllSortedByAll(SanPhamByAllReq request, Pageable pageable);
 }

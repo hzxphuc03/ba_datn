@@ -7,6 +7,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface LoaiCoRepository extends JpaRepository<LoaiCo,Long> {
 
@@ -16,4 +18,5 @@ public interface LoaiCoRepository extends JpaRepository<LoaiCo,Long> {
     Page<LoaiCo> searchByTen(String name, Pageable pageable);
 
 
+    List<LoaiCo> findAllByTrangThai(int i);
 }

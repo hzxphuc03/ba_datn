@@ -46,13 +46,15 @@ public class KhachHangController {
         return ResponseEntity.ok(khachHangService.update(request));
     }
 
-
-
     @PutMapping("/update-trang-thai/{id}")
     public ResponseEntity<?> updateTrangThai(@PathVariable("id") Long id,
                                              @RequestParam(name = "status",required = true) Integer status
     ){
-
         return ResponseEntity.ok(khachHangService.udateTrangThai(id, status));
+    }
+
+    @PutMapping("/dang-ky")
+    public ResponseEntity<?> dangKy(){
+        return ResponseEntity.ok("");
     }
 }

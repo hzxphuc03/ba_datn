@@ -16,6 +16,8 @@ public interface ThuongHieuRepository extends JpaRepository<ThuongHieu,Long> {
 
     Page<ThuongHieu> findAllByTrangThai(int trangThai, Pageable pageable);
 
+    List<ThuongHieu> findAllByTrangThai(int trangThai);
+
     @Query("SELECT u FROM ThuongHieu u WHERE u.ten LIKE %:name%")
     Page<ThuongHieu> searchByTen(String name, Pageable pageable);
     List<ThuongHieu> findAll();
