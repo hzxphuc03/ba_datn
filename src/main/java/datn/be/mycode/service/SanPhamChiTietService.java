@@ -1,12 +1,10 @@
 package datn.be.mycode.service;
 
-import datn.be.mycode.entity.GiamGia;
-import datn.be.mycode.entity.HoaDonChiTiet;
-import datn.be.mycode.entity.SanPham;
-import datn.be.mycode.entity.SanPhamChiTiet;
+import datn.be.mycode.entity.*;
 import datn.be.mycode.repository.*;
 import datn.be.mycode.request.SanPhamChiTietRequest;
 import datn.be.mycode.request.customRequest.TableSanPhamChiTietRequest;
+import datn.be.mycode.request.sanPhamChiTiet.GetBySanPhamAndMauReq;
 import datn.be.mycode.response.NormalTableResponse;
 import datn.be.mycode.response.SanPhamChiTietResponse;
 import datn.be.mycode.response.customResponse.SanPhamChiTiet.SanPhamBanHang;
@@ -257,5 +255,20 @@ public class SanPhamChiTietService {
         });
 
         return listSanPhamChiTietRes;
+    }
+
+    public ResponseEntity<?> getAllMauBySanPham(Long idSanPham) {
+        var sanPhamChiTiets = sanPhamChiTietRepository.findAllBySanPham_IdAndTrangThai(idSanPham,1);
+        List<MauSac> mauSacs = new ArrayList<>();
+        for (SanPhamChiTiet sanPhamChiTiet:sanPhamChiTiets) {
+            var mauSac = sanPhamChiTiet.getMauSac();
+            mauSacs.add(mauSac);
+        }
+        return ResponseEntity.ok(mauSacs);
+    }
+
+    public ResponseEntity<?> getAllSizeBySanPhamAndMau(GetBySanPhamAndMauReq request) {
+        var sanPhamChiTiets = sanPhamChiTietRepository.findAllBySanPham_IdAndMauSacId(request.getIdSanPham(),request.getIdMau());
+        return ResponseEntity.ok(sanPhamChiTiets);
     }
 }

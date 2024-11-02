@@ -5,6 +5,7 @@ import datn.be.mycode.request.ChucVuRequest;
 import datn.be.mycode.request.NormalTableRequest;
 import datn.be.mycode.request.SanPhamChiTietRequest;
 import datn.be.mycode.request.customRequest.TableSanPhamChiTietRequest;
+import datn.be.mycode.request.sanPhamChiTiet.GetBySanPhamAndMauReq;
 import datn.be.mycode.service.ChucVuService;
 import datn.be.mycode.service.SanPhamChiTietService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,6 +62,19 @@ public class SanPhamChiTietController {
     ){
         TableSanPhamChiTietRequest request = new TableSanPhamChiTietRequest(page, pageSize, keyWord, status, startDate, endDate, idSanPham, idMauSac, idKichCo,  sort);
         return ResponseEntity.ok(sanPhamChiTietService.getAllSanPham(request));
+    }
+
+    @GetMapping("/get-mau")
+    public ResponseEntity<?> add(@RequestParam Long idSanPham){
+        return ResponseEntity.ok(sanPhamChiTietService.getAllMauBySanPham(idSanPham));
+    }
+
+    @GetMapping("/get-size")
+    public ResponseEntity<?> add(@RequestParam("idSanPham") Long idSanPham,
+                                 @RequestParam("idMau") Long idMau
+    ){
+        var request = new GetBySanPhamAndMauReq(idSanPham,idMau);
+        return ResponseEntity.ok(sanPhamChiTietService.getAllSizeBySanPhamAndMau(request));
     }
 
     @PostMapping("/add")

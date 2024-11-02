@@ -30,6 +30,9 @@ public class ThuongHieuController {
         NormalTableRequest request = new NormalTableRequest(page,pageSize,keyWord,status);
         return ResponseEntity.ok(thuongHieuService.getAll(request));
     }
+
+
+
     @GetMapping("/get-all-thuong-hieu")
     public List<ThuongHieu> findAllThuongHieu() {
         return thuongHieuService.findAllThuongHieu();

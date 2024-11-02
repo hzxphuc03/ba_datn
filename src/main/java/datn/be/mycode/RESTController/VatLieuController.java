@@ -28,6 +28,12 @@ public class VatLieuController {
         NormalTableRequest request = new NormalTableRequest(page,pageSize,keyWord,status);
         return ResponseEntity.ok(vatLieuService.getAll(request));
     }
+
+    @GetMapping("/get-all-vat-lieu")
+    public ResponseEntity<?> getAllVatLieu(){
+        return ResponseEntity.ok(vatLieuService.getAll());
+    }
+
     @PostMapping("/add")
     public ResponseEntity<?> add(@RequestBody String tenThuongHieuRequest){
         System.out.println(tenThuongHieuRequest);

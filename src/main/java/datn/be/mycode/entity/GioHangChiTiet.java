@@ -33,12 +33,15 @@ public class GioHangChiTiet implements Serializable {
     @Column(name = "trang_thai")
     private int trangThai;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne()
     @JoinColumn(name = "id_gio_hang", referencedColumnName = "id")
     private GioHang gioHang;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne()
     @JoinColumn(name = "id_chi_tiet_san_pham", referencedColumnName = "id")
     private SanPhamChiTiet sanPhamChiTiet;
 
+    public void addSoLuong(int soLuong) {
+        this.soLuong += soLuong;
+    }
 }

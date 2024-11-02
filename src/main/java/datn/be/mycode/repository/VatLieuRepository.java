@@ -7,6 +7,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface VatLieuRepository extends JpaRepository<VatLieu,Long> {
 
@@ -18,4 +20,5 @@ public interface VatLieuRepository extends JpaRepository<VatLieu,Long> {
     Page<VatLieu> searchByTen(String name, Pageable pageable);
 
 
+    List<VatLieu> findAllByTrangThai(int i);
 }

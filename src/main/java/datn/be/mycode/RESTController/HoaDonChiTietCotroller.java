@@ -42,23 +42,7 @@ public class HoaDonChiTietCotroller {
     public ResponseEntity<?> addSoLuong(@RequestBody AddSoLuong request){
         return hoaDonChiTietService.addSoLuong(request);
     }
-//    , request.getStartDate(), request.getEndDate(), request.getIdKhachHang(), request.getIdNhanVien()
-//, LocalDateTime startDate, LocalDateTime endDate, Long idKhachHang, Long idNhanVien
 
-
-//    @PutMapping("update")
-//    public ResponseEntity<?> update(@RequestBody HoaDonRequest request){
-//        System.out.println(request);
-//        return ResponseEntity.ok(hoaDonChiTietService.update(request));
-//    }
-//
-//    @PutMapping("/update-trang-thai/{id}")
-//    public ResponseEntity<?> updateTrangThai(@PathVariable("id") Long id,
-//                                             @RequestParam(name = "status",required = true) Integer status
-//    ){
-//
-//        return ResponseEntity.ok(hoaDonChiTietService.udateTrangThai(id, status));
-//    }
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<?> delete(@PathVariable("id") Long id){
         return hoaDonChiTietService.delete(id);

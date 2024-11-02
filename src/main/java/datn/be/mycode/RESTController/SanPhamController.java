@@ -3,12 +3,14 @@ package datn.be.mycode.RESTController;
 import datn.be.mycode.entity.SanPham;
 import datn.be.mycode.request.SanPhamRequest;
 import datn.be.mycode.request.customRequest.TableSanPhamRequest;
+import datn.be.mycode.request.sanPham.SanPhamByAllReq;
 import datn.be.mycode.service.ChucVuService;
 import datn.be.mycode.service.SanPhamService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -39,6 +41,29 @@ public class SanPhamController {
 
         TableSanPhamRequest request = new TableSanPhamRequest(page,pageSize,keyWord,status, startDate, endDate, idGiamGia, idThuongHieu, idTheLoai, idLoaiCo, idVatLieu, idLoaiDe, sort);
         return ResponseEntity.ok(sanPhamService.getAll(request));
+    }
+
+    @GetMapping("/get-by-all")
+    public ResponseEntity<?> getAllBy(
+            @RequestParam(name = "page",required = false) Integer page,
+            @RequestParam(name = "pageSize",required = false) Integer pageSize,
+            @RequestParam(name = "giamGia",required = false) Long idGiamGia,
+            @RequestParam(name = "giaCaoNhat",required = false) BigDecimal giaCaoNhat,
+            @RequestParam(name = "giaThapNhat",required = false) BigDecimal giaThapNhat,
+            @RequestParam(name = "thuongHieu",required = false) Long idThuongHieu,
+            @RequestParam(name = "theLoai",required = false) Long idTheLoai,
+            @RequestParam(name = "loaiCo",required = false) Long idLoaiCo,
+            @RequestParam(name = "vatLieu",required = false) Long idVatLieu,
+            @RequestParam(name = "loaiDe",required = false) Long idLoaiDe
+    ){
+        SanPhamByAllReq request = new SanPhamByAllReq(page, pageSize,idGiamGia, giaCaoNhat, giaThapNhat, idThuongHieu, idTheLoai, idLoaiCo, idVatLieu, idLoaiDe);
+        if (request.getPage() == null) {
+            request.setPage(1);
+        }
+        if (request.getPageSize() == null) {
+            request.setPageSize(10);
+        }
+        return ResponseEntity.ok(sanPhamService.getByAll(request));
     }
 
     @GetMapping("/get-by-id")

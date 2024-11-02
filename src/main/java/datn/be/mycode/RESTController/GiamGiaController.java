@@ -31,6 +31,11 @@ public class GiamGiaController {
         return ResponseEntity.ok(giamGiaService.getAll(request));
     }
 
+    @GetMapping("/get-all")
+    public ResponseEntity<?> getAllList(){
+        return ResponseEntity.ok(giamGiaService.getAll());
+    }
+
     @GetMapping("/get-by-id/{id}")
     public ResponseEntity<?> getByIdSanPham(
             @PathVariable(name = "id",required = false) Long id
