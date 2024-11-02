@@ -47,6 +47,7 @@ public class SanPhamController {
     public ResponseEntity<?> getAllBy(
             @RequestParam(name = "page",required = false) Integer page,
             @RequestParam(name = "pageSize",required = false) Integer pageSize,
+            @RequestParam(name = "keyWord",required = false) String keyWord,
             @RequestParam(name = "giamGia",required = false) Long idGiamGia,
             @RequestParam(name = "giaCaoNhat",required = false) BigDecimal giaCaoNhat,
             @RequestParam(name = "giaThapNhat",required = false) BigDecimal giaThapNhat,
@@ -54,14 +55,18 @@ public class SanPhamController {
             @RequestParam(name = "theLoai",required = false) Long idTheLoai,
             @RequestParam(name = "loaiCo",required = false) Long idLoaiCo,
             @RequestParam(name = "vatLieu",required = false) Long idVatLieu,
-            @RequestParam(name = "loaiDe",required = false) Long idLoaiDe
+            @RequestParam(name = "loaiDe",required = false) Long idLoaiDe,
+            @RequestParam(name = "sort",required = false) Integer sort
     ){
-        SanPhamByAllReq request = new SanPhamByAllReq(page, pageSize,idGiamGia, giaCaoNhat, giaThapNhat, idThuongHieu, idTheLoai, idLoaiCo, idVatLieu, idLoaiDe);
+        SanPhamByAllReq request = new SanPhamByAllReq(page, pageSize, keyWord, idGiamGia, giaCaoNhat, giaThapNhat, idThuongHieu, idTheLoai, idLoaiCo, idVatLieu, idLoaiDe, sort);
         if (request.getPage() == null) {
             request.setPage(1);
         }
         if (request.getPageSize() == null) {
             request.setPageSize(10);
+        }
+        if (request.getSort() == null) {
+            request.setSort(0);
         }
         return ResponseEntity.ok(sanPhamService.getByAll(request));
     }

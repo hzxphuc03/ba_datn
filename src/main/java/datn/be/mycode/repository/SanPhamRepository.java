@@ -100,6 +100,7 @@ public interface SanPhamRepository extends JpaRepository<SanPham, Long> {
     @Query("SELECT sp " +
             "FROM SanPham sp " +
             "WHERE " +
+            "(:#{#request.keyWord} IS null OR sp.ten LIKE CONCAT('%', :#{#request.keyWord}, '%')) AND " +
             "(:#{#request.giaCaoNhat} IS NULL OR sp.giaThapNhat <= :#{#request.giaCaoNhat}) AND " +
             "(:#{#request.giaThapNhat} IS NULL OR sp.giaThapNhat >= :#{#request.giaThapNhat}) AND " +
             "(:#{#request.idGiamGia} IS NULL OR sp.giamGia.id = :#{#request.idGiamGia}) AND " +
@@ -110,7 +111,9 @@ public interface SanPhamRepository extends JpaRepository<SanPham, Long> {
             "(:#{#request.idLoaiDe} IS NULL OR sp.loaiDe.id = :#{#request.idLoaiDe}) AND " +
             "sp.trangThai = 1 " +
             "GROUP BY sp.id, sp.ma, sp.ten, sp.moTa, sp.hinhAnh, sp.trongLuong, sp.beMatSuDung, sp.congNghe, sp.kieuDang, sp.giaThapNhat, sp.giaCaoNhat, sp.ngayTao, sp.ngaySua, sp.nguoiTao, sp.soLuong, sp.trangThai, sp.giamGia, sp.thuongHieu, sp.theLoai, sp.loaiCo, sp.vatLieu, sp.loaiDe " +
-            "ORDER BY CASE WHEN sp.giamGia.id IS NOT NULL THEN 0 ELSE 1 END, sp.giaThapNhat ASC"
+            "ORDER BY " +
+            "CASE WHEN :#{#request.sort} = 0 THEN sp.giaThapNhat END ASC, " +
+            "CASE WHEN :#{#request.sort} = 1 THEN sp.giaThapNhat END DESC"
     )
     Page<SanPham> searchAllSortedByAll(SanPhamByAllReq request, Pageable pageable);
 }

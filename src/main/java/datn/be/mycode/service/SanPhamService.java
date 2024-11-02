@@ -65,7 +65,7 @@ public class SanPhamService {
         }else {
             sanPhamResponsePage = repo.searchAllSortedBySoLuong(request, pageable);
         }
-        List<SanPhamResponse> sanPhamResponses = sanPhamResponsePage.getContent().stream().toList();
+        List<SanPhamResponse> sanPhamResponses = sanPhamResponsePage.getContent();
 
         sanPhamNormalTableResponse.setItem(sanPhamResponses);
         sanPhamNormalTableResponse.setPage(request.getPage());
@@ -222,7 +222,7 @@ public class SanPhamService {
         Pageable pageable = PageRequest.of(request.getPage() - 1,request.getPageSize());
         Page<SanPham> sanPhamResponsePage = repo.searchAllSortedByAll(request, pageable);
 
-        List<SanPham> sanPhamResponses = sanPhamResponsePage.getContent().stream().toList();
+        List<SanPham> sanPhamResponses = sanPhamResponsePage.getContent();
 
         NormalTableResponse<SanPham> sanPhamNormalTableResponse = new NormalTableResponse<>();
         sanPhamNormalTableResponse.setItem(sanPhamResponses);

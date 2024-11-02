@@ -12,6 +12,7 @@ import java.math.BigDecimal;
 public class SanPhamByAllReq {
     private Integer page;
     private Integer pageSize;
+    private String keyWord;
     private Long idGiamGia;
     private BigDecimal giaCaoNhat;
     private BigDecimal giaThapNhat;
@@ -20,4 +21,5 @@ public class SanPhamByAllReq {
     private Long idLoaiCo;
     private Long idVatLieu;
     private Long idLoaiDe;
+    private Integer sort;
 }

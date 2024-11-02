@@ -44,7 +44,14 @@ public class SanPhamChiTietController {
     public ResponseEntity<?> getByIdSanPham(
             @PathVariable(name = "idSanPham",required = false) Long idSanPham
     ){
-        return ResponseEntity.ok(sanPhamChiTietService.getByIdSanPham(idSanPham));
+        return ResponseEntity.ok(sanPhamChiTietService.getByIdSanPham(idSanPham,1));
+    }
+
+    @GetMapping("/get-all-by-idSanPham/{idSanPham}")
+    public ResponseEntity<?> getAllByIdSanPham(
+            @PathVariable(name = "idSanPham",required = false) Long idSanPham
+    ){
+        return ResponseEntity.ok(sanPhamChiTietService.getByIdSanPham(idSanPham, 0));
     }
 
     @GetMapping("/get-ban-hang")
