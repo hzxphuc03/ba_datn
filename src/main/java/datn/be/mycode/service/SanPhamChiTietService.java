@@ -58,9 +58,12 @@ public class SanPhamChiTietService {
         return sanPhamNormalTableResponse;
     }
 
-    public SanPhamChiTietByIdSanPhamRes getByIdSanPham(Long idSanPham){
+    public SanPhamChiTietByIdSanPhamRes getByIdSanPham(Long idSanPham, int trangThai){
 
         List<SanPhamChiTiet> listSanPhamChiTiet = sanPhamChiTietRepository.findAllBySanPham_IdAndTrangThai(idSanPham,1);
+        if(trangThai == 0){
+            listSanPhamChiTiet = sanPhamChiTietRepository.findAllBySanPham_Id(idSanPham);
+        }
         if(listSanPhamChiTiet.isEmpty()) return null;
 
         List<SanPhamChiTietByIdSP> listSanPhamChiTietRes = getSanPhamChiTietsBySanPham(listSanPhamChiTiet);
