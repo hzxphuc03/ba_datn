@@ -232,4 +232,9 @@ public class SanPhamService {
 
         return ResponseEntity.ok(sanPhamNormalTableResponse);
     }
+
+    public List<SanPham> getTop5SanPhamByTheLoaiAndDiscount(Long theLoaiId) {
+        Pageable pageable = PageRequest.of(0, 5); // Trang đầu tiên và giới hạn 5 sản phẩm
+        return repo.findTop5SanPhamByTheLoaiAndDiscount(theLoaiId, pageable);
+    }
 }

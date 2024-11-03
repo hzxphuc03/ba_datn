@@ -36,6 +36,12 @@ public class SuKienController {
         return ResponseEntity.ok(service.update(request));
     }
 
+    @PutMapping("/update-trangthai-auto")
+    public ResponseEntity<?> capNhatTrangThaiSuKien() {
+        service.capNhatTrangThaiSuKien();
+        return ResponseEntity.ok("Cập nhật trạng thái sự kiện tự động thành công.");
+    }
+
     @PutMapping("/update-trang-thai/{id}")
     public ResponseEntity<?> updateTrangThai(@PathVariable("id") Long id,
                                              @RequestParam(name = "status",required = true) Integer trangThai){
