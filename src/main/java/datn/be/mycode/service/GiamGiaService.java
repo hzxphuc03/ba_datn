@@ -93,7 +93,7 @@ public class GiamGiaService {
 
     public ResponseEntity<?> getAll (){
 
-        return ResponseEntity.ok(repository.findAllByTrangThai(1));
+        return ResponseEntity.ok(repository.findAllByNgayBatDauBeforeAndNgayKetThucAfter(LocalDateTime.now(),LocalDateTime.now()));
     }
 
     public GiamGia getById(Long id){

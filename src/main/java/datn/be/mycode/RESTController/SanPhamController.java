@@ -77,6 +77,12 @@ public class SanPhamController {
     ){
         return ResponseEntity.ok(sanPhamService.getSanPhamById(idSanPham));
     }
+
+    @GetMapping("/tim-kiem/{tenSanPham}")
+    public ResponseEntity<?> timKiem(@PathVariable() String tenSanPham){
+        return ResponseEntity.ok(sanPhamService.timKiem(tenSanPham).getBody());
+    }
+
     @GetMapping("/top5-ban-chay")
     public List<SanPham> getTop5SanPhamBanChay() {
         return sanPhamService.top5SanPhamBanChay();
