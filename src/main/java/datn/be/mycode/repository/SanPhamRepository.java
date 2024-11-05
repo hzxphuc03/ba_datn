@@ -115,14 +115,11 @@ public interface SanPhamRepository extends JpaRepository<SanPham, Long> {
     Page<SanPham> searchAllSortedByAll(SanPhamByAllReq request, Pageable pageable);
 
     @Query(value = "SELECT sp FROM SanPham sp " +
-            "JOIN sp.giamGia gg " +
             "JOIN sp.theLoai tl " +
-            "WHERE tl.id = :theLoaiId " +
-            "AND gg.trangThai = 1 " +
-            "AND gg.ngayBatDau <= CURRENT_TIMESTAMP " +
-            "AND gg.ngayKetThuc >= CURRENT_TIMESTAMP " +
-            "ORDER BY gg.mucGiam DESC")
-    List<SanPham> findTop5SanPhamByTheLoaiAndDiscount(@Param("theLoaiId") Long theLoaiId, Pageable pageable);
+            "WHERE tl.id = :theLoaiId AND sp.trangThai = 1 " +
+            "ORDER BY sp.soLuong DESC")
+    List<SanPham> findTop5SanPhamByTheLoai(@Param("theLoaiId") Long theLoaiId, Pageable pageable);
+
 
     @Query("SELECT sp " +
             "FROM SanPham sp " +
