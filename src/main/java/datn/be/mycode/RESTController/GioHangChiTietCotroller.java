@@ -6,6 +6,7 @@ import datn.be.mycode.request.NormalTableRequest;
 import datn.be.mycode.request.customRequest.BanHang.AddSoLuong;
 import datn.be.mycode.request.gioHangChiTIet.AddGioHangChiTietReq;
 import datn.be.mycode.request.gioHangChiTIet.AddSoLuongReq;
+import datn.be.mycode.request.gioHangChiTIet.GetAll;
 import datn.be.mycode.service.GioHangChiTietService;
 import datn.be.mycode.service.HoaDonChiTietService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,11 +25,11 @@ public class GioHangChiTietCotroller {
     public ResponseEntity<?> getAll(
             @RequestParam(name = "page",required = false) Integer page,
             @RequestParam(name = "pageSize",required = false) Integer pageSize,
-            @RequestParam(name = "idGioHang",required = false) Long keyWord,
+            @RequestParam(name = "idKhachHang",required = false) Long idKhachHang,
             @RequestParam(name = "status",required = false) Integer status
     ){
 
-        NormalTableRequest request = new NormalTableRequest(page,pageSize,keyWord+"",status);
+        GetAll request = new GetAll(page,pageSize,idKhachHang,status);
         if (request.getPage() == null) {
             request.setPage(1);
         }

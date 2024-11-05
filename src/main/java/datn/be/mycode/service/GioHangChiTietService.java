@@ -8,6 +8,7 @@ import datn.be.mycode.repository.SanPhamChiTietRepository;
 import datn.be.mycode.request.NormalTableRequest;
 import datn.be.mycode.request.gioHangChiTIet.AddGioHangChiTietReq;
 import datn.be.mycode.request.gioHangChiTIet.AddSoLuongReq;
+import datn.be.mycode.request.gioHangChiTIet.GetAll;
 import datn.be.mycode.response.NormalTableResponse;
 import datn.be.mycode.response.erroResponse;
 import datn.be.mycode.response.gioHangChiTiet.AddGioHangChiTietRes;
@@ -35,16 +36,18 @@ public class GioHangChiTietService {
     @Autowired
     private SanPhamChiTietRepository sanPhamChiTietRepository;
 
-    public NormalTableResponse<GioHangChiTiet> getAllByGioHang(NormalTableRequest request) {
+    public NormalTableResponse<GioHangChiTiet> getAllByGioHang(GetAll request) {
 
         Pageable pageable = PageRequest.of(request.getPage() - 1,request.getPageSize());
         Page<GioHangChiTiet> gioHangChiTietPage;
         List<GioHangChiTiet> gioHangChiTiets;
-        var hoaDonNormalTableResponse = new NormalTableResponse<GioHangChiTiet>();
+        var gioHang = gioHangRepository.findByKhachHangId(request.getIdKhachHang()).orElse(null);
+        if(gioHang == null) return null;
 
-        gioHangChiTietPage = repo.findAllByGioHangId(Long.valueOf(request.getKeyWord()), pageable);
+        gioHangChiTietPage = repo.findAllByGioHangId(gioHang.getId(), pageable);
         gioHangChiTiets = gioHangChiTietPage.getContent();
 
+        var hoaDonNormalTableResponse = new NormalTableResponse<GioHangChiTiet>();
         hoaDonNormalTableResponse.setItem(gioHangChiTiets);
         hoaDonNormalTableResponse.setPage(request.getPage());
         hoaDonNormalTableResponse.setPageSize(request.getPageSize());
