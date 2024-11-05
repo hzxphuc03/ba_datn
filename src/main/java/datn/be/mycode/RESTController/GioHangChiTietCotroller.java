@@ -21,26 +21,12 @@ public class GioHangChiTietCotroller {
     @Autowired
     private GioHangChiTietService gioHangChiTietService;
 
-    @GetMapping("")
+    @GetMapping("/{idKhachHang}")
     public ResponseEntity<?> getAll(
-            @RequestParam(name = "page",required = false) Integer page,
-            @RequestParam(name = "pageSize",required = false) Integer pageSize,
-            @RequestParam(name = "idKhachHang",required = false) Long idKhachHang,
-            @RequestParam(name = "status",required = false) Integer status
+            @PathVariable(name = "idKhachHang") Long idKhachHang
     ){
 
-        GetAll request = new GetAll(page,pageSize,idKhachHang,status);
-        if (request.getPage() == null) {
-            request.setPage(1);
-        }
-        if (request.getPageSize() == null) {
-            request.setPageSize(10);
-        }
-
-        if (request.getStatus() == null) {
-            request.setStatus(1);
-        }
-        return ResponseEntity.ok(gioHangChiTietService.getAllByGioHang(request));
+        return ResponseEntity.ok(gioHangChiTietService.getAllByGioHang(idKhachHang));
     }
 
     @PostMapping("/add")

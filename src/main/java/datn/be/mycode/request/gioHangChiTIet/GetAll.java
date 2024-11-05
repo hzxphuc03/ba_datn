@@ -11,12 +11,6 @@ import lombok.Setter;
 @Setter
 public class GetAll {
 
-    private Integer page;
-
-    private Integer pageSize;
-
     private Long idKhachHang;
-
-    private Integer status;
 
 }
