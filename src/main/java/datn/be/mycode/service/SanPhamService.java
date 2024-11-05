@@ -10,6 +10,7 @@ import datn.be.mycode.request.customRequest.TableSanPhamRequest;
 import datn.be.mycode.request.sanPham.SanPhamByAllReq;
 import datn.be.mycode.response.NormalTableResponse;
 import datn.be.mycode.response.SanPhamResponse;
+import datn.be.mycode.response.sanPham.SanPhamTimKiem;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -77,6 +78,16 @@ public class SanPhamService {
 
     public List<SanPham> findAllByGiamGiaId(Long idGiamGia){
         return repo.findAllByGiamGiaId(idGiamGia);
+    }
+
+    public ResponseEntity<?> timKiem(String tenSanPham) {
+        var sanPhams = repo.findAllByName(tenSanPham);
+        List<SanPhamTimKiem> sanPhamTimKiems = new ArrayList<>();
+        for (SanPham sanPham:sanPhams) {
+            SanPhamTimKiem sanPhamTimKiem = new SanPhamTimKiem(sanPham.getId(), sanPham.getTen());
+            sanPhamTimKiems.add(sanPhamTimKiem);
+        }
+        return ResponseEntity.ok(sanPhamTimKiems);
     }
 
     public SanPham add(SanPhamRequest request) {
@@ -153,10 +164,6 @@ public class SanPhamService {
         return sanPham;
     }
 
-
-//    public void delete(SanPham sanPham) {
-//        repo.delete(sanPham);
-//    }
 
     public SanPhamResponse getSanPhamById(Long id){
         return repo.searchById(id);

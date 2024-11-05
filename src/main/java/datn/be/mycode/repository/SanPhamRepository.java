@@ -60,13 +60,10 @@ public interface SanPhamRepository extends JpaRepository<SanPham, Long> {
     Page<SanPhamResponse> searchAllSortedBySoLuong(@Param("request") TableSanPhamRequest request, Pageable pageable);
 
 
-    @Query("SELECT new datn.be.mycode.response.SanPhamResponse(sp.id, sp.ma, sp.ten, sp.moTa, sp.hinhAnh, sp.trongLuong, sp.beMatSuDung, sp.congNghe, sp.kieuDang, sp.giaThapNhat, sp.giaCaoNhat, sp.ngayTao, sp.ngaySua, sp.nguoiTao, sp.soLuong, sp.trangThai,sp.giamGia, sp.thuongHieu, sp.theLoai, sp.loaiCo, sp.vatLieu, sp.loaiDe)" +
+    @Query("SELECT sp " +
             "FROM SanPham sp " +
-            "LEFT JOIN SanPhamChiTiet spct ON sp.id = spct.sanPham.id " +
-            "LEFT JOIN sp.giamGia g " +
             "WHERE " +
-            "(:id IS null OR sp.id = :id) " +
-            "GROUP BY sp.id, sp.ma, sp.ten, sp.moTa, sp.hinhAnh, sp.trongLuong, sp.beMatSuDung, sp.congNghe, sp.kieuDang, sp.giaThapNhat, sp.giaCaoNhat, sp.ngayTao, sp.ngaySua, sp.nguoiTao, sp.trangThai, sp.giamGia, sp.thuongHieu, sp.theLoai, sp.loaiCo, sp.vatLieu, sp.loaiDe "
+            "(:id IS null OR sp.id = :id) "
     )
     SanPhamResponse searchById(Long id);
 
@@ -127,4 +124,10 @@ public interface SanPhamRepository extends JpaRepository<SanPham, Long> {
             "ORDER BY gg.mucGiam DESC")
     List<SanPham> findTop5SanPhamByTheLoaiAndDiscount(@Param("theLoaiId") Long theLoaiId, Pageable pageable);
 
+    @Query("SELECT sp " +
+            "FROM SanPham sp " +
+            "WHERE " +
+            "(:keyWord IS null OR sp.ten LIKE CONCAT('%', :keyWord, '%'))"
+    )
+    List<SanPham> findAllByName(String keyWord);
 }
