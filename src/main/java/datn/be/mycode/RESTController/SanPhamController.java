@@ -111,7 +111,7 @@ public class SanPhamController {
     }
     @GetMapping("/top5-san-pham-theo-the-loai")
     public List<SanPham> getTop5SanPhamGiamGiaTheLoai(@RequestParam Long theLoaiId) {
-        return sanPhamService.getTop5SanPhamByTheLoaiAndDiscount(theLoaiId);
+        return sanPhamService.getTop5SanPhamByTheLoai(theLoaiId);
     }
     @PostMapping("/add")
     public ResponseEntity<?> add(@RequestBody SanPhamRequest sanPhamRequest){
