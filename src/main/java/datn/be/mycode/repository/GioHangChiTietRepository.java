@@ -5,6 +5,7 @@ import datn.be.mycode.entity.GioHangChiTiet;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -18,4 +19,9 @@ public interface GioHangChiTietRepository extends JpaRepository<GioHangChiTiet, 
     List<GioHangChiTiet> findAllByGioHangId(Long idGioHang);
 
     Optional<GioHangChiTiet> findByGioHangIdAndAndSanPhamChiTietId(Long idGioHangChiTiet, Long isSanPhamChiTiet);
+
+    @Query("SELECT SUM(ghct.soLuong) " +
+            "FROM GioHangChiTiet ghct " +
+            "WHERE ghct.gioHang.id = :idHoaDon")
+    int getTongSoLuong(Long idHoaDon);
 }

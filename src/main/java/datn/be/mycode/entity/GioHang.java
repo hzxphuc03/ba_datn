@@ -43,8 +43,20 @@ public class GioHang implements Serializable {
     @Column(name = "sdt_nguoi_nhan")
     private String sdtNguoiNhan;
 
-    @Column(name = "dia_chi_nguoi_nhan")
-    private String diaChiNguoiNhan;
+    @Column(name = "id_tinh_thanh")
+    private String idTinhThanh;
+    @Column(name = "tinh_thanh")
+    private String tinhThanh;
+
+    @Column(name = "id_quan_huyen")
+    private String idQuanHuyen;
+    @Column(name = "quan_huyen")
+    private String quanHuyen;
+
+    @Column(name = "id_phuong_xa")
+    private String idPhuongXa;
+    @Column(name = "phuong_xa")
+    private String phuongXa;
 
     @Column(name = "phi_ship")
     private BigDecimal phiShip;

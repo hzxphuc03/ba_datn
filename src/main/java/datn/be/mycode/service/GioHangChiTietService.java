@@ -36,24 +36,14 @@ public class GioHangChiTietService {
     @Autowired
     private SanPhamChiTietRepository sanPhamChiTietRepository;
 
-    public NormalTableResponse<GioHangChiTiet> getAllByGioHang(GetAll request) {
+    public List<GioHangChiTiet> getAllByGioHang(Long request) {
 
-        Pageable pageable = PageRequest.of(request.getPage() - 1,request.getPageSize());
-        Page<GioHangChiTiet> gioHangChiTietPage;
-        List<GioHangChiTiet> gioHangChiTiets;
-        var gioHang = gioHangRepository.findByKhachHangId(request.getIdKhachHang()).orElse(null);
+        var gioHang = gioHangRepository.findByKhachHangId(request).orElse(null);
         if(gioHang == null) return null;
 
-        gioHangChiTietPage = repo.findAllByGioHangId(gioHang.getId(), pageable);
-        gioHangChiTiets = gioHangChiTietPage.getContent();
+        var gioHangChiTiets = repo.findAllByGioHangId(gioHang.getId());
 
-        var hoaDonNormalTableResponse = new NormalTableResponse<GioHangChiTiet>();
-        hoaDonNormalTableResponse.setItem(gioHangChiTiets);
-        hoaDonNormalTableResponse.setPage(request.getPage());
-        hoaDonNormalTableResponse.setPageSize(request.getPageSize());
-        hoaDonNormalTableResponse.setTotalItem(gioHangChiTietPage.getTotalElements());
-
-        return hoaDonNormalTableResponse;
+        return gioHangChiTiets;
     }
 
     public ResponseEntity<?> addGioHangChiTiet(AddGioHangChiTietReq request){

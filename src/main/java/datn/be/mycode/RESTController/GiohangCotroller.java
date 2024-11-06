@@ -1,5 +1,6 @@
 package datn.be.mycode.RESTController;
 
+import datn.be.mycode.request.GioHang.GioHangAdd;
 import datn.be.mycode.request.HoaDon.HuyHoaDonRequest;
 import datn.be.mycode.request.HoaDon.NextStep;
 import datn.be.mycode.request.HoaDonRequest;
@@ -24,6 +25,17 @@ public class GiohangCotroller {
     @GetMapping("/{idKhachHang}")
     public ResponseEntity<?> getAll(@PathVariable("idKhachHang") Long idKhachHang){
         return ResponseEntity.ok(gioHangService.getByKhachHang(idKhachHang).getBody());
+    }
+
+    @GetMapping("/get_so_luong/{idKhachHang}")
+    public ResponseEntity<?> getSoLuong(@PathVariable("idKhachHang") Long idKhachHang){
+        return ResponseEntity.ok(gioHangService.getSoLuong(idKhachHang).getBody());
+    }
+
+    @PutMapping("/update")
+    public ResponseEntity<?> addGioHang(@RequestBody() GioHangAdd request){
+        ResponseEntity<?> responseEntity = gioHangService.updateGioHang(request);
+        return responseEntity;
     }
 
 }
