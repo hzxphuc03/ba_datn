@@ -1,11 +1,14 @@
 package datn.be.mycode.RESTController;
 
+import datn.be.mycode.entity.Voucher;
 import datn.be.mycode.request.NormalTableRequest;
 import datn.be.mycode.request.VoucherKhachHangRequest;
 import datn.be.mycode.service.VoucherKhachHangService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/voucher_khach_hang")
@@ -43,5 +46,11 @@ public class VoucherKhachHangController {
     ){
 
         return ResponseEntity.ok(service.udateTrangThai(id, status));
+    }
+
+    @GetMapping("/get-by-id/{idKhachHang}")
+    public ResponseEntity<List<Voucher>> getVouchersByHoaDon(@PathVariable() Long idKhachHang) {
+        List<Voucher> vouchers = service.getVouchersByKhachHangId(idKhachHang);
+        return ResponseEntity.ok(vouchers);
     }
 }

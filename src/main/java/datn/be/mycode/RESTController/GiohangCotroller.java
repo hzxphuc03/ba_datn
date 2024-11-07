@@ -1,18 +1,16 @@
 package datn.be.mycode.RESTController;
 
+import datn.be.mycode.request.GioHang.GioHangDiaChi;
 import datn.be.mycode.request.GioHang.GioHangAdd;
-import datn.be.mycode.request.HoaDon.HuyHoaDonRequest;
-import datn.be.mycode.request.HoaDon.NextStep;
-import datn.be.mycode.request.HoaDonRequest;
-import datn.be.mycode.request.customRequest.BanHang.*;
-import datn.be.mycode.request.customRequest.TableHoaDonRequest;
+import datn.be.mycode.request.GioHang.GioHangPhuongThucThanhToan;
+import datn.be.mycode.request.GioHang.GioHangVoucher;
+import datn.be.mycode.request.customRequest.BanHang.AddObject;
+import datn.be.mycode.request.customRequest.BanHang.AddVoucher;
 import datn.be.mycode.service.GioHangService;
-import datn.be.mycode.service.HoaDonService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
 
 @CrossOrigin("*")
 @RestController
@@ -32,8 +30,32 @@ public class GiohangCotroller {
         return ResponseEntity.ok(gioHangService.getSoLuong(idKhachHang).getBody());
     }
 
+    @PutMapping("/add-dia-chi")
+    public ResponseEntity<?> addDiaChi(@RequestBody() GioHangDiaChi request){
+
+        return ResponseEntity.ok(gioHangService.addDiaChi(request));
+    }
+
+    @PutMapping("/add-voucher")
+    public ResponseEntity<?> addVoucher(@RequestBody() GioHangVoucher request){
+
+        return ResponseEntity.ok(gioHangService.addVoucher(request));
+    }
+
+    @PutMapping("/add-phuong-thuc-thanh-toan")
+    public ResponseEntity<?> addPhuongThucThanhToan(@RequestBody() GioHangPhuongThucThanhToan request){
+
+        return ResponseEntity.ok(gioHangService.addPhuongThucThanhToan(request));
+    }
+
+//    @PutMapping("/thanh-toan-online/{idKhachHang}")
+//    public ResponseEntity<?> thanhToan(@RequestBody() ThanhToanRequest request){
+//
+//        return ResponseEntity.ok(gioHangService.thanhToan());
+//    }
+
     @PutMapping("/update")
-    public ResponseEntity<?> addGioHang(@RequestBody() GioHangAdd request){
+    public ResponseEntity<?> updateGioHang(@RequestBody() GioHangAdd request){
         ResponseEntity<?> responseEntity = gioHangService.updateGioHang(request);
         return responseEntity;
     }

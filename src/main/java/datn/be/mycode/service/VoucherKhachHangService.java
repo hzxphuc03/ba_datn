@@ -1,5 +1,6 @@
 package datn.be.mycode.service;
 
+import datn.be.mycode.entity.Voucher;
 import datn.be.mycode.entity.VoucherKhachHang;
 import datn.be.mycode.repository.KhachHangRepository;
 import datn.be.mycode.repository.VoucherKhachHangRepository;
@@ -15,6 +16,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -89,4 +91,12 @@ public class VoucherKhachHangService {
     }
 
 
+    public List<Voucher> getVouchersByKhachHangId(Long idKhachHang) {
+        var voucherKhachHangs = voucherKhachHangRepository.findAllByKhachHangId(idKhachHang);
+        List<Voucher> vouchers = new ArrayList<>();
+        for (VoucherKhachHang voucherKhachHang:voucherKhachHangs) {
+            vouchers.add(voucherKhachHang.getVoucher());
+        }
+        return vouchers;
+    }
 }
