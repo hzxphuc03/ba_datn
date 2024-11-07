@@ -11,6 +11,8 @@ import java.time.LocalDateTime;
 @Setter
 public class GioHangAdd {
 
+    private LocalDateTime ngayThanhToan;
+
     private String ghiChu;
 
     private String tenNguoiNhan;
