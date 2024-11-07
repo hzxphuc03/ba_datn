@@ -58,8 +58,12 @@ public class DiaChiService {
     }
 
     public DiaChi add(DiaChiRequest request) {
-        System.out.println("addDC1");
-        System.out.println(request);
+        var diaChiMacDinhCu = repository.findByKhachHangIdAndTrangThai(request.getIdKhachHang(), 2).orElse(null);
+        if( diaChiMacDinhCu != null){
+            diaChiMacDinhCu.setTrangThai(1);
+            repository.save(diaChiMacDinhCu);
+        }
+
         DiaChi diaChi = new DiaChi();
         diaChi.setIdTinhThanh(request.getIdTinhThanh());
         diaChi.setTinhThanh(request.getTinhThanh());
@@ -68,8 +72,9 @@ public class DiaChiService {
         diaChi.setIdPhuongXa(request.getIdPhuongXa());
         diaChi.setPhuongXa(request.getPhuongXa());
         diaChi.setGhiChu(request.getGhiChu());
-        diaChi.setTrangThai(1);
+        diaChi.setTrangThai(2);
         diaChi.setKhachHang(khRepo.searchById(request.getIdKhachHang()).get());
+
         return repository.save(diaChi);
     }
 
