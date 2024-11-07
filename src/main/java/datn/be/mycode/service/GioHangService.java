@@ -60,7 +60,6 @@ public class GioHangService {
 
     public GioHang getGioHang(GioHang gioHang, GioHangAdd request){
 
-        gioHang.setNgayThanhToan(request.getNgayThanhToan());
         gioHang.setGhiChu(request.getGhiChu());
         gioHang.setTenNguoiNhan(request.getTenNguoiNhan());
         gioHang.setSdtNguoiNhan(request.getSdtNguoiNhan());
