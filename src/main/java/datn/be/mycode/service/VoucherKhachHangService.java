@@ -91,12 +91,12 @@ public class VoucherKhachHangService {
     }
 
 
-    public List<Voucher> getVouchersByKhachHangId(Long idKhachHang) {
+    public List<VoucherKhachHang> getVouchersByKhachHangId(Long idKhachHang) {
         var voucherKhachHangs = voucherKhachHangRepository.findAllByKhachHangId(idKhachHang);
-        List<Voucher> vouchers = new ArrayList<>();
-        for (VoucherKhachHang voucherKhachHang:voucherKhachHangs) {
-            vouchers.add(voucherKhachHang.getVoucher());
-        }
-        return vouchers;
+//        List<Voucher> vouchers = new ArrayList<>();
+//        for (VoucherKhachHang voucherKhachHang:voucherKhachHangs) {
+//            vouchers.add(voucherKhachHang.getVoucher());
+//        }
+        return voucherKhachHangs;
     }
 }

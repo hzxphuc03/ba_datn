@@ -49,8 +49,8 @@ public class VoucherKhachHangController {
     }
 
     @GetMapping("/get-by-id/{idKhachHang}")
-    public ResponseEntity<List<Voucher>> getVouchersByHoaDon(@PathVariable() Long idKhachHang) {
-        List<Voucher> vouchers = service.getVouchersByKhachHangId(idKhachHang);
+    public ResponseEntity<?> getVouchersByHoaDon(@PathVariable() Long idKhachHang) {
+        var vouchers = service.getVouchersByKhachHangId(idKhachHang);
         return ResponseEntity.ok(vouchers);
     }
 }
