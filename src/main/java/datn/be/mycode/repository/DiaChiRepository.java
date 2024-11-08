@@ -9,11 +9,15 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
 public interface DiaChiRepository extends JpaRepository<DiaChi, Long> {
 
 
     Page<DiaChi> findAllByTrangThai(int trangThai, Pageable pageable);
+
+    Optional<DiaChi> findByKhachHangIdAndTrangThai(Long idKhachHang, int trangThai);
 
 
     @Query("SELECT d FROM DiaChi d WHERE d.khachHang.id = :id")

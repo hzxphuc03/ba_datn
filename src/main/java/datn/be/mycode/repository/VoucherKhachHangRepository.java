@@ -8,6 +8,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface VoucherKhachHangRepository extends JpaRepository<VoucherKhachHang,Long> {
 
@@ -28,4 +30,6 @@ public interface VoucherKhachHangRepository extends JpaRepository<VoucherKhachHa
             "WHERE  v.trangThai = :trangThai " +
             "ORDER BY v.ngayTao DESC")
     Page<VoucherKhachHangResponse> findAllByTrangThai(Integer trangThai, Pageable pageable);
+
+    List<VoucherKhachHang> findAllByKhachHangId(Long idKhachHang);
 }
