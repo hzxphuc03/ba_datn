@@ -364,6 +364,7 @@ public class GioHangService {
             vouchers.add(voucher);
         }
 //        chech voucher
+        if(vouchers.size()==0) return "done";
         if(vouchers.size()>2) return "Số lượng voucher vượt quá giới hạn";
         if(vouchers.get(0).getTheLoai() == vouchers.get(1).getTheLoai()) return "2 voucher đều cùng 1 loại";
         for (Voucher voucher:vouchers) {
