@@ -163,20 +163,20 @@ public class GioHangService {
     }
 
     public ResponseEntity<?> thanhToanOnline(ThanhToanKhiNhanHang request){
-        var pttt = phuongThucThanhToanRepository.findById(Long.valueOf(2)).orElse(null);
-        var gioHang = gioHangRepository.findByKhachHangId(request.getIdKhachHang()).orElse(null);
-        if(gioHang == null) return getErro("Khách hàng này đã dừng");
+//        var pttt = phuongThucThanhToanRepository.findById(Long.valueOf(2)).orElse(null);
+//        var gioHang = gioHangRepository.findByKhachHangId(request.getIdKhachHang()).orElse(null);
+//        if(gioHang == null) return getErro("Khách hàng này đã dừng");
 
-        HoaDon hoaDon = taoHoaDonThanhToan(request);
-        hoaDon.setPhuongThucThanhToan(pttt);
-        hoaDon.setTrangThai(0);
-        hoaDon = hoaDonRepository.save(hoaDon);
-//            toa hoa don chi tiet
-        List<HoaDonChiTiet> hoaDonChiTietList = taoHoaDonChiTiet(hoaDon,request.getIdGioHangChiTietList());
-        if(hoaDonChiTietList == null) return getErro("Chưa có sản phẩm trong giỏ hàng");
-        setGiohang(gioHang);
+//        HoaDon hoaDon = taoHoaDonThanhToan(request);
+//        hoaDon.setPhuongThucThanhToan(pttt);
+//        hoaDon.setTrangThai(0);
+//        hoaDon = hoaDonRepository.save(hoaDon);
+////            toa hoa don chi tiet
+//        List<HoaDonChiTiet> hoaDonChiTietList = taoHoaDonChiTiet(hoaDon,request.getIdGioHangChiTietList());
+//        if(hoaDonChiTietList == null) return getErro("Chưa có sản phẩm trong giỏ hàng");
+//        setGiohang(gioHang);
 
-        return ResponseEntity.ok(taoURLThanhToan(hoaDon.getTongTien().intValue(),hoaDon.getId()+""));
+        return ResponseEntity.ok(taoURLThanhToan(request.getTongTien().intValue(),request.getIdKhachHang()+""));
 
     }
 
@@ -205,25 +205,29 @@ public class GioHangService {
     }
 
 
-    public ResponseEntity<?> thanhToanThanhCong(Long idHoaDon, int trangThai) {
-        var hoaDon = hoaDonRepository.findById(idHoaDon).orElse(null);
-        if (hoaDon == null ) return getErro("Hóa đơn này không tồn tại");
+    public ResponseEntity<?> thanhToanThanhCong(ThanhToanKhiNhanHang request) {
+        var pttt = phuongThucThanhToanRepository.findById(Long.valueOf(2)).orElse(null);
+        var gioHang = gioHangRepository.findByKhachHangId(request.getIdKhachHang()).orElse(null);
+        if(gioHang == null) return getErro("Khách hàng này đã dừng");
 
-        if(trangThai == 0){
-            xoaHoaDon(hoaDon);
-
-            return ResponseEntity.ok("Thanh toán thất bại");
-        }
-
+//        tao hoa don
+        HoaDon hoaDon = taoHoaDonThanhToan(request);
+        hoaDon.setPhuongThucThanhToan(pttt);
         hoaDon.setThanhToan(true);
         hoaDon.setNgayThanhToan(LocalDateTime.now());
         hoaDon.setTrangThai(2);
         hoaDonRepository.save(hoaDon);
 
-        setSanPhamThanhToanOnline(hoaDon);
+//      toa hoa don chi tiet
+        List<HoaDonChiTiet> hoaDonChiTietList = taoHoaDonChiTiet(hoaDon,request.getIdGioHangChiTietList());
+        if(hoaDonChiTietList == null) return getErro("Chưa có sản phẩm trong giỏ hàng");
+        setGiohang(gioHang);
+
+
+//        setSanPhamThanhToanOnline(hoaDon);
 
 //        tra ve hoaDon va hoadonchitiet
-        return ResponseEntity.ok("Thành Công");
+        return ResponseEntity.ok(hoaDon);
     }
 
     private void xoaHoaDon(HoaDon hoaDon) {
@@ -290,9 +294,8 @@ public class GioHangService {
             hoaDonChiTiet.setHoaDon(hoaDon);
             hoaDonChiTiet.setSanPhamChiTiet(gioHangChiTiet.getSanPhamChiTiet());
 
-            if (hoaDon.getPhuongThucThanhToan().getId() == 3) {
-                setSanPham(gioHangChiTiet);
-            }
+            setSanPham(gioHangChiTiet);
+
             hoaDonChiTiets.add(hoaDonChiTiet);
         }
 
@@ -382,35 +385,6 @@ public class GioHangService {
         return "done";
     }
 
-//    private HoaDon taoHoaDonThanhToanKhiNhanHang(GioHang gioHang){
-//        HoaDon hoaDon = new HoaDon();
-//
-//        hoaDon.setNgayTao(LocalDateTime.now());
-//        hoaDon.setGhiChu(gioHang.getGhiChu());
-//        hoaDon.setTenNguoiNhan(gioHang.getTenNguoiNhan());
-//        hoaDon.setSdtNguoiNhan(gioHang.getSdtNguoiNhan());
-//        hoaDon.setIdTinhThanh(gioHang.getIdTinhThanh());
-//        hoaDon.setTinhThanh(gioHang.getTinhThanh());
-//        hoaDon.setIdQuanHuyen(gioHang.getIdQuanHuyen());
-//        hoaDon.setQuanHuyen(gioHang.getQuanHuyen());
-//        hoaDon.setIdPhuongXa(gioHang.getIdPhuongXa());
-//        hoaDon.setPhuongXa(gioHang.getPhuongXa());
-//        hoaDon.setPhiShip(gioHang.getPhiShip());
-//        hoaDon.setTongTien(gioHang.getTongTien());
-//        hoaDon.setTongTienSanPhamChuaGiam(gioHang.getTongTienSanPhamChuaGiam());
-//        hoaDon.setTongTienGiam(gioHang.getTongTienGiam());
-//        hoaDon.setThanhToan(false);
-//        hoaDon.setGiaoHang(true);
-//        hoaDon.setTrangThai(2);
-//        hoaDon.setPhuongThucThanhToan(gioHang.getPhuongThucThanhToan());
-//        hoaDon.setKhachHang(gioHang.getKhachHang());
-//        hoaDon.setNhanVien(null);
-//
-//        hoaDon = hoaDonRepository.save(hoaDon);
-//        hoaDon.setMa("HD"+hoaDon.getId());
-//
-//        return hoaDon;
-//    }
 
     private void getDiaChi(GioHang gioHang , GioHangDiaChi request) {
         gioHang.setIdTinhThanh(request.getIdTinhThanh());

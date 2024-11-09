@@ -62,11 +62,9 @@ public class GiohangCotroller {
     }
 
     @PutMapping("/thanh-toan-thanh-cong")
-    public ResponseEntity<?> thanhToanThanhCong(@RequestParam() Long vnp_OrderInfo,
-                                                @RequestParam() int vnp_ResponseCode
-    ){
+    public ResponseEntity<?> thanhToanThanhCong(@RequestBody() ThanhToanKhiNhanHang request){
 
-        return ResponseEntity.ok(gioHangService.thanhToanThanhCong(vnp_OrderInfo, vnp_ResponseCode));
+        return ResponseEntity.ok(gioHangService.thanhToanThanhCong(request));
     }
 
     @PutMapping("/update")
