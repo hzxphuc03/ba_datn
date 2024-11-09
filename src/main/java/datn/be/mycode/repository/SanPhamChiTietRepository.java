@@ -74,7 +74,7 @@ public interface SanPhamChiTietRepository extends JpaRepository<SanPhamChiTiet, 
     )
     BigDecimal findGiaMaxByIdSanPham(Long idSanPham);
 
-    @Query("SELECT SUM(spct.soLuong) " +
+    @Query("SELECT COALESCE(SUM(spct.soLuong), 0) " +
             "FROM SanPhamChiTiet spct " +
             "WHERE " +
             "spct.sanPham.id = :idSanPham AND " +
