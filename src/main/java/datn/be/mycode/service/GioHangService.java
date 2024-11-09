@@ -36,6 +36,8 @@ public class GioHangService {
     @Autowired
     private VoucherHoaDonRepository voucherHoaDonRepository;
     @Autowired
+    private VoucherKhachHangRepository voucherKhachHangRepository;
+    @Autowired
     private HoaDonRepository hoaDonRepository;
     @Autowired
     private HoaDonChiTietRepository hoaDonChiTietRepository;
@@ -352,24 +354,29 @@ public class GioHangService {
 
         hoaDon = hoaDonRepository.save(hoaDon);
         hoaDon.setMa("HD"+hoaDon.getId());
-        addVoucher(hoaDon, request.getIdVoucherList());
+        addVoucher(hoaDon, request.getIdVoucherKhachHangList());
 
         return hoaDon;
     }
 
-    private String addVoucher(HoaDon hoaDon, List<Long> idVoucherList) {
+    private String addVoucher(HoaDon hoaDon, List<Long> idVoucherKhachHangList) {
 
 //        get vocher
         List<Voucher> vouchers = new ArrayList<>();
-        for (Long idVoucher: idVoucherList) {
-            var voucher = voucherRepository.findById(idVoucher).orElse(null);
-            if(vouchers == null) return "voucher không tồn tại";
-            vouchers.add(voucher);
+        for (Long idVoucherKhachHang: idVoucherKhachHangList) {
+            var voucherKhachHang = voucherKhachHangRepository.findById(idVoucherKhachHang).orElse(null);
+            if(voucherKhachHang == null) return "voucher không tồn tại";
+            var soLuong = voucherKhachHang.getSoLuong() - 1;
+            if(soLuong == 0) voucherKhachHang.setTrangThai(0);
+
+            voucherKhachHang.setSoLuong(soLuong);
+            voucherKhachHangRepository.save(voucherKhachHang);
+            vouchers.add(voucherKhachHang.getVoucher());
         }
 //        chech voucher
         if(vouchers.size()==0) return "done";
         if(vouchers.size()>2) return "Số lượng voucher vượt quá giới hạn";
-        if(vouchers.get(0).getTheLoai() == vouchers.get(1).getTheLoai()) return "2 voucher đều cùng 1 loại";
+//        if(vouchers.get(0).getTheLoai() == vouchers.get(1).getTheLoai()) return "2 voucher đều cùng 1 loại";
         for (Voucher voucher:vouchers) {
             if(voucher.getTrangThai() != 1) return "Vouche này đã hết hạn hoặc không còn hoạt động";
             if(voucher.getSoLuong() <= 0) return "Voucher này đã hết";
