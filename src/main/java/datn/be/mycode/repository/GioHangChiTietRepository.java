@@ -20,7 +20,7 @@ public interface GioHangChiTietRepository extends JpaRepository<GioHangChiTiet, 
 
     Optional<GioHangChiTiet> findByGioHangIdAndAndSanPhamChiTietId(Long idGioHangChiTiet, Long isSanPhamChiTiet);
 
-    @Query("SELECT SUM(ghct.soLuong) " +
+    @Query("SELECT COALESCE(SUM(ghct.soLuong), 0) " +
             "FROM GioHangChiTiet ghct " +
             "WHERE ghct.gioHang.id = :idHoaDon")
     int getTongSoLuong(Long idHoaDon);

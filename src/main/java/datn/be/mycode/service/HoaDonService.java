@@ -497,7 +497,7 @@ public class HoaDonService {
 
 
         var trangThai = hoaDon.getTrangThai();
-
+        if(trangThai == 2) trangThai += 1;
         trangThai += 1;
         hoaDon.setTrangThai(trangThai);
         hoaDon = repo.save(hoaDon);
