@@ -1,5 +1,6 @@
 package datn.be.mycode.RESTController;
 
+import datn.be.mycode.request.BanHangOnline.ThanhToanKhiNhanHang;
 import datn.be.mycode.request.GioHang.GioHangDiaChi;
 import datn.be.mycode.request.GioHang.GioHangAdd;
 import datn.be.mycode.request.GioHang.GioHangPhuongThucThanhToan;
@@ -48,11 +49,25 @@ public class GiohangCotroller {
         return ResponseEntity.ok(gioHangService.addPhuongThucThanhToan(request));
     }
 
-//    @PutMapping("/thanh-toan-online/{idKhachHang}")
-//    public ResponseEntity<?> thanhToan(@RequestBody() ThanhToanRequest request){
-//
-//        return ResponseEntity.ok(gioHangService.thanhToan());
-//    }
+    @PutMapping("/thanh-toan-khi-giao-hang")
+    public ResponseEntity<?> thanhToanKhiGiaohang(@RequestBody() ThanhToanKhiNhanHang request){
+
+        return ResponseEntity.ok(gioHangService.thanhToanKhiGiaohang(request));
+    }
+
+    @PutMapping("/thanh-toan-online")
+    public ResponseEntity<?> thanhToanOnline(@RequestBody() ThanhToanKhiNhanHang request){
+
+        return ResponseEntity.ok(gioHangService.thanhToanOnline(request));
+    }
+
+    @PutMapping("/thanh-toan-thanh-cong")
+    public ResponseEntity<?> thanhToanThanhCong(@RequestParam() Long vnp_OrderInfo,
+                                                @RequestParam() int vnp_ResponseCode
+    ){
+
+        return ResponseEntity.ok(gioHangService.thanhToanThanhCong(vnp_OrderInfo, vnp_ResponseCode));
+    }
 
     @PutMapping("/update")
     public ResponseEntity<?> updateGioHang(@RequestBody() GioHangAdd request){
