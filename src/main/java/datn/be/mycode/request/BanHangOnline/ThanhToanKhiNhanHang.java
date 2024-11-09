@@ -40,6 +40,8 @@ public class ThanhToanKhiNhanHang {
 
     private BigDecimal tongTienGiam;
 
+    private List<Long> idVoucherList;
+
     private List<Long> idGioHangChiTietList;
 
     private Long idKhachHang;

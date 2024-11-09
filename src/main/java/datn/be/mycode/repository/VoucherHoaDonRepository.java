@@ -30,4 +30,6 @@ public interface VoucherHoaDonRepository extends JpaRepository<VoucherHoaDon,Lon
 
     VoucherHoaDon findByHoaDonIdAndVoucherId(Long idHoadon, Long idVoucher);
 
+    void deleteAllByHoaDon_Id(Long idHoaDon);
+
 }

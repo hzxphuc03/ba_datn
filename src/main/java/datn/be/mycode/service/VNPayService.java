@@ -13,7 +13,7 @@ import java.util.*;
 
 @Service
 public class VNPayService {
-    public String createOrder(int total, String orderInfor){
+    public String createOrder(int total, String orderInfor,String urlReturn){
         String vnp_Version = "2.1.0";
         String vnp_Command = "pay";
         String vnp_TxnRef = VNpayConfig.getRandomNumber(8);
@@ -36,7 +36,7 @@ public class VNPayService {
         vnp_Params.put("vnp_Locale", locate);
 
 //        urlReturn += VNpayConfig.vnp_Returnurl;
-        vnp_Params.put("vnp_ReturnUrl", VNpayConfig.vnp_Returnurl);
+        vnp_Params.put("vnp_ReturnUrl", urlReturn);
         vnp_Params.put("vnp_IpAddr", vnp_IpAddr);
 
         Calendar cld = Calendar.getInstance(TimeZone.getTimeZone("Etc/GMT+7"));
