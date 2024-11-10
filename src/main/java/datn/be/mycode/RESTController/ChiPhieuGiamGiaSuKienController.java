@@ -2,7 +2,6 @@ package datn.be.mycode.RESTController;
 
 import datn.be.mycode.request.ChiPhieuGGSKRequest;
 import datn.be.mycode.request.ChiPhieuGiamGia.AddChiPheuGiamGia;
-import datn.be.mycode.request.SuKienRequest;
 import datn.be.mycode.request.customRequest.TableLongRequest;
 import datn.be.mycode.service.ChiPhieuGiamGiaSuKienService;
 import org.springframework.beans.factory.annotation.Autowired;

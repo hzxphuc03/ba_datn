@@ -1,7 +1,6 @@
 package datn.be.mycode.RESTController;
 
 import datn.be.mycode.request.LichSuSuDungRequest;
-import datn.be.mycode.request.SuKienRequest;
 import datn.be.mycode.request.customRequest.TableLongRequest;
 import datn.be.mycode.service.LichSuSuDungService;
 import org.springframework.beans.factory.annotation.Autowired;

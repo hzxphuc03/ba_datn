@@ -1,6 +1,7 @@
 package datn.be.mycode.RESTController;
 
-import datn.be.mycode.request.SuKienRequest;
+import datn.be.mycode.request.SuKien.SuKienRequest;
+import datn.be.mycode.request.SuKien.SuKienUpdateReq;
 import datn.be.mycode.request.customRequest.TableLongRequest;
 import datn.be.mycode.service.SuKienService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,11 +43,11 @@ public class SuKienController {
         return ResponseEntity.ok(service.getThangActive());
     }
 
-//    @PutMapping("/update")
-//    public ResponseEntity<?> update(@RequestBody SuKienRequest request){
-//
-//        return ResponseEntity.ok(service.update(request));
-//    }
+    @PutMapping("/update")
+    public ResponseEntity<?> update(@RequestBody SuKienUpdateReq request){
+
+        return ResponseEntity.ok(service.update(request));
+    }
 
     @GetMapping("/update-trangthai-auto")
     public ResponseEntity<?> capNhatTrangThaiSuKien() {
