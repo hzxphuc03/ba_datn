@@ -22,6 +22,8 @@ public interface VoucherRepository extends JpaRepository<Voucher,Long> {
 
     Page<Voucher> findAllByTheLoai(int theLoai, Pageable pageable);
 
+    List<Voucher> findAllByTheLoai(int theLoai);
+
     @Query("SELECT u FROM Voucher u WHERE u.ten LIKE %:query% OR u.ma LIKE %:query%")
     Page<Voucher> searchByTenOrMa(@Param("query") String query, Pageable pageable);
 

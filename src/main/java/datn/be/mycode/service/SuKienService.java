@@ -82,7 +82,7 @@ public class SuKienService {
         suKien.setThangHoatDong(thangHoatDong);
         suKien.setDonViPhieuGiamGia(donViPhieuGiamGia);// <= 2000
         suKien.setThoiGianHetHanPhieu(thoiGianHetHanPhieu);// <= 30
-        suKien.setTrangThai(1);
+        suKien.setTrangThai(0);
 
         SuKien savedSuKien = suKienRepository.save(suKien);
         savedSuKien.setMaSuKien("SK"+savedSuKien.getId());

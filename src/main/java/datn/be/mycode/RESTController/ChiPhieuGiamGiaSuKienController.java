@@ -1,6 +1,7 @@
 package datn.be.mycode.RESTController;
 
 import datn.be.mycode.request.ChiPhieuGGSKRequest;
+import datn.be.mycode.request.ChiPhieuGiamGia.AddChiPheuGiamGia;
 import datn.be.mycode.request.SuKienRequest;
 import datn.be.mycode.request.customRequest.TableLongRequest;
 import datn.be.mycode.service.ChiPhieuGiamGiaSuKienService;
@@ -25,10 +26,24 @@ public class ChiPhieuGiamGiaSuKienController {
         TableLongRequest request = new TableLongRequest(page,pageSize,keyWord,status);
         return ResponseEntity.ok(service.getAll(request));
     }
+
+    @GetMapping("/get-detail/{idSuKien}")
+    public ResponseEntity<?> getDetailByIdSuKien(@PathVariable("idSuKien") Long idSuKien){
+
+//        TableLongRequest request = new TableLongRequest(page,pageSize,keyWord,status);
+        return ResponseEntity.ok(service.getDetailByIdSuKien(idSuKien));
+    }
+
+//    @GetMapping("/load-su-kien")
+//    public ResponseEntity<?> getSuKien(){
+//
+//        return ResponseEntity.ok(service.loadSuKien());
+//    }
+
     @PostMapping("/add")
-    public ResponseEntity<?> add(@RequestBody ChiPhieuGGSKRequest suKienRequest){
-        System.out.println(suKienRequest);
-        return ResponseEntity.ok(service.add(suKienRequest));
+    public ResponseEntity<?> add(@RequestBody AddChiPheuGiamGia request){
+
+        return ResponseEntity.ok(service.add(request));
     }
 
     @PutMapping("/update")
