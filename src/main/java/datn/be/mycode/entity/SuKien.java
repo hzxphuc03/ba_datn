@@ -5,6 +5,7 @@ import lombok.*;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -25,11 +26,14 @@ public class SuKien implements Serializable {
     @Column(name = "ma_su_kien")
     private String maSuKien;
 
-    @Column(name = "ngay_bat_dau")
-    private LocalDateTime ngayBatDau;
+    @Column(name = "thang_hoat_dong")
+    private String thangHoatDong;
 
-    @Column(name = "ngay_ket_thuc")
-    private LocalDateTime ngayKetThuc;
+    @Column(name = "don_vi_phieu_giam_gia")
+    private int donViPhieuGiamGia;
+
+    @Column(name = "thoi_gian_het_han_phieu")
+    private int thoiGianHetHanPhieu;
 
     @Column(name = "key_su_kien")
     private String keySuKien;

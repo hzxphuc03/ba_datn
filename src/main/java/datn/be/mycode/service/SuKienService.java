@@ -5,6 +5,7 @@ import datn.be.mycode.repository.SuKienRepository;
 import datn.be.mycode.request.SuKienRequest;
 import datn.be.mycode.request.customRequest.TableLongRequest;
 import datn.be.mycode.response.NormalTableResponse;
+import datn.be.mycode.response.SuKien.ThangActive;
 import datn.be.mycode.response.erroResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -17,8 +18,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class SuKienService {
@@ -59,82 +60,68 @@ public class SuKienService {
 
     public ResponseEntity<?> add(SuKienRequest request) {
         LocalDateTime now = LocalDateTime.now();
+        var donViPhieuGiamGia = request.getDonViPhieuGiamGia();
+        if(donViPhieuGiamGia > 2000) return getErro("Đợn vị phiếu giảm giá không quá 2000");
+        if(donViPhieuGiamGia <= 0 ) return getErro("Đợn vị phiếu giảm giá phải lơn hơn 0");
+        var thoiGianHetHanPhieu = request.getThoiGianHetHanPhieu();
+        if(thoiGianHetHanPhieu > 30) return getErro("Thời gian hết hạn phiếu giảm giá không quá 30");
+        if(thoiGianHetHanPhieu <= 0) return getErro("Thời gian hết hạn phiếu giảm giá phải lơn hơn 0");
 
-        // Kiểm tra ngày bắt đầu sự kiện phải sau hôm nay
-        if (request.getNgayBatDau().isBefore(now.plusDays(1))) {
-            return getErro("Ngày bắt đầu sự kiện phải sau ngày hiện tại ít nhất 1 ngày.");
-        }
-//        System.out.println(request);
+        var thangHoatDong = request.getThangHoatDong().stream()
+                .map(String::valueOf)
+                .collect(Collectors.joining(","));
+
+        // Kiểm tra tháng bắt đầu sự kiện, tháng cuối phải sau tháng hiện tại
+
         SuKien suKien = new SuKien();
         suKien.setTenSuKien(request.getTenSuKien());
-        suKien.setMaSuKien(request.getMaSuKien());
-        suKien.setNgayBatDau(request.getNgayBatDau());
-        suKien.setNgayKetThuc(request.getNgayKetThuc());
-        suKien.setKeySuKien(request.getKeySuKien());
-        suKien.setTrangThai(2);
+        suKien.setThangHoatDong(thangHoatDong);
+        suKien.setDonViPhieuGiamGia(donViPhieuGiamGia);// <= 2000
+        suKien.setThoiGianHetHanPhieu(thoiGianHetHanPhieu);// <= 30
+        suKien.setTrangThai(1);
+
         SuKien savedSuKien = suKienRepository.save(suKien);
-        capNhatTrangThaiSuKien();
-        return ResponseEntity.ok(savedSuKien);
+        savedSuKien.setMaSuKien("SK"+savedSuKien.getId());
+        savedSuKien.setKeySuKien(savedSuKien.getMaSuKien()+"="+now.getYear());
+
+        return ResponseEntity.ok(suKienRepository.save(savedSuKien));
     }
 
     private ResponseEntity<?> getErro(String s){
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new erroResponse(s));
     }
 
-    public ResponseEntity<?> update(SuKienRequest request) {
-        LocalDateTime now = LocalDateTime.now();
+//    public ResponseEntity<?> update(SuKienRequest request) {
+//        LocalDateTime now = LocalDateTime.now();
+//
+//        // Kiểm tra nếu sự kiện không tồn tại
+//        Optional<SuKien> suKienOptional = suKienRepository.findById(request.getId());
+//        if (suKienOptional.isEmpty()) {
+//            return getErro("Sự kiện không tồn tại.");
+//        }
+//
+//        SuKien suKien = suKienOptional.get();
+//
+//        // Kiểm tra ngày bắt đầu phải sau ngày hiện tại
+//        if (request.getNgayBatDau().isBefore(now.plusDays(1))) {
+//            return getErro("Ngày bắt đầu sự kiện phải sau ngày hiện tại ít nhất 1 ngày.");
+//        }
+//
+//        // Cập nhật các thông tin của sự kiện
+//        suKien.setTenSuKien(request.getTenSuKien());
+//        suKien.setMaSuKien(request.getMaSuKien());
+//        suKien.setNgayBatDau(request.getNgayBatDau());
+//        suKien.setNgayKetThuc(request.getNgayKetThuc());
+//        suKien.setKeySuKien(request.getKeySuKien());
+//        suKien.setTrangThai(request.getTrangThai());
+//
+//        // Lưu lại sự kiện sau khi cập nhật
+//        SuKien updatedSuKien = suKienRepository.save(suKien);
+//        capNhatTrangThaiSuKien();
+//        // Trả về phản hồi thành công với sự kiện đã cập nhật
+//        return ResponseEntity.ok(updatedSuKien);
+//    }
 
-        // Kiểm tra nếu sự kiện không tồn tại
-        Optional<SuKien> suKienOptional = suKienRepository.findById(request.getId());
-        if (suKienOptional.isEmpty()) {
-            return getErro("Sự kiện không tồn tại.");
-        }
-
-        SuKien suKien = suKienOptional.get();
-
-        // Kiểm tra ngày bắt đầu phải sau ngày hiện tại
-        if (request.getNgayBatDau().isBefore(now.plusDays(1))) {
-            return getErro("Ngày bắt đầu sự kiện phải sau ngày hiện tại ít nhất 1 ngày.");
-        }
-
-        // Cập nhật các thông tin của sự kiện
-        suKien.setTenSuKien(request.getTenSuKien());
-        suKien.setMaSuKien(request.getMaSuKien());
-        suKien.setNgayBatDau(request.getNgayBatDau());
-        suKien.setNgayKetThuc(request.getNgayKetThuc());
-        suKien.setKeySuKien(request.getKeySuKien());
-        suKien.setTrangThai(request.getTrangThai());
-
-        // Lưu lại sự kiện sau khi cập nhật
-        SuKien updatedSuKien = suKienRepository.save(suKien);
-        capNhatTrangThaiSuKien();
-        // Trả về phản hồi thành công với sự kiện đã cập nhật
-        return ResponseEntity.ok(updatedSuKien);
-    }
-
-    @Transactional
-    public void capNhatTrangThaiSuKien() {
-        LocalDateTime now = LocalDateTime.now();
-        // Lấy tất cả Sự kiện
-        List<SuKien> suKiens = suKienRepository.findAll();
-        for (SuKien suKien : suKiens) {
-            LocalDateTime startDay = suKien.getNgayBatDau();
-            LocalDateTime endDay = suKien.getNgayKetThuc();
-            if (endDay.isBefore(now)) {
-                // Sự kiện đã qua
-                suKien.setTrangThai(0);
-            } else if (startDay.isAfter(now)) {
-                // Sự kiện chưa đến
-                suKien.setTrangThai(2);
-            } else if (startDay.isBefore(now) || startDay.isEqual(now)) {
-                // Sự kiện đang trong thời gian sự kiện (startDay <= now <= endDay)
-                suKien.setTrangThai(1);
-            }
-            // Lưu lại sự kiện nếu trạng thái thay đổi
-            suKienRepository.save(suKien);
-        }
-
-    }
 
     public SuKien udateTrangThai(Long id, Integer trangThai){
         SuKien suKien = suKienRepository.findById(id).get();
@@ -142,4 +129,21 @@ public class SuKienService {
         return suKienRepository.save(suKien);
     }
 
+    public Object getThangActive() {
+        List<ThangActive> thangActives = new ArrayList<>();
+
+        var sukiens = suKienRepository.findAllWithActiveMonths();
+        Set<Integer> activeMonths = new HashSet<>();
+        for (SuKien suKien:sukiens) {
+            String[] monthsArray = suKien.getThangHoatDong().split(",");
+            for (String month : monthsArray) {
+                activeMonths.add(Integer.parseInt(month.trim()));
+            }
+        }
+        for (int i = 1; i <= 12; i++) {
+            thangActives.add(new ThangActive(i, activeMonths.contains(i))); // Kiểm tra xem tháng có trong Set không
+        }
+
+        return thangActives;
+    }
 }

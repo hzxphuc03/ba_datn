@@ -5,6 +5,7 @@ import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.Date;
+import java.util.List;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -12,11 +13,10 @@ import java.util.Date;
 @Setter
 @ToString
 public class SuKienRequest {
-    private Long id;
+
     private String tenSuKien;
-    private String maSuKien;
-    private LocalDateTime ngayBatDau;
-    private LocalDateTime ngayKetThuc;
-    private String keySuKien;
-    private int trangThai;
+    private List<Integer> thangHoatDong;
+    private int donViPhieuGiamGia;
+    private int thoiGianHetHanPhieu;
+
 }

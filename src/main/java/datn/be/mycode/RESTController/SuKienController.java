@@ -26,21 +26,27 @@ public class SuKienController {
     }
     @PostMapping("/add")
     public ResponseEntity<?> add(@RequestBody SuKienRequest suKienRequest){
-        System.out.println(suKienRequest);
+
         return ResponseEntity.ok(service.add(suKienRequest));
     }
 
-    @PutMapping("/update")
-    public ResponseEntity<?> update(@RequestBody SuKienRequest request){
+    @PostMapping("/get-thang-active")
+    public ResponseEntity<?> getThangActive(){
 
-        return ResponseEntity.ok(service.update(request));
+        return ResponseEntity.ok(service.getThangActive());
     }
 
-    @PutMapping("/update-trangthai-auto")
-    public ResponseEntity<?> capNhatTrangThaiSuKien() {
-        service.capNhatTrangThaiSuKien();
-        return ResponseEntity.ok("Cập nhật trạng thái sự kiện tự động thành công.");
-    }
+//    @PutMapping("/update")
+//    public ResponseEntity<?> update(@RequestBody SuKienRequest request){
+//
+//        return ResponseEntity.ok(service.update(request));
+//    }
+
+//    @PutMapping("/update-trangthai-auto")
+//    public ResponseEntity<?> capNhatTrangThaiSuKien() {
+//        service.capNhatTrangThaiSuKien();
+//        return ResponseEntity.ok("Cập nhật trạng thái sự kiện tự động thành công.");
+//    }
 
     @PutMapping("/update-trang-thai/{id}")
     public ResponseEntity<?> updateTrangThai(@PathVariable("id") Long id,
