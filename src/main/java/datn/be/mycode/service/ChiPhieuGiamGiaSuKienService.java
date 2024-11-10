@@ -14,10 +14,13 @@ import datn.be.mycode.response.ChiPhieuSuKien.SuKienRes;
 import datn.be.mycode.response.ChiPhieuSuKien.Thang;
 import datn.be.mycode.response.NormalTableResponse;
 import datn.be.mycode.response.SuKien.ThangActive;
+import datn.be.mycode.response.erroResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -67,17 +70,19 @@ public class ChiPhieuGiamGiaSuKienService {
     }
 
 
-    public ChiPhieuGiamGiaSuKien add(AddChiPheuGiamGia request) {
+    public Object add(AddChiPheuGiamGia request) {
         System.out.println(request);
         var voucher = voucherRepository.searchById(request.getVoucher()).get();
         var suKien = suKienRepository.searchById(request.getSuKien()).get();
+        var chiPhieuGiamGiaSuKien = cprepository.findBySuKienIdAndVoucherId(request.getSuKien(),request.getVoucher());
+        if(chiPhieuGiamGiaSuKien.size() >1) return getErro("Voucher này đã có trong sự kiện");
 
         ChiPhieuGiamGiaSuKien cpggsk = new ChiPhieuGiamGiaSuKien();
         cpggsk.setKeys(suKien.getKeySuKien());
         cpggsk.setSuKien(suKien);
         cpggsk.setVoucher(voucher);
         cpggsk.setTrangThai(1);
-        return cprepository.save(cpggsk);
+        return ResponseEntity.ok(cprepository.save(cpggsk));
     }
 
 
@@ -164,4 +169,7 @@ public class ChiPhieuGiamGiaSuKienService {
 //
 //        return thangActives;
 //    }
+private ResponseEntity<?> getErro(String s){
+    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new erroResponse(s));
+}
 }
