@@ -38,6 +38,9 @@ public class SuKien implements Serializable {
     @Column(name = "key_su_kien")
     private String keySuKien;
 
+    @Column(name = "mo_ta")
+    private String moTa;
+
     @Column(name = "trang_thai")
     private int trangThai;
 }

@@ -2,7 +2,8 @@ package datn.be.mycode.service;
 
 import datn.be.mycode.entity.SuKien;
 import datn.be.mycode.repository.SuKienRepository;
-import datn.be.mycode.request.SuKienRequest;
+import datn.be.mycode.request.SuKien.SuKienRequest;
+import datn.be.mycode.request.SuKien.SuKienUpdateReq;
 import datn.be.mycode.request.customRequest.TableLongRequest;
 import datn.be.mycode.response.NormalTableResponse;
 import datn.be.mycode.response.SuKien.ThangActive;
@@ -14,9 +15,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -84,11 +83,12 @@ public class SuKienService {
         suKien.setThangHoatDong(thangHoatDong);
         suKien.setDonViPhieuGiamGia(donViPhieuGiamGia);// <= 2000
         suKien.setThoiGianHetHanPhieu(thoiGianHetHanPhieu);// <= 30
+        suKien.setMoTa(request.getMoTa());
         suKien.setTrangThai(0);
 
         SuKien savedSuKien = suKienRepository.save(suKien);
         savedSuKien.setMaSuKien("SK"+savedSuKien.getId());
-        savedSuKien.setKeySuKien(savedSuKien.getMaSuKien()+"-"+now.getYear());
+        savedSuKien.setKeySuKien(savedSuKien.getMaSuKien()+"-"+now.getMonth().getValue()+"-"+now.getYear());
 
         return ResponseEntity.ok(suKienRepository.save(savedSuKien));
     }
@@ -97,36 +97,41 @@ public class SuKienService {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new erroResponse(s));
     }
 
-//    public ResponseEntity<?> update(SuKienRequest request) {
-//        LocalDateTime now = LocalDateTime.now();
-//
-//        // Kiểm tra nếu sự kiện không tồn tại
-//        Optional<SuKien> suKienOptional = suKienRepository.findById(request.getId());
-//        if (suKienOptional.isEmpty()) {
-//            return getErro("Sự kiện không tồn tại.");
-//        }
-//
-//        SuKien suKien = suKienOptional.get();
-//
-//        // Kiểm tra ngày bắt đầu phải sau ngày hiện tại
-//        if (request.getNgayBatDau().isBefore(now.plusDays(1))) {
-//            return getErro("Ngày bắt đầu sự kiện phải sau ngày hiện tại ít nhất 1 ngày.");
-//        }
-//
-//        // Cập nhật các thông tin của sự kiện
-//        suKien.setTenSuKien(request.getTenSuKien());
-//        suKien.setMaSuKien(request.getMaSuKien());
-//        suKien.setNgayBatDau(request.getNgayBatDau());
-//        suKien.setNgayKetThuc(request.getNgayKetThuc());
-//        suKien.setKeySuKien(request.getKeySuKien());
-//        suKien.setTrangThai(request.getTrangThai());
-//
-//        // Lưu lại sự kiện sau khi cập nhật
-//        SuKien updatedSuKien = suKienRepository.save(suKien);
-//        capNhatTrangThaiSuKien();
-//        // Trả về phản hồi thành công với sự kiện đã cập nhật
-//        return ResponseEntity.ok(updatedSuKien);
-//    }
+    public ResponseEntity<?> update(SuKienUpdateReq request) {
+        LocalDateTime now = LocalDateTime.now();
+        var donViPhieuGiamGia = request.getDonViPhieuGiamGia();
+        if(donViPhieuGiamGia > 2000) return getErro("Đợn vị phiếu giảm giá không quá 2000");
+        if(donViPhieuGiamGia <= 0 ) return getErro("Đợn vị phiếu giảm giá phải lơn hơn 0");
+        var thoiGianHetHanPhieu = request.getThoiGianHetHanPhieu();
+        if(thoiGianHetHanPhieu > 30) return getErro("Thời gian hết hạn phiếu giảm giá không quá 30");
+        if(thoiGianHetHanPhieu <= 0) return getErro("Thời gian hết hạn phiếu giảm giá phải lơn hơn 0");
+
+        if(request.getTenSuKien().isBlank()) return getErro("Không để trống tên");
+        if(request.getDonViPhieuGiamGia() == null) return getErro("Không để trống số lượng mỗi loại phiếu giảm giá");
+        if(request.getThoiGianHetHanPhieu() == null) return getErro("Không để trống thời gian hết hạn phiếu");
+
+        var thangHoatDong = request.getThangHoatDong().stream()
+                .map(String::valueOf)
+                .collect(Collectors.joining(","));
+
+        if(thangHoatDong.isBlank())return getErro("Cần chọn tháng cho sự kiện");
+
+        // Kiểm tra tháng bắt đầu sự kiện, tháng cuối phải sau tháng hiện tại
+
+        SuKien suKien = suKienRepository.findById(request.getId()).orElse(null);
+        if(suKien == null) return getErro("Sự kiện này không có");
+
+        suKien.setTenSuKien(request.getTenSuKien());
+        suKien.setThangHoatDong(thangHoatDong);
+        suKien.setDonViPhieuGiamGia(donViPhieuGiamGia);// <= 2000
+        suKien.setThoiGianHetHanPhieu(thoiGianHetHanPhieu);// <= 30
+        suKien.setMoTa(request.getMoTa());
+        suKien.setTrangThai(0);
+
+        SuKien savedSuKien = suKienRepository.save(suKien);
+
+        return ResponseEntity.ok(suKienRepository.save(savedSuKien));
+    }
 
 
     public SuKien udateTrangThai(Long id, Integer trangThai){

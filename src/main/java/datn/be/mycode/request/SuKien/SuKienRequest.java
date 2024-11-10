@@ -1,4 +1,4 @@
-package datn.be.mycode.request;
+package datn.be.mycode.request.SuKien;
 
 import jakarta.persistence.Column;
 import lombok.*;
@@ -16,6 +16,7 @@ public class SuKienRequest {
 
     private String tenSuKien;
     private List<Integer> thangHoatDong;
+    private String moTa;
     private Integer donViPhieuGiamGia;
     private Integer thoiGianHetHanPhieu;
 
