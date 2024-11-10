@@ -16,7 +16,7 @@ public class SuKienRequest {
 
     private String tenSuKien;
     private List<Integer> thangHoatDong;
-    private int donViPhieuGiamGia;
-    private int thoiGianHetHanPhieu;
+    private Integer donViPhieuGiamGia;
+    private Integer thoiGianHetHanPhieu;
 
 }

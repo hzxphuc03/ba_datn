@@ -67,6 +67,10 @@ public class SuKienService {
         if(thoiGianHetHanPhieu > 30) return getErro("Thời gian hết hạn phiếu giảm giá không quá 30");
         if(thoiGianHetHanPhieu <= 0) return getErro("Thời gian hết hạn phiếu giảm giá phải lơn hơn 0");
 
+        if(request.getTenSuKien() == null) return getErro("Không để trống tên");
+        if(request.getDonViPhieuGiamGia() == null) return getErro("Không để trống số lượng mỗi loại phiếu giảm giá");
+        if(request.getThoiGianHetHanPhieu() == null) return getErro("Không để trống thời gian hết hạn phiếu");
+
         var thangHoatDong = request.getThangHoatDong().stream()
                 .map(String::valueOf)
                 .collect(Collectors.joining(","));

@@ -6,6 +6,7 @@ import datn.be.mycode.request.customRequest.TableVoucherActiveRequest;
 import datn.be.mycode.request.customRequest.TableVoucherHoaDonRequest;
 import datn.be.mycode.request.customRequest.TableVoucherRequest;
 import datn.be.mycode.request.customRequest.TableVoucherStatusInRequest;
+import datn.be.mycode.request.voucher.VoucherSuKien;
 import datn.be.mycode.service.VoucherService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -43,6 +44,20 @@ public class VoucherController {
         return ResponseEntity.ok(service.add(tenVoucherRequest));
     }
 
+    @PostMapping("/add-voucher-su-kien")
+    public ResponseEntity<?> addVoucherSuKien(@RequestBody VoucherSuKien request){
+
+        return ResponseEntity.ok(service.addVoucherSuKien(request));
+    }
+
+    @GetMapping("/get-phieu-giam-gia-su-kien")
+    public ResponseEntity<?> getPhieuGiamGiaVoucher(
+            @RequestParam(name = "page",required = false) Integer page,
+            @RequestParam(name = "pageSize",required = false) Integer pageSize
+    ){
+        return ResponseEntity.ok(service.getPhieuGiamGiaVoucher(page, pageSize));
+    }
+
     @GetMapping("/get-by-id/{idVoucher}")
     public ResponseEntity<?> getById(
             @PathVariable(name = "idVoucher",required = false) Long idVoucher
@@ -73,16 +88,16 @@ public class VoucherController {
         return ResponseEntity.ok("Cập nhật trạng thái voucher tự động thành công.");
     }
 
-    @GetMapping("trong-su-kien")
-    public ResponseEntity<?> trongSuKien(
-            @RequestParam(name = "page",required = false) Integer page,
-            @RequestParam(name = "pageSize",required = false) Integer pageSize,
-            @RequestParam(name = "status",required = false) Integer status
-    ){
-
-        TableVoucherStatusInRequest request = new TableVoucherStatusInRequest(page,pageSize,status);
-        return ResponseEntity.ok(service.trongSuKien(request));
-    }
+//    @GetMapping("trong-su-kien")
+//    public ResponseEntity<?> trongSuKien(
+//            @RequestParam(name = "page",required = false) Integer page,
+//            @RequestParam(name = "pageSize",required = false) Integer pageSize,
+//            @RequestParam(name = "status",required = false) Integer status
+//    ){
+//
+//        TableVoucherStatusInRequest request = new TableVoucherStatusInRequest(page,pageSize,status);
+//        return ResponseEntity.ok(service.trongSuKien(request));
+//    }
     @GetMapping("get-voucher-active")
     public ResponseEntity<?> getVoucherActive(
             @RequestParam(name = "page",required = false) Integer page,

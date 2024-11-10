@@ -8,6 +8,7 @@ import datn.be.mycode.request.customRequest.TableVoucherActiveRequest;
 import datn.be.mycode.request.customRequest.TableVoucherHoaDonRequest;
 import datn.be.mycode.request.customRequest.TableVoucherRequest;
 import datn.be.mycode.request.customRequest.TableVoucherStatusInRequest;
+import datn.be.mycode.request.voucher.VoucherSuKien;
 import datn.be.mycode.response.NormalTableResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -147,30 +148,30 @@ public class VoucherService {
         giamGiaService.loadGiamGia();
     }
 
-    public NormalTableResponse<Voucher> trongSuKien(TableVoucherStatusInRequest request) {
-
-        if (request.getPage() ==  null) {
-            request.setPage(1);
-        }
-        if (request.getPageSize() == null) {
-            request.setPageSize(10);
-        }
-
-        LocalDateTime today = LocalDateTime.now();
-        NormalTableResponse<Voucher> voucherNormalTableResponse = new NormalTableResponse<>();
-        Pageable pageable = PageRequest.of(request.getPage() - 1,request.getPageSize());
-        Page<Voucher> voucherPage;
-            voucherPage = repository.findByNgayBatDauLessThanEqualAndNgayKetThucGreaterThanEqual(today,today, pageable);
-
-        List<Voucher> vouchers = voucherPage.getContent().stream().toList();
-
-        voucherNormalTableResponse.setItem(vouchers);
-        voucherNormalTableResponse.setPage(request.getPage());
-        voucherNormalTableResponse.setPageSize(request.getPageSize());
-        voucherNormalTableResponse.setTotalItem(voucherPage.getTotalElements());
-
-        return voucherNormalTableResponse;
-    }
+//    public NormalTableResponse<Voucher> trongSuKien(TableVoucherStatusInRequest request) {
+//
+//        if (request.getPage() ==  null) {
+//            request.setPage(1);
+//        }
+//        if (request.getPageSize() == null) {
+//            request.setPageSize(10);
+//        }
+//
+//        LocalDateTime today = LocalDateTime.now();
+//        NormalTableResponse<Voucher> voucherNormalTableResponse = new NormalTableResponse<>();
+//        Pageable pageable = PageRequest.of(request.getPage() - 1,request.getPageSize());
+//        Page<Voucher> voucherPage;
+//            voucherPage = repository.findByNgayBatDauLessThanEqualAndNgayKetThucGreaterThanEqual(today,today, pageable);
+//
+//        List<Voucher> vouchers = voucherPage.getContent().stream().toList();
+//
+//        voucherNormalTableResponse.setItem(vouchers);
+//        voucherNormalTableResponse.setPage(request.getPage());
+//        voucherNormalTableResponse.setPageSize(request.getPageSize());
+//        voucherNormalTableResponse.setTotalItem(voucherPage.getTotalElements());
+//
+//        return voucherNormalTableResponse;
+//    }
 
     public NormalTableResponse<Voucher> getVoucherActive(TableVoucherActiveRequest request) {
         if (request.getPage() ==  null) {
@@ -251,4 +252,40 @@ public class VoucherService {
         return voucherNormalTableResponse;
     }
 
+    public Object addVoucherSuKien(VoucherSuKien request) {
+        Voucher voucher = new Voucher();
+
+        voucher.setTen(request.getTen());
+        voucher.setTheLoai(2);
+        voucher.setNgayTao(LocalDateTime.now());
+        voucher.setPhanTramGiam(request.getPhanTramGiam());
+        voucher.setGiamToiDa(request.getGiamToiDa());
+        voucher.setGiaTriGiamToiThieu(request.getGiaTriGiamToiThieu());
+        voucher.setTrangThai(1);
+
+        voucher = repository.save(voucher);
+        voucher.setMa("PGG"+voucher.getId());
+
+        return repository.save(voucher);
+    }
+
+    public Object getPhieuGiamGiaVoucher(Integer page, Integer pageSize) {
+        if (page ==  null) {
+            page = 1 ;
+        }
+        if (pageSize == null) {
+            pageSize = 10;
+        }
+        Pageable pageable = PageRequest.of(page - 1,pageSize);
+
+        var voucherEven = repository.findAllByTheLoai(2, pageable);
+
+        List<Voucher> vouchers = voucherEven.getContent();
+        NormalTableResponse<Voucher> voucherNormalTableResponse = new NormalTableResponse<>();
+        voucherNormalTableResponse.setItem(vouchers);
+        voucherNormalTableResponse.setPage(page);
+        voucherNormalTableResponse.setPageSize(pageSize);
+        voucherNormalTableResponse.setTotalItem(voucherEven.getTotalElements());
+        return voucherNormalTableResponse;
+    }
 }
