@@ -58,10 +58,13 @@ public class ChiPhieuGiamGiaSuKienService {
 
     public ChiPhieuGiamGiaSuKien add(ChiPhieuGGSKRequest request) {
         System.out.println(request);
+        var voucher = voucherRepository.searchById(request.getVoucher()).get();
+        var suKien = suKienRepository.searchById(request.getSuKien()).get();
+
         ChiPhieuGiamGiaSuKien cpggsk = new ChiPhieuGiamGiaSuKien();
         cpggsk.setKeys(request.getKeys());
-        cpggsk.setSuKien(suKienRepository.searchById(request.getSuKien()).get());
-        cpggsk.setVoucher(voucherRepository.searchById(request.getVoucher()).get());
+        cpggsk.setSuKien(suKien);
+        cpggsk.setVoucher(voucher);
         cpggsk.setTrangThai(1);
         return cprepository.save(cpggsk);
     }
