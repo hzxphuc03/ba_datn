@@ -82,7 +82,7 @@ public class ChiPhieuGiamGiaSuKienService {
         cpggsk.setSuKien(suKien);
         cpggsk.setVoucher(voucher);
         cpggsk.setTrangThai(1);
-        return ResponseEntity.ok(cprepository.save(cpggsk));
+        return cprepository.save(cpggsk);
     }
 
 
@@ -106,35 +106,12 @@ public class ChiPhieuGiamGiaSuKienService {
         var suKien = suKienRepository.findById(idSuKien).get();
         String thangHoatDong = suKien.getThangHoatDong();
 
-        List<Thang> monthsList = new ArrayList<>();
-        String[] monthsArray = thangHoatDong.split(","); // Tách chuỗi thành mảng
-        for (String month : monthsArray) {
-            monthsList.add(new Thang(Integer.parseInt(month.trim()))); // Chuyển đổi chuỗi thành số nguyên và thêm vào danh sách
+        List<Voucher> vouchers = new ArrayList<>();
+        for (ChiPhieuGiamGiaSuKien chiPhieuGiamGiaSuKien:cpsks) {
+            vouchers.add(chiPhieuGiamGiaSuKien.getVoucher());
         }
 
-        var suKienRes = new SuKienRes();
-        suKienRes.setId(suKien.getId());
-        suKienRes.setTenSuKien(suKien.getTenSuKien());
-        suKienRes.setMaSuKien(suKien.getMaSuKien());
-        suKienRes.setThangHoatDong(monthsList);
-        suKienRes.setDonViPhieuGiamGia(suKien.getDonViPhieuGiamGia());
-        suKienRes.setThoiGianHetHanPhieu(suKien.getThoiGianHetHanPhieu());
-        suKienRes.setKeySuKien(suKien.getKeySuKien());
-        suKienRes.setTrangThai(suKien.getTrangThai());
-
-        List<ChiPhieuSuKienDetail> cpskRes = new ArrayList<>();
-
-        for (ChiPhieuGiamGiaSuKien cpsk:cpsks) {
-            ChiPhieuSuKienDetail cpskRe = new ChiPhieuSuKienDetail();
-            cpskRe.setId(cpsk.getId());
-            cpskRe.setKeys(cpsk.getKeys());
-            cpskRe.setTrangThai(cpsk.getTrangThai());
-            cpskRe.setSuKien(suKienRes);
-            cpskRe.setVoucher(cpsk.getVoucher());
-            cpskRes.add(cpskRe);
-        }
-
-        return cpsks;
+        return vouchers;
     }
 //
 //    public Object loadSuKien() {

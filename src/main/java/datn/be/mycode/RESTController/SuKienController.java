@@ -24,6 +24,12 @@ public class SuKienController {
         TableLongRequest request = new TableLongRequest(page,pageSize,keyWord,status);
         return ResponseEntity.ok(service.getAll(request));
     }
+
+    @GetMapping("/get-detail-su-kien/{idSuKien}")
+    public ResponseEntity<?> getDetailSuKien(@PathVariable Long idSuKien){
+        return ResponseEntity.ok(service.getDetailSuKien(idSuKien));
+    }
+
     @PostMapping("/add")
     public ResponseEntity<?> add(@RequestBody SuKienRequest suKienRequest){
 
@@ -42,11 +48,11 @@ public class SuKienController {
 //        return ResponseEntity.ok(service.update(request));
 //    }
 
-//    @PutMapping("/update-trangthai-auto")
-//    public ResponseEntity<?> capNhatTrangThaiSuKien() {
-//        service.capNhatTrangThaiSuKien();
-//        return ResponseEntity.ok("Cập nhật trạng thái sự kiện tự động thành công.");
-//    }
+    @GetMapping("/update-trangthai-auto")
+    public ResponseEntity<?> capNhatTrangThaiSuKien() {
+        service.loadSuKien();
+        return ResponseEntity.ok("Cập nhật trạng thái sự kiện tự động thành công.");
+    }
 
     @PutMapping("/update-trang-thai/{id}")
     public ResponseEntity<?> updateTrangThai(@PathVariable("id") Long id,
