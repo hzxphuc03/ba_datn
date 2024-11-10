@@ -24,4 +24,6 @@ public interface ChiPhieuGiamGiaSuKienRepository extends JpaRepository<ChiPhieuG
     Page<ChiPhieuGiamGiaSuKien> findAllByTrangThai(int trangThai, Pageable pageable);
 
     List<ChiPhieuGiamGiaSuKien> findAllBySuKienId(Long idSuKien);
+
+    List<ChiPhieuGiamGiaSuKien> findBySuKienIdAndVoucherId(Long idChiPhieuGiamGia, Long idVoucher);
 }

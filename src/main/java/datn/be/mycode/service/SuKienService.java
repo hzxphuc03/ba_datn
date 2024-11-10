@@ -67,13 +67,15 @@ public class SuKienService {
         if(thoiGianHetHanPhieu > 30) return getErro("Thời gian hết hạn phiếu giảm giá không quá 30");
         if(thoiGianHetHanPhieu <= 0) return getErro("Thời gian hết hạn phiếu giảm giá phải lơn hơn 0");
 
-        if(request.getTenSuKien() == null) return getErro("Không để trống tên");
+        if(request.getTenSuKien().isBlank()) return getErro("Không để trống tên");
         if(request.getDonViPhieuGiamGia() == null) return getErro("Không để trống số lượng mỗi loại phiếu giảm giá");
         if(request.getThoiGianHetHanPhieu() == null) return getErro("Không để trống thời gian hết hạn phiếu");
 
         var thangHoatDong = request.getThangHoatDong().stream()
                 .map(String::valueOf)
                 .collect(Collectors.joining(","));
+
+        if(thangHoatDong.isBlank())return getErro("Cần chọn tháng cho sự kiện");
 
         // Kiểm tra tháng bắt đầu sự kiện, tháng cuối phải sau tháng hiện tại
 
@@ -86,7 +88,7 @@ public class SuKienService {
 
         SuKien savedSuKien = suKienRepository.save(suKien);
         savedSuKien.setMaSuKien("SK"+savedSuKien.getId());
-        savedSuKien.setKeySuKien(savedSuKien.getMaSuKien()+"="+now.getYear());
+        savedSuKien.setKeySuKien(savedSuKien.getMaSuKien()+"-"+now.getYear());
 
         return ResponseEntity.ok(suKienRepository.save(savedSuKien));
     }
@@ -149,5 +151,38 @@ public class SuKienService {
         }
 
         return thangActives;
+    }
+
+    public ResponseEntity<?> getDetailSuKien(Long idSuKien) {
+        var suKien = suKienRepository.findById(idSuKien).orElse(null);
+        if(suKien == null) return getErro("Sự kiện này không tồn tại");
+
+        return ResponseEntity.ok(suKien);
+    }
+
+    public Object loadSuKien(){
+
+        var now = LocalDateTime.now();
+        var suKiens = suKienRepository.findAllWithActiveMonths();
+        for (SuKien suKien:suKiens) {
+            List<Integer> activeMonths = new ArrayList<>();
+            String[] monthsArray = suKien.getThangHoatDong().split(",");
+            for (String month : monthsArray) {
+                activeMonths.add(Integer.parseInt(month.trim()));
+            }
+            if(activeMonths.get(0)>now.getMonth().getValue()){
+                suKien.setTrangThai(0);
+            }
+            if(activeMonths.get(activeMonths.size()-1)<now.getMonth().getValue()){
+                suKien.setTrangThai(0);
+            }
+            if(activeMonths.get(activeMonths.size()-1)>=now.getMonth().getValue() && activeMonths.get(0)<=now.getMonth().getValue()){
+                suKien.setTrangThai(1);
+            }
+            suKienRepository.save(suKien);
+        }
+
+        return "ok";
+
     }
 }

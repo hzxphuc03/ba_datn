@@ -14,10 +14,13 @@ import datn.be.mycode.response.ChiPhieuSuKien.SuKienRes;
 import datn.be.mycode.response.ChiPhieuSuKien.Thang;
 import datn.be.mycode.response.NormalTableResponse;
 import datn.be.mycode.response.SuKien.ThangActive;
+import datn.be.mycode.response.erroResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -67,10 +70,12 @@ public class ChiPhieuGiamGiaSuKienService {
     }
 
 
-    public ChiPhieuGiamGiaSuKien add(AddChiPheuGiamGia request) {
+    public Object add(AddChiPheuGiamGia request) {
         System.out.println(request);
         var voucher = voucherRepository.searchById(request.getVoucher()).get();
         var suKien = suKienRepository.searchById(request.getSuKien()).get();
+        var chiPhieuGiamGiaSuKien = cprepository.findBySuKienIdAndVoucherId(request.getSuKien(),request.getVoucher());
+        if(chiPhieuGiamGiaSuKien.size() >1) return getErro("Voucher này đã có trong sự kiện");
 
         ChiPhieuGiamGiaSuKien cpggsk = new ChiPhieuGiamGiaSuKien();
         cpggsk.setKeys(suKien.getKeySuKien());
@@ -101,35 +106,12 @@ public class ChiPhieuGiamGiaSuKienService {
         var suKien = suKienRepository.findById(idSuKien).get();
         String thangHoatDong = suKien.getThangHoatDong();
 
-        List<Thang> monthsList = new ArrayList<>();
-        String[] monthsArray = thangHoatDong.split(","); // Tách chuỗi thành mảng
-        for (String month : monthsArray) {
-            monthsList.add(new Thang(Integer.parseInt(month.trim()))); // Chuyển đổi chuỗi thành số nguyên và thêm vào danh sách
+        List<Voucher> vouchers = new ArrayList<>();
+        for (ChiPhieuGiamGiaSuKien chiPhieuGiamGiaSuKien:cpsks) {
+            vouchers.add(chiPhieuGiamGiaSuKien.getVoucher());
         }
 
-        var suKienRes = new SuKienRes();
-        suKienRes.setId(suKien.getId());
-        suKienRes.setTenSuKien(suKien.getTenSuKien());
-        suKienRes.setMaSuKien(suKien.getMaSuKien());
-        suKienRes.setThangHoatDong(monthsList);
-        suKienRes.setDonViPhieuGiamGia(suKien.getDonViPhieuGiamGia());
-        suKienRes.setThoiGianHetHanPhieu(suKien.getThoiGianHetHanPhieu());
-        suKienRes.setKeySuKien(suKien.getKeySuKien());
-        suKienRes.setTrangThai(suKien.getTrangThai());
-
-        List<ChiPhieuSuKienDetail> cpskRes = new ArrayList<>();
-
-        for (ChiPhieuGiamGiaSuKien cpsk:cpsks) {
-            ChiPhieuSuKienDetail cpskRe = new ChiPhieuSuKienDetail();
-            cpskRe.setId(cpsk.getId());
-            cpskRe.setKeys(cpsk.getKeys());
-            cpskRe.setTrangThai(cpsk.getTrangThai());
-            cpskRe.setSuKien(suKienRes);
-            cpskRe.setVoucher(cpsk.getVoucher());
-            cpskRes.add(cpskRe);
-        }
-
-        return cpsks;
+        return vouchers;
     }
 //
 //    public Object loadSuKien() {
@@ -164,4 +146,7 @@ public class ChiPhieuGiamGiaSuKienService {
 //
 //        return thangActives;
 //    }
+private ResponseEntity<?> getErro(String s){
+    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new erroResponse(s));
+}
 }
