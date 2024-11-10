@@ -258,6 +258,8 @@ public class VoucherService {
         voucher.setTen(request.getTen());
         voucher.setTheLoai(2);
         voucher.setNgayTao(LocalDateTime.now());
+        voucher.setNgayBatDau(LocalDateTime.parse("1753-11-10T10:15:30"));
+        voucher.setNgayKetThuc(LocalDateTime.parse("5024-11-10T10:15:30"));
         voucher.setPhanTramGiam(request.getPhanTramGiam());
         voucher.setGiamToiDa(request.getGiamToiDa());
         voucher.setGiaTriGiamToiThieu(request.getGiaTriGiamToiThieu());

@@ -1,19 +1,30 @@
 package datn.be.mycode.service;
 
 import datn.be.mycode.entity.ChiPhieuGiamGiaSuKien;
+import datn.be.mycode.entity.SuKien;
+import datn.be.mycode.entity.Voucher;
 import datn.be.mycode.repository.ChiPhieuGiamGiaSuKienRepository;
 import datn.be.mycode.repository.SuKienRepository;
 import datn.be.mycode.repository.VoucherRepository;
 import datn.be.mycode.request.ChiPhieuGGSKRequest;
+import datn.be.mycode.request.ChiPhieuGiamGia.AddChiPheuGiamGia;
 import datn.be.mycode.request.customRequest.TableLongRequest;
+import datn.be.mycode.response.ChiPhieuSuKien.ChiPhieuSuKienDetail;
+import datn.be.mycode.response.ChiPhieuSuKien.SuKienRes;
+import datn.be.mycode.response.ChiPhieuSuKien.Thang;
 import datn.be.mycode.response.NormalTableResponse;
+import datn.be.mycode.response.SuKien.ThangActive;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Service
 public class ChiPhieuGiamGiaSuKienService {
@@ -56,13 +67,13 @@ public class ChiPhieuGiamGiaSuKienService {
     }
 
 
-    public ChiPhieuGiamGiaSuKien add(ChiPhieuGGSKRequest request) {
+    public ChiPhieuGiamGiaSuKien add(AddChiPheuGiamGia request) {
         System.out.println(request);
         var voucher = voucherRepository.searchById(request.getVoucher()).get();
         var suKien = suKienRepository.searchById(request.getSuKien()).get();
 
         ChiPhieuGiamGiaSuKien cpggsk = new ChiPhieuGiamGiaSuKien();
-        cpggsk.setKeys(request.getKeys());
+        cpggsk.setKeys(suKien.getKeySuKien());
         cpggsk.setSuKien(suKien);
         cpggsk.setVoucher(voucher);
         cpggsk.setTrangThai(1);
@@ -84,4 +95,73 @@ public class ChiPhieuGiamGiaSuKienService {
         cpggsk.setTrangThai(trangThai);
         return cprepository.save(cpggsk);
     }
+
+    public Object getDetailByIdSuKien(Long idSuKien) {
+        var cpsks = cprepository.findAllBySuKienId(idSuKien);
+        var suKien = suKienRepository.findById(idSuKien).get();
+        String thangHoatDong = suKien.getThangHoatDong();
+
+        List<Thang> monthsList = new ArrayList<>();
+        String[] monthsArray = thangHoatDong.split(","); // Tách chuỗi thành mảng
+        for (String month : monthsArray) {
+            monthsList.add(new Thang(Integer.parseInt(month.trim()))); // Chuyển đổi chuỗi thành số nguyên và thêm vào danh sách
+        }
+
+        var suKienRes = new SuKienRes();
+        suKienRes.setId(suKien.getId());
+        suKienRes.setTenSuKien(suKien.getTenSuKien());
+        suKienRes.setMaSuKien(suKien.getMaSuKien());
+        suKienRes.setThangHoatDong(monthsList);
+        suKienRes.setDonViPhieuGiamGia(suKien.getDonViPhieuGiamGia());
+        suKienRes.setThoiGianHetHanPhieu(suKien.getThoiGianHetHanPhieu());
+        suKienRes.setKeySuKien(suKien.getKeySuKien());
+        suKienRes.setTrangThai(suKien.getTrangThai());
+
+        List<ChiPhieuSuKienDetail> cpskRes = new ArrayList<>();
+
+        for (ChiPhieuGiamGiaSuKien cpsk:cpsks) {
+            ChiPhieuSuKienDetail cpskRe = new ChiPhieuSuKienDetail();
+            cpskRe.setId(cpsk.getId());
+            cpskRe.setKeys(cpsk.getKeys());
+            cpskRe.setTrangThai(cpsk.getTrangThai());
+            cpskRe.setSuKien(suKienRes);
+            cpskRe.setVoucher(cpsk.getVoucher());
+            cpskRes.add(cpskRe);
+        }
+
+        return cpsks;
+    }
+//
+//    public Object loadSuKien() {
+//        var now = LocalDateTime.now();
+//
+//        var vouchers = voucherRepository.findAllByTheLoai(2);
+//        var sukiens = suKienRepository.findAllWithActiveMonths();
+//        for (SuKien suKien:sukiens) {
+//                String[] monthsArray = suKien.getThangHoatDong().split(",");
+//                for (String month : monthsArray) {
+//                    if(month = now.getMonth())
+//                    return suKien;
+//                }
+//            }
+//
+//        return "";
+//    }
+//    public Object getThangActive() {
+//        List<ThangActive> thangActives = new ArrayList<>();
+//
+//        var sukiens = suKienRepository.findAllWithActiveMonths();
+//        Set<Integer> activeMonths = new HashSet<>();
+//        for (SuKien suKien:sukiens) {
+//            String[] monthsArray = suKien.getThangHoatDong().split(",");
+//            for (String month : monthsArray) {
+//                activeMonths.add(Integer.parseInt(month.trim()));
+//            }
+//        }
+//        for (int i = 1; i <= 12; i++) {
+//            thangActives.add(new ThangActive(i, activeMonths.contains(i))); // Kiểm tra xem tháng có trong Set không
+//        }
+//
+//        return thangActives;
+//    }
 }
