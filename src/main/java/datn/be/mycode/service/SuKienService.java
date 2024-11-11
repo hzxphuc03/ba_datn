@@ -1,7 +1,10 @@
 package datn.be.mycode.service;
 
+import datn.be.mycode.entity.ChiPhieuGiamGiaSuKien;
 import datn.be.mycode.entity.SuKien;
+import datn.be.mycode.repository.ChiPhieuGiamGiaSuKienRepository;
 import datn.be.mycode.repository.SuKienRepository;
+import datn.be.mycode.repository.VoucherRepository;
 import datn.be.mycode.request.SuKien.SuKienRequest;
 import datn.be.mycode.request.SuKien.SuKienUpdateReq;
 import datn.be.mycode.request.customRequest.TableLongRequest;
@@ -24,6 +27,10 @@ import java.util.stream.Collectors;
 public class SuKienService {
     @Autowired
     SuKienRepository suKienRepository;
+    @Autowired
+    private ChiPhieuGiamGiaSuKienRepository chiPhieuGiamGiaSuKienRepository;
+    @Autowired
+    private VoucherRepository voucherRepository;
 
     public NormalTableResponse<SuKien> getAll(TableLongRequest request) {
 
@@ -33,6 +40,8 @@ public class SuKienService {
         if (request.getPageSize() == null) {
             request.setPageSize(10);
         }
+
+        loadSuKien();
 
         NormalTableResponse<SuKien> suKienNormalTableResponse = new NormalTableResponse<>();
         Pageable pageable = PageRequest.of(request.getPage() - 1,request.getPageSize());
@@ -90,6 +99,8 @@ public class SuKienService {
         savedSuKien.setMaSuKien("SK"+savedSuKien.getId());
         savedSuKien.setKeySuKien(savedSuKien.getMaSuKien()+"-"+now.getMonth().getValue()+"-"+now.getYear());
 
+        loadSuKien();
+
         return ResponseEntity.ok(suKienRepository.save(savedSuKien));
     }
 
@@ -130,6 +141,8 @@ public class SuKienService {
 
         SuKien savedSuKien = suKienRepository.save(suKien);
 
+        loadSuKien();
+
         return ResponseEntity.ok(suKienRepository.save(savedSuKien));
     }
 
@@ -141,6 +154,7 @@ public class SuKienService {
     }
 
     public Object getThangActive() {
+        loadSuKien();
         List<ThangActive> thangActives = new ArrayList<>();
 
         var sukiens = suKienRepository.findAllWithActiveMonths();
@@ -154,7 +168,6 @@ public class SuKienService {
         for (int i = 1; i <= 12; i++) {
             thangActives.add(new ThangActive(i, activeMonths.contains(i))); // Kiểm tra xem tháng có trong Set không
         }
-
         return thangActives;
     }
 
@@ -165,29 +178,65 @@ public class SuKienService {
         return ResponseEntity.ok(suKien);
     }
 
-    public Object loadSuKien(){
+    public void loadSuKien(){
+//        VDthangsng = "1,2,7"
+//                thì 1,2 cùng key
+//                7 là key khác
+//
+//                trừ sô lượng ở voucher mõi khi thay dỏ
 
         var now = LocalDateTime.now();
         var suKiens = suKienRepository.findAllWithActiveMonths();
-        for (SuKien suKien:suKiens) {
+        for (SuKien suKien : suKiens) {
             List<Integer> activeMonths = new ArrayList<>();
             String[] monthsArray = suKien.getThangHoatDong().split(",");
             for (String month : monthsArray) {
                 activeMonths.add(Integer.parseInt(month.trim()));
             }
-            if(activeMonths.get(0)>now.getMonth().getValue()){
+
+            if(activeMonths.contains(now.getMonth().getValue()) && suKien.getTrangThai() == 1) return;
+            if(!activeMonths.contains(now.getMonth().getValue()) && suKien.getTrangThai() == 1){
                 suKien.setTrangThai(0);
+                setVoucher(suKien);
             }
-            if(activeMonths.get(activeMonths.size()-1)<now.getMonth().getValue()){
-                suKien.setTrangThai(0);
-            }
-            if(activeMonths.get(activeMonths.size()-1)>=now.getMonth().getValue() && activeMonths.get(0)<=now.getMonth().getValue()){
+
+            if(activeMonths.contains(now.getMonth().getValue()) && suKien.getTrangThai() == 0){
                 suKien.setTrangThai(1);
+                suKien.setKeySuKien(suKien.getMaSuKien()+"-"+now.getMonth().getValue()+"-"+now.getYear());
+                setVoucher(suKien);
             }
             suKienRepository.save(suKien);
         }
 
-        return "ok";
+    }
 
+    private void setVoucher(SuKien suKien) {
+        var chiPhieuSuKiens = chiPhieuGiamGiaSuKienRepository.findAllBySuKienId(suKien.getId());
+//        if (chiPhieuSuKiens.isEmpty()) return;
+
+        if (suKien.getTrangThai()==0){
+            for (ChiPhieuGiamGiaSuKien chiPhieuGiamGiaSuKien : chiPhieuSuKiens) {
+                var voucher = chiPhieuGiamGiaSuKien.getVoucher();
+                voucher.setSoLuong(0);
+                voucherRepository.save(voucher);
+            }
+        }
+        if (suKien.getTrangThai() == 1){
+            for (ChiPhieuGiamGiaSuKien chiPhieuGiamGiaSuKien : chiPhieuSuKiens) {
+                var voucher = chiPhieuGiamGiaSuKien.getVoucher();
+                voucher.setSoLuong(suKien.getDonViPhieuGiamGia());
+                voucherRepository.save(voucher);
+            }
+        }
+
+    }
+
+    public Object getSuKienActive() {
+        var now = LocalDateTime.now();
+        var suKiens = suKienRepository.findAllWithActiveMonths();
+        for (SuKien suKien : suKiens) {
+            if(suKien.getTrangThai() == 1) return ResponseEntity.ok(suKien);
+        }
+        return getErro("Không có sự kiện nào trong tháng này");
     }
 }

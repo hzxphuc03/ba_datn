@@ -31,6 +31,12 @@ public class SuKienController {
         return ResponseEntity.ok(service.getDetailSuKien(idSuKien));
     }
 
+    @GetMapping("/get-su-kien-active")
+    public ResponseEntity<?> getSuKienActive() {
+        service.loadSuKien();
+        return ResponseEntity.ok(service.getSuKienActive());
+    }
+
     @PostMapping("/add")
     public ResponseEntity<?> add(@RequestBody SuKienRequest suKienRequest){
 
