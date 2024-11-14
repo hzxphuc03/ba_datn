@@ -21,6 +21,8 @@ public interface SuKienRepository extends JpaRepository<SuKien,Long> {
 
     Page<SuKien> findAllByTrangThai(int trangThai, Pageable pageable);
 
+    Optional<SuKien> findByTrangThai(int trangThai);
+
     @Query("SELECT t FROM SuKien t WHERE t.thangHoatDong IS NOT NULL AND t.thangHoatDong <> ''")
     List<SuKien> findAllWithActiveMonths();
 }

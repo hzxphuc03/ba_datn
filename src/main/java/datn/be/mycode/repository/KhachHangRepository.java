@@ -1,5 +1,6 @@
 package datn.be.mycode.repository;
 
+import datn.be.mycode.entity.ChiPhieuGiamGiaSuKien;
 import datn.be.mycode.entity.KhachHang;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

@@ -92,6 +92,7 @@ public class SuKienService {
         suKien.setThangHoatDong(thangHoatDong);
         suKien.setDonViPhieuGiamGia(donViPhieuGiamGia);// <= 2000
         suKien.setThoiGianHetHanPhieu(thoiGianHetHanPhieu);// <= 30
+        suKien.setHinhAnh(request.getHinhAnh());
         suKien.setMoTa(request.getMoTa());
         suKien.setTrangThai(0);
 
@@ -136,6 +137,7 @@ public class SuKienService {
         suKien.setThangHoatDong(thangHoatDong);
         suKien.setDonViPhieuGiamGia(donViPhieuGiamGia);// <= 2000
         suKien.setThoiGianHetHanPhieu(thoiGianHetHanPhieu);// <= 30
+        suKien.setHinhAnh(request.getHinhAnh());
         suKien.setMoTa(request.getMoTa());
         suKien.setTrangThai(0);
 
@@ -185,8 +187,12 @@ public class SuKienService {
 //
 //                trừ sô lượng ở voucher mõi khi thay dỏ
 
+//        khac su kien khong thay doi
+//        khac key tao
+
         var now = LocalDateTime.now();
         var suKiens = suKienRepository.findAllWithActiveMonths();
+
         for (SuKien suKien : suKiens) {
             List<Integer> activeMonths = new ArrayList<>();
             String[] monthsArray = suKien.getThangHoatDong().split(",");
@@ -201,8 +207,10 @@ public class SuKienService {
             }
 
             if(activeMonths.contains(now.getMonth().getValue()) && suKien.getTrangThai() == 0){
+                var keySuKien = suKien.getMaSuKien()+"-"+now.getMonth().getValue()+"-"+now.getYear();
                 suKien.setTrangThai(1);
-                suKien.setKeySuKien(suKien.getMaSuKien()+"-"+now.getMonth().getValue()+"-"+now.getYear());
+                suKien.setKeySuKien(keySuKien);
+
                 setVoucher(suKien);
             }
             suKienRepository.save(suKien);
@@ -216,6 +224,8 @@ public class SuKienService {
 
         if (suKien.getTrangThai()==0){
             for (ChiPhieuGiamGiaSuKien chiPhieuGiamGiaSuKien : chiPhieuSuKiens) {
+                chiPhieuGiamGiaSuKien.setTrangThai(0);
+                chiPhieuGiamGiaSuKienRepository.save(chiPhieuGiamGiaSuKien);
                 var voucher = chiPhieuGiamGiaSuKien.getVoucher();
                 voucher.setSoLuong(0);
                 voucherRepository.save(voucher);
@@ -223,6 +233,9 @@ public class SuKienService {
         }
         if (suKien.getTrangThai() == 1){
             for (ChiPhieuGiamGiaSuKien chiPhieuGiamGiaSuKien : chiPhieuSuKiens) {
+                chiPhieuGiamGiaSuKien.setKeys(suKien.getKeySuKien());
+                chiPhieuGiamGiaSuKien.setTrangThai(1);
+                chiPhieuGiamGiaSuKienRepository.save(chiPhieuGiamGiaSuKien);
                 var voucher = chiPhieuGiamGiaSuKien.getVoucher();
                 voucher.setSoLuong(suKien.getDonViPhieuGiamGia());
                 voucherRepository.save(voucher);
