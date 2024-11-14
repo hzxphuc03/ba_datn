@@ -135,9 +135,9 @@ public class LichSuSuDungService {
                     .findAny().orElse(null);
             VoucherTrangThaiSuDung voucherTrangThaiSuDung = new VoucherTrangThaiSuDung();
             voucherTrangThaiSuDung.setVoucher(voucher);
-            voucherTrangThaiSuDung.setCustumerUser(true); //chưa dùng
+            voucherTrangThaiSuDung.setCustumerUser(false); //chưa dùng
             if(lichSuSuDungSuKienBayGio != null) {
-                voucherTrangThaiSuDung.setCustumerUser(false);
+                voucherTrangThaiSuDung.setCustumerUser(true);
             }
 
             respone.add(voucherTrangThaiSuDung);
