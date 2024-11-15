@@ -10,10 +10,13 @@ import datn.be.mycode.request.customRequest.TableVoucherRequest;
 import datn.be.mycode.request.customRequest.TableVoucherStatusInRequest;
 import datn.be.mycode.request.voucher.VoucherSuKien;
 import datn.be.mycode.response.NormalTableResponse;
+import datn.be.mycode.response.erroResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -253,6 +256,9 @@ public class VoucherService {
     }
 
     public Object addVoucherSuKien(VoucherSuKien request) {
+        var ketQuaValidate = validate(request);
+        if( !ketQuaValidate.equals("ok")) return getErro(ketQuaValidate);
+
         Voucher voucher = new Voucher();
 
         voucher.setTen(request.getTen());
@@ -271,6 +277,15 @@ public class VoucherService {
         return repository.save(voucher);
     }
 
+    private String validate(VoucherSuKien request) {
+        if(request.getTheLoai()== null) return "Cần chọn thể loại";
+        if(request.getTen().isBlank()) return "Tên không được bỏ trống";
+        if(request.getPhanTramGiam() == null) return "Phần trăm không được bỏ trống";
+        if(request.getGiamToiDa() == null) return "Giảm tối đa chưa được nhập";
+        if(request.getGiaTriGiamToiThieu()== null) return "Giá trị giảm tối thiểu chưa được nhập";
+        return "ok";
+    }
+
     public Object getPhieuGiamGiaVoucher(Integer page, Integer pageSize) {
         if (page ==  null) {
             page = 1 ;
@@ -280,7 +295,7 @@ public class VoucherService {
         }
         Pageable pageable = PageRequest.of(page - 1,pageSize);
 
-        var voucherEven = repository.findAllByTheLoai(2, pageable);
+        var voucherEven = repository.findAllByTrangThai(3, pageable);
 
         List<Voucher> vouchers = voucherEven.getContent();
         NormalTableResponse<Voucher> voucherNormalTableResponse = new NormalTableResponse<>();
@@ -290,4 +305,9 @@ public class VoucherService {
         voucherNormalTableResponse.setTotalItem(voucherEven.getTotalElements());
         return voucherNormalTableResponse;
     }
+
+    private ResponseEntity<?> getErro(String s){
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new erroResponse(s));
+    }
+
 }
