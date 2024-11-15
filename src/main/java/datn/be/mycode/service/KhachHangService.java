@@ -10,6 +10,7 @@ import datn.be.mycode.repository.KhachHangRepository;
 import datn.be.mycode.request.KhachHangRequest;
 import datn.be.mycode.request.NormalTableRequest;
 import datn.be.mycode.request.NormalTableRequestKhachHang;
+import datn.be.mycode.request.khachHang.UpdateKhachHangRequest;
 import datn.be.mycode.response.NormalTableResponse;
 import datn.be.mycode.response.UserLoginResponse;
 import datn.be.mycode.response.erroResponse;
@@ -157,7 +158,15 @@ public class KhachHangService {
         khachHang.setMatKhau(request.getMatKhau());
         return repository.save(khachHang);
     }
-
+    public KhachHang updateKhachHang(UpdateKhachHangRequest request) {
+        KhachHang khachHang = repository.findById(request.getId()).get();
+        khachHang.setMa(request.getMa());
+        khachHang.setHoTen(request.getHoTen());
+        khachHang.setHinhAnh(request.getHinhAnh());
+        khachHang.setNgaySinh(request.getNgaySinh());
+        khachHang.setGioiTinh(request.getGioiTinh());
+        return repository.save(khachHang);
+    }
 
 //    public void delete(KhachHang khachHang) {
 //        repository.delete(khachHang);
