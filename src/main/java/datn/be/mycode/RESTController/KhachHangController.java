@@ -3,6 +3,7 @@ package datn.be.mycode.RESTController;
 import datn.be.mycode.request.KhachHangRequest;
 import datn.be.mycode.request.NormalTableRequest;
 import datn.be.mycode.request.NormalTableRequestKhachHang;
+import datn.be.mycode.response.khachHang.ThongTinKhachHangResponse;
 import datn.be.mycode.service.KhachHangService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -32,6 +33,12 @@ public class KhachHangController {
             @PathVariable(name = "id",required = false) Long id
     ){
         return ResponseEntity.ok(khachHangService.getById(id));
+    }
+
+
+    @GetMapping("/{id}")
+    public ThongTinKhachHangResponse getThongTinById(@PathVariable Long id) {
+        return khachHangService.getThongTinById(id);
     }
 
     @PostMapping("/add")

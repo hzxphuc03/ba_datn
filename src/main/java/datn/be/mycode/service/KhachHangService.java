@@ -13,6 +13,7 @@ import datn.be.mycode.request.NormalTableRequestKhachHang;
 import datn.be.mycode.response.NormalTableResponse;
 import datn.be.mycode.response.UserLoginResponse;
 import datn.be.mycode.response.erroResponse;
+import datn.be.mycode.response.khachHang.ThongTinKhachHangResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -26,6 +27,7 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Service
 public class KhachHangService {
@@ -66,6 +68,8 @@ public class KhachHangService {
             khachHangPage = repository.findAll(pageable);
         }
 
+
+
         List<KhachHang> khachHangs = khachHangPage.getContent().stream().toList();
 
         khachHangNormalTableResponse.setItem(khachHangs);
@@ -79,6 +83,26 @@ public class KhachHangService {
     public KhachHang getById(Long id){
         return repository.findById(id).get();
     }
+
+
+    public ThongTinKhachHangResponse getThongTinById(Long id) {
+        KhachHang khachHang = repository.findById(id).get(); // Lấy trực tiếp khách hàng
+
+        // Chuyển đổi sang KhachHangResponse
+        return new ThongTinKhachHangResponse(
+                khachHang.getId(),
+                khachHang.getMa(),
+                khachHang.getHoTen(),
+                khachHang.getHinhAnh(),
+                khachHang.getNgaySinh(),
+                khachHang.getNgayTao(),
+                khachHang.getSoDienThoai(),
+                khachHang.getGioiTinh(),
+                khachHang.getEmail(),
+                khachHang.getTrangThai()
+        );
+    }
+
 
     public KhachHang add(KhachHangRequest request) {
 

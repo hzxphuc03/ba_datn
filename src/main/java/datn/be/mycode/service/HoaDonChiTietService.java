@@ -147,6 +147,7 @@ public class HoaDonChiTietService {
                         .giaHienHanh(gia)
                         .giaDaGiam(giaDaGiam)
                         .trangThai(1)
+                        .isCMT(false)
                         .hoaDon(hd)
                         .sanPhamChiTiet(spct)
                         .build();
@@ -227,4 +228,12 @@ public class HoaDonChiTietService {
         }
         repo.saveAll(hoaDonCHiTiets);
     }
+
+    public List<SanPham> timSanPhamChuaCmtTrong7NgayThanhToan() {
+        LocalDateTime endDate = LocalDateTime.now();
+        LocalDateTime startDate = endDate.minusDays(7);
+
+        return repo.timSanPhamChuaCmtTrong7NgayThanhToan(startDate, endDate);
+    }
+
 }

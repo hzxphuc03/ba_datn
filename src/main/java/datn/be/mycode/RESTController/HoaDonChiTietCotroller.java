@@ -1,5 +1,6 @@
 package datn.be.mycode.RESTController;
 
+import datn.be.mycode.entity.SanPham;
 import datn.be.mycode.request.HoaDonChiTietRequest;
 import datn.be.mycode.request.HoaDonRequest;
 import datn.be.mycode.request.NormalTableRequest;
@@ -12,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @CrossOrigin("*")
 @RestController
@@ -31,6 +33,11 @@ public class HoaDonChiTietCotroller {
 
         NormalTableRequest request = new NormalTableRequest(page,pageSize,keyWord+"",status);
         return ResponseEntity.ok(hoaDonChiTietService.getAllByIdHoaDon(request));
+    }
+    @GetMapping("/san-pham-chua-cmt")
+    public ResponseEntity<List<SanPham>> timSanPhamChuaCmtTrong7NgayThanhToan() {
+        List<SanPham> sanPhamList = hoaDonChiTietService.timSanPhamChuaCmtTrong7NgayThanhToan();
+        return ResponseEntity.ok(sanPhamList);
     }
 
     @PostMapping("/add")
