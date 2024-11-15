@@ -15,8 +15,8 @@ import java.math.BigDecimal;
 public class VoucherSuKien {
 
     private String ten;
-    private int theLoai;
-    private int phanTramGiam;
+    private Integer theLoai;
+    private Integer phanTramGiam;
     private BigDecimal giamToiDa;
     private BigDecimal giaTriGiamToiThieu;
 }
