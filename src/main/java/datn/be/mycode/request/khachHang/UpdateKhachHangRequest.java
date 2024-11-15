@@ -14,7 +14,7 @@ public class UpdateKhachHangRequest {
     private Long id;
     private String ma;
     private String hoTen;
-//    private String hinhAnh;
+    private String hinhAnh;
     private LocalDateTime ngaySinh;
 //    private Date ngayTao;
     private int gioiTinh;

@@ -162,7 +162,7 @@ public class KhachHangService {
         KhachHang khachHang = repository.findById(request.getId()).get();
         khachHang.setMa(request.getMa());
         khachHang.setHoTen(request.getHoTen());
-//        khachHang.setHinhAnh(request.getHinhAnh());
+        khachHang.setHinhAnh(request.getHinhAnh());
         khachHang.setNgaySinh(request.getNgaySinh());
         khachHang.setGioiTinh(request.getGioiTinh());
         return repository.save(khachHang);
