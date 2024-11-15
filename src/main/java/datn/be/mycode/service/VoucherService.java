@@ -143,7 +143,9 @@ public class VoucherService {
                 voucher.setTrangThai(2);
             } else if (startDay.isBefore(now) || startDay.isEqual(now)) {
                 // Voucher đang trong thời gian sự kiện (startDay <= now <= endDay)
+                if (voucher.getTrangThai() != 3){
                 voucher.setTrangThai(1);
+                }
             }
             // Lưu lại voucher nếu trạng thái thay đổi
             repository.save(voucher);
