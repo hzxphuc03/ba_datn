@@ -3,6 +3,7 @@ package datn.be.mycode.RESTController;
 import datn.be.mycode.request.KhachHangRequest;
 import datn.be.mycode.request.NormalTableRequest;
 import datn.be.mycode.request.NormalTableRequestKhachHang;
+import datn.be.mycode.request.khachHang.UpdateKhachHangRequest;
 import datn.be.mycode.response.khachHang.ThongTinKhachHangResponse;
 import datn.be.mycode.service.KhachHangService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,6 +52,12 @@ public class KhachHangController {
     public ResponseEntity<?> update(@RequestBody KhachHangRequest request){
 
         return ResponseEntity.ok(khachHangService.update(request));
+    }
+
+    @PutMapping("update-khach-hang")
+    public ResponseEntity<?> updateKhachHang(@RequestBody UpdateKhachHangRequest request){
+
+        return ResponseEntity.ok(khachHangService.updateKhachHang(request));
     }
 
     @PutMapping("/update-trang-thai/{id}")
