@@ -34,6 +34,9 @@ public class HoaDonChiTiet implements Serializable {
     @Column(name = "trang_thai")
     private int trangThai;
 
+    @Column(name = "is_cmt")
+    private boolean isCMT;
+
     @ManyToOne()
     @JoinColumn(name = "id_hoa_don", referencedColumnName = "id")
     private HoaDon hoaDon;

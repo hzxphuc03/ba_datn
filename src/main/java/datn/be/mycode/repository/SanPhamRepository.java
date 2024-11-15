@@ -1,6 +1,7 @@
 package datn.be.mycode.repository;
 
 import datn.be.mycode.entity.GiamGia;
+import datn.be.mycode.entity.KhachHang;
 import datn.be.mycode.entity.SanPham;
 import datn.be.mycode.request.customRequest.TableSanPhamRequest;
 import datn.be.mycode.request.sanPham.SanPhamByAllReq;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface SanPhamRepository extends JpaRepository<SanPham, Long> {
@@ -127,4 +129,7 @@ public interface SanPhamRepository extends JpaRepository<SanPham, Long> {
             "(:keyWord IS null OR sp.ten LIKE CONCAT('%', :keyWord, '%'))"
     )
     List<SanPham> findAllByName(String keyWord);
+
+    @Query("SELECT u FROM SanPham u WHERE u.id = :id")
+    Optional<SanPham> timTheoId(@Param("id") Long id);
 }
