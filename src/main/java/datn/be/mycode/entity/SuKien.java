@@ -26,6 +26,9 @@ public class SuKien implements Serializable {
     @Column(name = "ma_su_kien")
     private String maSuKien;
 
+    @Column(name = "hinh_anh")
+    private String hinhAnh;
+
     @Column(name = "thang_hoat_dong")
     private String thangHoatDong;
 

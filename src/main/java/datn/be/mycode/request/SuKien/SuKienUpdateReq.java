@@ -14,6 +14,7 @@ public class SuKienUpdateReq {
     private Long id;
     private String tenSuKien;
     private List<Integer> thangHoatDong;
+    private String hinhAnh;
     private String moTa;
     private Integer donViPhieuGiamGia;
     private Integer thoiGianHetHanPhieu;

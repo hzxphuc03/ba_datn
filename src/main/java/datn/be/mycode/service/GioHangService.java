@@ -377,18 +377,20 @@ public class GioHangService {
         if(vouchers.size()==0) return "done";
         if(vouchers.size()>2) return "Số lượng voucher vượt quá giới hạn";
 //        if(vouchers.get(0).getTheLoai() == vouchers.get(1).getTheLoai()) return "2 voucher đều cùng 1 loại";
+        List<VoucherHoaDon> voucherHoaDons = new ArrayList<>();
         for (Voucher voucher:vouchers) {
-            if(voucher.getTrangThai() != 1) return "Vouche này đã hết hạn hoặc không còn hoạt động";
+            if(voucher.getTrangThai() != 1 && voucher.getTrangThai() != 3 ) return "Vouche này đã hết hạn hoặc không còn hoạt động";
             if(voucher.getSoLuong() <= 0) return "Voucher này đã hết";
-
-            VoucherHoaDon voucherHoaDon = new VoucherHoaDon();
-            voucherHoaDon.setNgayTao(LocalDateTime.now());
-            voucherHoaDon.setVoucher(voucher);
-            voucherHoaDon.setHoaDon(hoaDon);
-            voucherHoaDon.setTrangThai(1);
-
-            voucherHoaDonRepository.save(voucherHoaDon);
+//            if(voucher.getTrangThai() == 1 || voucher.getTrangThai() == 3 ) {
+                VoucherHoaDon voucherHoaDon = new VoucherHoaDon();
+                voucherHoaDon.setNgayTao(LocalDateTime.now());
+                voucherHoaDon.setVoucher(voucher);
+                voucherHoaDon.setHoaDon(hoaDon);
+                voucherHoaDon.setTrangThai(1);
+                voucherHoaDons.add(voucherHoaDon);
+//            }
         }
+            voucherHoaDonRepository.saveAll(voucherHoaDons);
         return "done";
     }
 

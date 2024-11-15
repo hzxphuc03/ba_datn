@@ -256,14 +256,14 @@ public class VoucherService {
         Voucher voucher = new Voucher();
 
         voucher.setTen(request.getTen());
-        voucher.setTheLoai(2);
+        voucher.setTheLoai(request.getTheLoai());
         voucher.setNgayTao(LocalDateTime.now());
         voucher.setNgayBatDau(LocalDateTime.parse("1753-11-10T10:15:30"));
         voucher.setNgayKetThuc(LocalDateTime.parse("5024-11-10T10:15:30"));
         voucher.setPhanTramGiam(request.getPhanTramGiam());
         voucher.setGiamToiDa(request.getGiamToiDa());
         voucher.setGiaTriGiamToiThieu(request.getGiaTriGiamToiThieu());
-        voucher.setTrangThai(1);
+        voucher.setTrangThai(3);
 
         voucher = repository.save(voucher);
         voucher.setMa("PGG"+voucher.getId());

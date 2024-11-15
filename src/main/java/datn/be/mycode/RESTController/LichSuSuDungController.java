@@ -1,6 +1,7 @@
 package datn.be.mycode.RESTController;
 
-import datn.be.mycode.request.LichSuSuDungRequest;
+import datn.be.mycode.request.LichSuSuDung.LichSuSuDungRequest;
+import datn.be.mycode.request.LichSuSuDung.LichSuSuDungUpdateRequest;
 import datn.be.mycode.request.customRequest.TableLongRequest;
 import datn.be.mycode.service.LichSuSuDungService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +25,12 @@ public class LichSuSuDungController {
         TableLongRequest request = new TableLongRequest(page,pageSize,keyWord,status);
         return ResponseEntity.ok(service.getAll(request));
     }
+
+    @GetMapping("/voucher-trang-thai-su-dung-by-khach-hang/{idKhachHang}")
+    public ResponseEntity<?> getTrangThaiSuDungVoucher(@PathVariable Long idKhachHang){
+        return ResponseEntity.ok(service.getTrangThaiSuDungVoucher(idKhachHang));
+    }
+
     @PostMapping("/add")
     public ResponseEntity<?> add(@RequestBody LichSuSuDungRequest lichSuSuDungRequest){
         System.out.println(lichSuSuDungRequest);
@@ -31,7 +38,7 @@ public class LichSuSuDungController {
     }
 
     @PutMapping("/update")
-    public ResponseEntity<?> update(@RequestBody LichSuSuDungRequest request){
+    public ResponseEntity<?> update(@RequestBody LichSuSuDungUpdateRequest request){
 
         return ResponseEntity.ok(service.update(request));
     }
