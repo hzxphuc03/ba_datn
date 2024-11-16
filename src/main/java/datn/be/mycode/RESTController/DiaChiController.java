@@ -1,6 +1,7 @@
 package datn.be.mycode.RESTController;
 
-import datn.be.mycode.request.DiaChiRequest;
+import datn.be.mycode.request.DiaChi.DiaChiAddRequest;
+import datn.be.mycode.request.DiaChi.DiaChiRequest;
 import datn.be.mycode.request.customRequest.TableDiaChiKhachHangRequest;
 import datn.be.mycode.request.customRequest.TableLongRequest;
 import datn.be.mycode.service.DiaChiService;
@@ -36,9 +37,14 @@ public class DiaChiController {
         return ResponseEntity.ok(diaChiService.getDiaChiByIdKhachHang(request));
     }
 
+    @GetMapping("set-mac-dinh/{idDiaChi}")
+    public ResponseEntity<?> setMacDinh( @PathVariable Long idDiaChi){
+
+        return ResponseEntity.ok(diaChiService.setMacDinh(idDiaChi));
+    }
 
     @PostMapping("/add")
-    public ResponseEntity<?> add(@RequestBody DiaChiRequest tenDiaChiRequest){
+    public ResponseEntity<?> add(@RequestBody DiaChiAddRequest tenDiaChiRequest){
         System.out.println(tenDiaChiRequest);
         return ResponseEntity.ok(diaChiService.add(tenDiaChiRequest));
     }
