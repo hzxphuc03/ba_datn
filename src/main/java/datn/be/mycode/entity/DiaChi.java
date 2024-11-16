@@ -41,7 +41,7 @@ public class DiaChi implements Serializable {
     @Column(name = "trang_thai")
     private int trangThai;
 
-    @Column(name = "mac-dinh")
+    @Column(name = "mac_dinh")
     private boolean macDinh;
 
     @ManyToOne()
