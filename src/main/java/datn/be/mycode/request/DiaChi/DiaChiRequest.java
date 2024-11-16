@@ -1,4 +1,4 @@
-package datn.be.mycode.request;
+package datn.be.mycode.request.DiaChi;
 
 import datn.be.mycode.entity.KhachHang;
 import jakarta.persistence.Column;
@@ -24,7 +24,7 @@ public class DiaChiRequest {
     private String idPhuongXa;
     private String phuongXa;
     private String ghiChu;
-
+//    private Boolean macDinh;
     private int trangThai;
     private Long idKhachHang;
 }

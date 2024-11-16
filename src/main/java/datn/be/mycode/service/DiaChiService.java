@@ -1,9 +1,11 @@
 package datn.be.mycode.service;
 
 import datn.be.mycode.entity.DiaChi;
+import datn.be.mycode.entity.KhachHang;
 import datn.be.mycode.repository.DiaChiRepository;
 import datn.be.mycode.repository.KhachHangRepository;
-import datn.be.mycode.request.DiaChiRequest;
+import datn.be.mycode.request.DiaChi.DiaChiAddRequest;
+import datn.be.mycode.request.DiaChi.DiaChiRequest;
 import datn.be.mycode.request.customRequest.TableDiaChiKhachHangRequest;
 import datn.be.mycode.request.customRequest.TableLongRequest;
 import datn.be.mycode.response.NormalTableResponse;
@@ -57,12 +59,9 @@ public class DiaChiService {
         return diaChiNormalTableResponse;
     }
 
-    public DiaChi add(DiaChiRequest request) {
-        var diaChiMacDinhCu = repository.findByKhachHangIdAndTrangThai(request.getIdKhachHang(), 2).orElse(null);
-        if( diaChiMacDinhCu != null){
-            diaChiMacDinhCu.setTrangThai(1);
-            repository.save(diaChiMacDinhCu);
-        }
+    public DiaChi add(DiaChiAddRequest request) {
+        var khachHang = khRepo.searchById(request.getIdKhachHang()).get();
+        setDiaChiCu(khachHang);
 
         DiaChi diaChi = new DiaChi();
         diaChi.setIdTinhThanh(request.getIdTinhThanh());
@@ -72,14 +71,17 @@ public class DiaChiService {
         diaChi.setIdPhuongXa(request.getIdPhuongXa());
         diaChi.setPhuongXa(request.getPhuongXa());
         diaChi.setGhiChu(request.getGhiChu());
-        diaChi.setTrangThai(2);
-        diaChi.setKhachHang(khRepo.searchById(request.getIdKhachHang()).get());
+        diaChi.setTrangThai(1);
+        diaChi.setMacDinh(true);
+        diaChi.setKhachHang(khachHang);
 
         return repository.save(diaChi);
     }
 
     public DiaChi update(DiaChiRequest request) {
         DiaChi diaChi = repository.findById(request.getId()).get();
+        var khachHang = khRepo.searchById(request.getIdKhachHang()).get();
+
         diaChi.setIdTinhThanh(request.getIdTinhThanh());
         diaChi.setTinhThanh(request.getTinhThanh());
         diaChi.setIdQuanHuyen(request.getIdQuanHuyen());
@@ -87,16 +89,18 @@ public class DiaChiService {
         diaChi.setIdPhuongXa(request.getIdPhuongXa());
         diaChi.setPhuongXa(request.getPhuongXa());
         diaChi.setGhiChu(request.getGhiChu());
-        diaChi.setKhachHang(khRepo.searchById(request.getIdKhachHang()).get());
+        diaChi.setKhachHang(khachHang);
         diaChi.setTrangThai(request.getTrangThai());
         return repository.save(diaChi);
     }
 
-//    public DiaChi udateTrangThai(Long id, Integer status){
-//        DiaChi diaChi = repository.findById(id).get();
-//        diaChi.setTrangThai(status);
-//        return repository.save(diaChi);
-//    }
+    private void setDiaChiCu(KhachHang khachHang) {
+        var diaChiMacDinhCu = repository.findByKhachHangIdAndTrangThai(khachHang.getId(), 1);
+        diaChiMacDinhCu.forEach(diaChi -> {
+            diaChi.setMacDinh(false);
+            repository.save(diaChi);
+        });
+    }
 
     @Transactional
     public DiaChi updateTrangThai(Long id, Integer status) {
@@ -114,9 +118,6 @@ public class DiaChiService {
         return repository.save(diaChi);
     }
 
-//    public List<DiaChi> getDiaChiByIdKhachHang(Long id){
-//        return repository.searchByIdKhachHang(id);
-//    }
 
     public NormalTableResponse<DiaChi> getDiaChiByIdKhachHang(TableDiaChiKhachHangRequest request) {
 
@@ -139,5 +140,14 @@ public class DiaChiService {
         diaChiNormalTableResponse.setTotalItem(diaChiPage.getTotalElements());
 
         return diaChiNormalTableResponse;
+    }
+
+    public Object setMacDinh(Long idDiaChi) {
+        DiaChi diaChi = repository.findById(idDiaChi).get();
+        var khachHang = diaChi.getKhachHang();
+        setDiaChiCu(khachHang);
+
+        diaChi.setMacDinh(true);
+        return repository.save(diaChi);
     }
 }

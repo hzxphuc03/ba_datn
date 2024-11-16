@@ -41,6 +41,9 @@ public class DiaChi implements Serializable {
     @Column(name = "trang_thai")
     private int trangThai;
 
+    @Column(name = "mac-dinh")
+    private boolean macDinh;
+
     @ManyToOne()
     @JoinColumn(name = "id_khach_hang", referencedColumnName = "id")
     private KhachHang khachHang;
