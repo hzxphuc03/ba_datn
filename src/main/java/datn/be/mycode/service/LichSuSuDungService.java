@@ -1,8 +1,6 @@
 package datn.be.mycode.service;
 
-import datn.be.mycode.entity.ChiPhieuGiamGiaSuKien;
-import datn.be.mycode.entity.LichSuSuDung;
-import datn.be.mycode.entity.VoucherKhachHang;
+import datn.be.mycode.entity.*;
 import datn.be.mycode.repository.*;
 import datn.be.mycode.request.LichSuSuDung.LichSuSuDungRequest;
 import datn.be.mycode.request.LichSuSuDung.LichSuSuDungUpdateRequest;
@@ -36,6 +34,8 @@ public class LichSuSuDungService {
     private VoucherRepository voucherRepository;
     @Autowired
     private VoucherKhachHangRepository voucherKhachHangRepository;
+    @Autowired
+    private ThongBaoRepository thongBaoRepository;
 
 
     public NormalTableResponse<LichSuSuDung> getAll(TableLongRequest request) {
@@ -96,6 +96,8 @@ public class LichSuSuDungService {
         voucherKhachHang.setKhachHang(khachHang);
         voucherKhachHangRepository.save(voucherKhachHang);
 
+        ThongBao(voucher, khachHang);
+
         LichSuSuDung lichSuSuDung = new LichSuSuDung();
         lichSuSuDung.setNgayTao(now);
         lichSuSuDung.setKeys(chiPhieuGiamGiaSuKienieu.getKeys());
@@ -103,6 +105,17 @@ public class LichSuSuDungService {
         lichSuSuDung.setKhachHang(khachHang);
         lichSuSuDung.setTrangThai(1);
         return ResponseEntity.ok(repository.save(lichSuSuDung));
+    }
+
+    private void ThongBao(Voucher voucher, KhachHang khachHang) {
+        ThongBao thongBao = new ThongBao();
+        thongBao.setNoiDung("Bạn đã thêm thành công voucher "+voucher.getTen());
+        thongBao.setUrl("http://localhost:4200/g4/shop/khach-hang?activeItem=2");
+        thongBao.setDaDoc(false);
+        thongBao.setTrangThai(1);
+        thongBao.setKhachHang(khachHang);
+
+        thongBaoRepository.save(thongBao);
     }
 
 
