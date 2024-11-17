@@ -33,12 +33,24 @@ public class DanhGiaSanPhamController {
 
     @GetMapping("/get-by-khach-hang-id")
     public ResponseEntity<?> getDanhGiaByKhachHangId(
-            @RequestParam Long idKhachHang,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
+            @RequestParam(name = "page",required = false) Integer page,
+            @RequestParam(name = "pageSize",required = false) Integer pageSize,
+            @RequestParam(name = "keyWord",required = false) Long keyWord,
+            @RequestParam(name = "status",required = false) Integer status) {
 
-        Page<DanhGiaSanPham> danhGiaPage = danhGiaSanPhamService.getDanhGiaByKhachHangId(idKhachHang, page, size);
-        return ResponseEntity.ok(danhGiaPage);
+        TableLongRequest request = new TableLongRequest(page,pageSize,keyWord,status);
+        return ResponseEntity.ok(danhGiaSanPhamService.getDanhGiaByKhachHangId(request));
+    }
+
+    @GetMapping("/get-by-san-pham-id")
+    public ResponseEntity<?> getDanhGiaBySanPhamId(
+            @RequestParam(name = "page",required = false) Integer page,
+            @RequestParam(name = "pageSize",required = false) Integer pageSize,
+            @RequestParam(name = "keyWord",required = false) Long keyWord,
+            @RequestParam(name = "status",required = false) Integer status) {
+
+        TableLongRequest request = new TableLongRequest(page,pageSize,keyWord,status);
+        return ResponseEntity.ok(danhGiaSanPhamService.getDanhGiaBySanPhamId(request));
     }
 
 //    @PutMapping("/update")
