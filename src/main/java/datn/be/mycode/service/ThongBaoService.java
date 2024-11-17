@@ -76,6 +76,16 @@ public class ThongBaoService {
         return ResponseEntity.ok(thongBaoChuaDoc);
     }
 
+    public ResponseEntity<?> setThongBaoTungCai(Long idThongBao) {
+        var thongBao = thongBaoRepository.findById(idThongBao).orElse(null);
+        if (thongBao == null) return getErro("Khách hàng không có thông báo nào");
+        if(thongBao.isDaDoc()) return getErro("Thông báo này đã được xem");
+
+        thongBao.setDaDoc(true);
+
+        return ResponseEntity.ok(thongBaoRepository.save(thongBao));
+    }
+
     private ResponseEntity<?> getErro(String s){
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new erroResponse(s));
     }

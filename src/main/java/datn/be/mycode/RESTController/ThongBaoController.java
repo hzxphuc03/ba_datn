@@ -37,6 +37,11 @@ public class ThongBaoController {
         return ResponseEntity.ok(thongBaoService.setThongBao(idKhachHang));
     }
 
+    @GetMapping("/set-thong-bao-tung-cai/{idThongBao}")
+    public ResponseEntity<?> setThongBaoDaDocTungCai(@PathVariable Long idThongBao){
+        return ResponseEntity.ok(thongBaoService.setThongBaoTungCai(idThongBao));
+    }
+
     @PostMapping("/send-notification")
     public String sendNotification(@RequestBody String message) {
         // Gửi thông báo đến topic "/topic/notifications"
