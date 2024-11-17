@@ -47,6 +47,8 @@ public class GioHangService {
     private SanPhamChiTietRepository sanPhamChiTietRepository;
     @Autowired
     private VNPayService vnPayService;
+    @Autowired
+    private ThongBaoRepository thongBaoRepository;
 
     public ResponseEntity<?> getByKhachHang(Long idKhachHang) {
         var gioHang = gioHangRepository.findByKhachHangId(idKhachHang).orElse(null);
@@ -197,9 +199,21 @@ public class GioHangService {
         if(hoaDonChiTietList == null) return getErro("Chưa có sản phẩm trong giỏ hàng");
         setGiohang(gioHang);
 
+        TaoThongBao(hoaDon);
 
         return ResponseEntity.ok(hoaDon);
 
+    }
+
+    private void TaoThongBao(HoaDon hoaDon) {
+        ThongBao thongBao = new ThongBao();
+        thongBao.setNoiDung("Bạn đã đặt thành công đơn hàng "+hoaDon.getMa());
+        thongBao.setUrl("http://localhost:4200/g4/shop/khach-hang?activeItem=1&idHoaDon="+hoaDon.getId());
+        thongBao.setDaDoc(false);
+        thongBao.setTrangThai(1);
+        thongBao.setKhachHang(hoaDon.getKhachHang());
+
+        thongBaoRepository.save(thongBao);
     }
 
     public String taoURLThanhToan(int orderTotal,String maHoaDon) {
@@ -225,10 +239,7 @@ public class GioHangService {
         if(hoaDonChiTietList == null) return getErro("Chưa có sản phẩm trong giỏ hàng");
         setGiohang(gioHang);
 
-
-//        setSanPhamThanhToanOnline(hoaDon);
-
-//        tra ve hoaDon va hoadonchitiet
+        TaoThongBao(hoaDon);
         return ResponseEntity.ok(hoaDon);
     }
 
