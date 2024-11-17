@@ -1,5 +1,6 @@
 package datn.be.mycode.RESTController;
 
+import datn.be.mycode.entity.HoaDonChiTiet;
 import datn.be.mycode.entity.SanPham;
 import datn.be.mycode.request.HoaDonChiTietRequest;
 import datn.be.mycode.request.HoaDonRequest;
@@ -38,6 +39,19 @@ public class HoaDonChiTietCotroller {
     public ResponseEntity<List<SanPham>> timSanPhamChuaCmtTrong7NgayThanhToan() {
         List<SanPham> sanPhamList = hoaDonChiTietService.timSanPhamChuaCmtTrong7NgayThanhToan();
         return ResponseEntity.ok(sanPhamList);
+    }
+
+    @GetMapping("/san-pham-iscmt-false-by-idkh")
+    public ResponseEntity<?> get_NhungSanPhamTrongHoaDonChiTietIsCMTFalseByIdKh(@RequestParam Long idKhachHang) {
+        List<SanPham> sanPhams = hoaDonChiTietService.getNhungSanPhamTrongHoaDonChiTietIsCMTFalseByIdKhTrong7Ngay(idKhachHang);
+        return ResponseEntity.ok(sanPhams);
+    }
+
+
+    @GetMapping("/hoa-don-get-by-idkh-chua-cmt")
+    public ResponseEntity<?> getHoaDonChiTietByKhachHangIdAndWithin7Days(@RequestParam Long idKhachHang) {
+        List<HoaDonChiTiet> hoaDonChiTietList = hoaDonChiTietService.getHoaDonChiTietByKhachHangIdAndWithin7Days(idKhachHang);
+        return ResponseEntity.ok(hoaDonChiTietList);
     }
 
     @PostMapping("/add")

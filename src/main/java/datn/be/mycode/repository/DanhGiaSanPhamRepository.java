@@ -16,5 +16,7 @@ public interface DanhGiaSanPhamRepository extends JpaRepository<DanhGiaSanPham,L
     @Query("SELECT l FROM DanhGiaSanPham l WHERE l.id  =:id")
     Page<DanhGiaSanPham> findAllById(@Param("id")Long id, Pageable pageable);
 
+    @Query("SELECT d FROM DanhGiaSanPham d WHERE d.idKhachHang.id = :idKhachHang")
+    Page<DanhGiaSanPham> findDanhGiaByKhachHangId(@Param("idKhachHang") Long idKhachHang, Pageable pageable);
 
 }
