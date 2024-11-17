@@ -115,6 +115,7 @@ public class LichSuSuDungService {
         thongBao.setNoiDung("Bạn đã thêm thành công voucher "+voucher.getTen());
         thongBao.setUrl("/g4/shop/khach-hang?activeItem=2");
         thongBao.setDaDoc(false);
+        thongBao.setNgayTao(LocalDateTime.now());
         thongBao.setTrangThai(1);
         thongBao.setKhachHang(khachHang);
 
