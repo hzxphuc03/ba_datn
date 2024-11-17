@@ -14,6 +14,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -36,6 +37,8 @@ public class LichSuSuDungService {
     private VoucherKhachHangRepository voucherKhachHangRepository;
     @Autowired
     private ThongBaoRepository thongBaoRepository;
+    @Autowired
+    private SimpMessagingTemplate messagingTemplate;
 
 
     public NormalTableResponse<LichSuSuDung> getAll(TableLongRequest request) {
@@ -116,6 +119,7 @@ public class LichSuSuDungService {
         thongBao.setKhachHang(khachHang);
 
         thongBaoRepository.save(thongBao);
+        messagingTemplate.convertAndSend("/topic/notifications", khachHang.getId());
     }
 
 
