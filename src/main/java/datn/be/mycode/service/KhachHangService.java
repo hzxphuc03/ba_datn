@@ -108,7 +108,7 @@ public class KhachHangService {
     public KhachHang add(KhachHangRequest request) {
 
         KhachHang khachHang = new KhachHang();
-        khachHang.setMa(null);
+        khachHang.setMa("");
         khachHang.setHoTen(request.getHoTen());
         khachHang.setHinhAnh(request.getHinhAnh());
         khachHang.setNgaySinh(request.getNgaySinh());

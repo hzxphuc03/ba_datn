@@ -35,20 +35,38 @@ public interface HoaDonChiTietRepository extends JpaRepository<HoaDonChiTiet, Lo
             @Param("startDate") LocalDateTime startDate,
             @Param("endDate") LocalDateTime endDate);
 
-    @Modifying
-    @Query("UPDATE HoaDonChiTiet hdc SET hdc.isCMT = true " +
+    @Query("SELECT DISTINCT hdc.sanPhamChiTiet.sanPham " +
+            "FROM HoaDonChiTiet hdc " +
             "WHERE hdc.hoaDon.khachHang.id = :idKhachHang " +
-            "AND hdc.sanPhamChiTiet.sanPham.id = :idSanPham " +
-            "AND hdc.isCMT = false")
-    void updateIsCMTByKhachHangAndSanPham(@Param("idKhachHang") Long idKhachHang, @Param("idSanPham") Long idSanPham);
+            "AND hdc.isCMT = false " +
+            "AND hdc.hoaDon.ngayThanhToan IS NOT NULL " +
+            "AND hdc.hoaDon.ngayThanhToan BETWEEN :startDate AND :endDate")
+    List<SanPham> getNhungSanPhamTrongHoaDonChiTietIsCMTFalseByIdKh(
+            @Param("idKhachHang") Long idKhachHang,
+            @Param("startDate") LocalDateTime startDate,
+            @Param("endDate") LocalDateTime endDate
+    );
 
+    // Lọc các sản phẩm chưa được đánh giá (isCMT = false) theo idKhachHang và trong vòng 7 ngày kể từ ngàyThanhToan
     @Query("SELECT hdc FROM HoaDonChiTiet hdc " +
-            "WHERE hdc.hoaDon.khachHang.id = :idKhachHang AND hdc.isCMT = false")
-    List<HoaDonChiTiet> timKhachHangIdCoIsCMTLaFalse(@Param("idKhachHang") Long idKhachHang);
+            "WHERE hdc.hoaDon.khachHang.id = :idKhachHang " +
+            "AND hdc.isCMT = false " +
+            "AND hdc.hoaDon.ngayThanhToan IS NOT NULL " +
+            "AND hdc.hoaDon.ngayThanhToan >= :sevenDaysAgo")
+    List<HoaDonChiTiet> findAllByKhachHangIdAndIsCMTFalseAndIn7Days(
+            @Param("idKhachHang") Long idKhachHang,
+            @Param("sevenDaysAgo") LocalDateTime sevenDaysAgo);
 
-    @Modifying
-    @Query("UPDATE HoaDonChiTiet hdc SET hdc.isCMT = true " +
-            "WHERE hdc.hoaDon.khachHang.id = :idKhachHang AND hdc.isCMT = false")
-    void updateIsCMTThanhTrueTuKhachHangId(@Param("idKhachHang") Long idKhachHang);
+    @Query("SELECT hdc " +
+            "FROM HoaDonChiTiet hdc " +
+            "JOIN FETCH hdc.hoaDon hd " +
+            "JOIN FETCH hd.khachHang kh " +
+            "WHERE kh.id = :idKhachHang AND hdc.isCMT = false " +
+            "AND hd.ngayTao >= :sevenDaysAgo")
+    List<HoaDonChiTiet> findAllByKhachHangIdAndWithin7Days(@Param("idKhachHang") Long idKhachHang,
+                                                           @Param("sevenDaysAgo") LocalDateTime sevenDaysAgo);
+
+
+
 
 }

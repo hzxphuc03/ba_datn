@@ -1,7 +1,11 @@
 package datn.be.mycode.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -23,8 +27,10 @@ public class DanhGiaSanPham {
     @Column(name = "cmt")
     private String cmt;
 
-    @Column(name = "list_hinh_anh")
-    private String listHinhAnh;
+
+    @OneToMany(mappedBy = "danhGiaSanPham", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
+    private List<HinhAnhComment> hinhAnhComment = new ArrayList<>();
 
     @Column(name = "trang_thai")
     private int trangThai;

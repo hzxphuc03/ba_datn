@@ -2,13 +2,14 @@ package datn.be.mycode.service;
 
 import datn.be.mycode.entity.DanhGiaSanPham;
 import datn.be.mycode.entity.HoaDonChiTiet;
-import datn.be.mycode.entity.KhachHang;
+import datn.be.mycode.entity.HinhAnhComment;
 import datn.be.mycode.repository.DanhGiaSanPhamRepository;
 import datn.be.mycode.repository.HoaDonChiTietRepository;
 import datn.be.mycode.repository.KhachHangRepository;
 import datn.be.mycode.repository.SanPhamRepository;
 import datn.be.mycode.request.DanhGiaSanPhamRequest;
 import datn.be.mycode.request.customRequest.TableLongRequest;
+import datn.be.mycode.request.khachHang.DanhGiaSanPhamChungRequest;
 import datn.be.mycode.response.NormalTableResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -17,8 +18,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class DanhGiaSanPhamService {
@@ -62,71 +64,98 @@ public class DanhGiaSanPhamService {
         return danhGiaSanPhamNormalTableResponse;
     }
 
-    @Transactional
-    public DanhGiaSanPham add(DanhGiaSanPhamRequest request) {
-
-        // Tạo mới một đánh giá sản phẩm
-        DanhGiaSanPham danhGiaSanPham = new DanhGiaSanPham();
-        danhGiaSanPham.setSao(request.getSao());
-        danhGiaSanPham.setCmt(request.getCmt());
-        danhGiaSanPham.setListHinhAnh(request.getListHinhAnh());
-        danhGiaSanPham.setIdKhachHang(khachHangRepository.searchById(request.getIdKhachHang()).get());
-        danhGiaSanPham.setIdSanPham(sanPhamRepository.timTheoId(request.getIdSanPham()).get());
-        danhGiaSanPham.setTrangThai(1);
-
-        // Lưu đánh giá vào cơ sở dữ liệu
-        danhGiaSanPham = danhGiaSanPhamRepository.save(danhGiaSanPham);
-
-        // Cập nhật isCMT thành true cho các bản ghi HoaDonChiTiet tương ứng
-        hoaDonChiTietRepository.updateIsCMTByKhachHangAndSanPham(request.getIdKhachHang(), request.getIdSanPham());
-
-        return danhGiaSanPham;
-    }
-    @Transactional
-    public List<DanhGiaSanPham> addAllDanhGia(Long idKhachHang, int sao, String cmt, String listHinhAnh) {
-        KhachHang khachHang = khachHangRepository.findById(idKhachHang)
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy khách hàng!"));
-
-        // Tìm tất cả các sản phẩm mà khách hàng chưa đánh giá (isCMT = false)
-        List<HoaDonChiTiet> hoaDonChiTietList = hoaDonChiTietRepository.timKhachHangIdCoIsCMTLaFalse(idKhachHang);
-
-        List<DanhGiaSanPham> danhGiaList = new ArrayList<>();
-
-        // Tạo đánh giá cho từng sản phẩm và lưu vào danh sách
-        for (HoaDonChiTiet hdc : hoaDonChiTietList) {
-            DanhGiaSanPham danhGiaSanPham = new DanhGiaSanPham();
-            danhGiaSanPham.setSao(sao);
-            danhGiaSanPham.setCmt(cmt);
-            danhGiaSanPham.setListHinhAnh(listHinhAnh);
-            danhGiaSanPham.setIdKhachHang(khachHang);
-            danhGiaSanPham.setIdSanPham(hdc.getSanPhamChiTiet().getSanPham());
-            danhGiaSanPham.setTrangThai(1);
-
-            // Lưu từng đánh giá vào cơ sở dữ liệu
-            danhGiaSanPham = danhGiaSanPhamRepository.save(danhGiaSanPham);
-            danhGiaList.add(danhGiaSanPham);
-        }
-
-        // Cập nhật tất cả các bản ghi HoaDonChiTiet thành isCMT = true
-        hoaDonChiTietRepository.updateIsCMTThanhTrueTuKhachHangId(idKhachHang);
-
-        return danhGiaList;
-    }
-
-    public DanhGiaSanPham update(DanhGiaSanPhamRequest request) {
-        DanhGiaSanPham danhGiaSanPham = danhGiaSanPhamRepository.findById(request.getId()).get();
-        danhGiaSanPham.setSao(request.getSao());
-        danhGiaSanPham.setCmt(request.getCmt());
-        danhGiaSanPham.setListHinhAnh(request.getListHinhAnh());
-        danhGiaSanPham.setIdKhachHang(khachHangRepository.searchById(request.getIdKhachHang()).get());
-        danhGiaSanPham.setIdSanPham(sanPhamRepository.timTheoId(request.getIdSanPham()).get());
-        danhGiaSanPham.setTrangThai(request.getTrangThai());
-        return danhGiaSanPhamRepository.save(danhGiaSanPham);
-    }
 
     public DanhGiaSanPham udateTrangThai(Long id, Integer trangThai){
         DanhGiaSanPham danhGiaSanPham = danhGiaSanPhamRepository.findById(id).get();
         danhGiaSanPham.setTrangThai(trangThai);
         return danhGiaSanPhamRepository.save(danhGiaSanPham);
     }
+
+    @Transactional
+    public DanhGiaSanPham danhGiaTheoIDChiTietHoaDon(Long idChiTietHoaDon, DanhGiaSanPhamChungRequest request) {
+        // Lấy HoaDonChiTiet từ idChiTietHoaDon, trả về null nếu không tìm thấy
+        HoaDonChiTiet hoaDonChiTiet = hoaDonChiTietRepository.findById(idChiTietHoaDon).orElse(null);
+
+        // Nếu không tìm thấy hoaDonChiTiet, trả về null hoặc có thể thay bằng giá trị mặc định
+        if (hoaDonChiTiet == null) {
+            return null; // Hoặc có thể trả về một giá trị mặc định tùy ý
+        }
+
+        // Tạo đối tượng DanhGiaSanPham mới
+        DanhGiaSanPham danhGiaSanPham = new DanhGiaSanPham();
+        danhGiaSanPham.setSao(request.getSao());
+        danhGiaSanPham.setCmt(request.getCmt());
+        danhGiaSanPham.setTrangThai(1);
+        danhGiaSanPham.setIdKhachHang(hoaDonChiTiet.getHoaDon().getKhachHang());
+        danhGiaSanPham.setIdSanPham(hoaDonChiTiet.getSanPhamChiTiet().getSanPham());
+
+        // Xử lý danh sách hình ảnh từ request
+        List<HinhAnhComment> hinhAnhList = request.getListHinhAnh().stream().map(hinhAnh -> {
+            HinhAnhComment hinhAnhComment = new HinhAnhComment();
+            hinhAnhComment.setAnh(hinhAnh);
+            hinhAnhComment.setTrangThai(1);
+            hinhAnhComment.setDanhGiaSanPham(danhGiaSanPham); // Liên kết với DanhGiaSanPham
+            return hinhAnhComment;
+        }).collect(Collectors.toList());
+        danhGiaSanPham.setHinhAnhComment(hinhAnhList);
+
+        // Lưu đánh giá sản phẩm và danh sách hình ảnh
+        DanhGiaSanPham savedDanhGia = danhGiaSanPhamRepository.save(danhGiaSanPham);
+
+        // Cập nhật trạng thái isCMT = true
+        hoaDonChiTiet.setCMT(true);
+        hoaDonChiTietRepository.save(hoaDonChiTiet);
+
+        return savedDanhGia;
+    }
+
+    @Transactional
+    public List<DanhGiaSanPham> danhGiaChungByIDKH(Long idKhachHang, DanhGiaSanPhamChungRequest request) {
+        // Lấy thời gian 7 ngày trước từ hiện tại
+        LocalDateTime sevenDaysAgo = LocalDateTime.now().minusDays(7);
+
+        // Lấy danh sách HoaDonChiTiet có isCMT = false và nằm trong 7 ngày
+        List<HoaDonChiTiet> hoaDonChiTietList = hoaDonChiTietRepository
+                .findAllByKhachHangIdAndIsCMTFalseAndIn7Days(idKhachHang, sevenDaysAgo);
+
+        if (hoaDonChiTietList.isEmpty()) {
+            throw new RuntimeException("Không có sản phẩm nào cần đánh giá.");
+        }
+
+        // Tạo danh sách đánh giá sản phẩm
+        List<DanhGiaSanPham> danhGiaList = hoaDonChiTietList.stream().map(chiTiet -> {
+            DanhGiaSanPham danhGiaSanPham = new DanhGiaSanPham();
+            danhGiaSanPham.setSao(request.getSao());
+            danhGiaSanPham.setCmt(request.getCmt());
+            danhGiaSanPham.setTrangThai(1);
+            danhGiaSanPham.setIdKhachHang(chiTiet.getHoaDon().getKhachHang());
+            danhGiaSanPham.setIdSanPham(chiTiet.getSanPhamChiTiet().getSanPham());
+
+            // Xử lý danh sách hình ảnh từ request
+            List<HinhAnhComment> hinhAnhList = request.getListHinhAnh().stream().map(hinhAnh -> {
+                HinhAnhComment hinhAnhComment = new HinhAnhComment();
+                hinhAnhComment.setAnh(hinhAnh);
+                hinhAnhComment.setTrangThai(1);
+                hinhAnhComment.setDanhGiaSanPham(danhGiaSanPham); // Liên kết với DanhGiaSanPham
+                return hinhAnhComment;
+            }).collect(Collectors.toList());
+            danhGiaSanPham.setHinhAnhComment(hinhAnhList);
+
+            return danhGiaSanPham;
+        }).collect(Collectors.toList());
+
+        // Lưu tất cả đánh giá sản phẩm
+        List<DanhGiaSanPham> savedDanhGiaList = danhGiaSanPhamRepository.saveAll(danhGiaList);
+
+        // Cập nhật trạng thái isCMT = true cho các HoaDonChiTiet
+        hoaDonChiTietList.forEach(chiTiet -> chiTiet.setCMT(true));
+        hoaDonChiTietRepository.saveAll(hoaDonChiTietList);
+
+        return savedDanhGiaList;
+    }
+    public Page<DanhGiaSanPham> getDanhGiaByKhachHangId(Long idKhachHang, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return danhGiaSanPhamRepository.findDanhGiaByKhachHangId(idKhachHang, pageable);
+    }
+
 }

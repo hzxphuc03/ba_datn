@@ -235,5 +235,19 @@ public class HoaDonChiTietService {
 
         return repo.timSanPhamChuaCmtTrong7NgayThanhToan(startDate, endDate);
     }
+    public List<SanPham> getNhungSanPhamTrongHoaDonChiTietIsCMTFalseByIdKhTrong7Ngay(Long idKhachHang) {
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime startDate = now.minusDays(7); // 7 ngày trước
+        LocalDateTime endDate = now;               // hiện tại
 
+        return repo.getNhungSanPhamTrongHoaDonChiTietIsCMTFalseByIdKh(idKhachHang, startDate, endDate);
+    }
+
+    public List<HoaDonChiTiet> getHoaDonChiTietByKhachHangIdAndWithin7Days(Long idKhachHang) {
+        // Tính ngày 7 ngày trước từ hiện tại
+        LocalDateTime sevenDaysAgo = LocalDateTime.now().minusDays(7);
+
+        // Lấy danh sách hóa đơn chi tiết trong vòng 7 ngày
+        return repo.findAllByKhachHangIdAndWithin7Days(idKhachHang, sevenDaysAgo);
+    }
 }

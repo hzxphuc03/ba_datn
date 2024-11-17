@@ -2,6 +2,8 @@ package datn.be.mycode.request;
 
 import lombok.*;
 
+import java.util.List;
+
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
@@ -13,7 +15,7 @@ public class DanhGiaSanPhamRequest {
     private Long id;
     private int sao;
     private String cmt;
-    private String listHinhAnh;
+    private List<String> listHinhAnh;
     private int trangThai;
     private Long idKhachHang;
     private Long idSanPham;
