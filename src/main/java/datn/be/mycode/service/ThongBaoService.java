@@ -16,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class ThongBaoService {
@@ -56,6 +57,23 @@ public class ThongBaoService {
         var khachHang = khachHangRepository.findById(idKhachHang).orElse(null);
         if(khachHang == null) return 0;
         return thongBaoRepository.countByDaDocFalse(khachHang.getId());
+    }
+
+
+    public ResponseEntity<?> setThongBao(Long idKhachHang) {
+        var khachHang = khachHangRepository.findById(idKhachHang).orElse(null);
+        if(khachHang == null) return getErro("Khách hàng này không tồn tại");
+        var thongBaoList = thongBaoRepository.findAllByKhachHangId(khachHang.getId());
+        if (thongBaoList.isEmpty()) return getErro("Khách hàng không có thông báo nào");
+//        if(thongBao.isDaDoc()) return getErro("Thông báo này đã được xem");
+        var thongBaoChuaDoc = thongBaoList.stream().filter(thongBao -> thongBao.isDaDoc() == false).collect(Collectors.toList());
+        thongBaoChuaDoc.forEach(thongBao -> {
+            thongBao.setDaDoc(true);
+            thongBaoRepository.save(thongBao);
+        });
+
+
+        return ResponseEntity.ok(thongBaoChuaDoc);
     }
 
     private ResponseEntity<?> getErro(String s){
