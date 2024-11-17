@@ -113,7 +113,7 @@ public class LichSuSuDungService {
     private void ThongBao(Voucher voucher, KhachHang khachHang) {
         ThongBao thongBao = new ThongBao();
         thongBao.setNoiDung("Bạn đã thêm thành công voucher "+voucher.getTen());
-        thongBao.setUrl("http://localhost:4200/g4/shop/khach-hang?activeItem=2");
+        thongBao.setUrl("/g4/shop/khach-hang?activeItem=2");
         thongBao.setDaDoc(false);
         thongBao.setTrangThai(1);
         thongBao.setKhachHang(khachHang);
