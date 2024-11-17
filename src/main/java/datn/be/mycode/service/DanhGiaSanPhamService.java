@@ -10,6 +10,8 @@ import datn.be.mycode.repository.KhachHangRepository;
 import datn.be.mycode.repository.SanPhamRepository;
 import datn.be.mycode.request.DanhGiaSanPhamRequest;
 import datn.be.mycode.request.customRequest.TableLongRequest;
+import datn.be.mycode.request.danhGiaSanPham.DanhGiaByKhachHangIdRequest;
+import datn.be.mycode.request.danhGiaSanPham.DanhGiaBySanPhamIdRequest;
 import datn.be.mycode.request.khachHang.DanhGiaSanPhamChungRequest;
 import datn.be.mycode.response.NormalTableResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -181,7 +183,7 @@ private void updateTrungBinhDanhGia(Long idSanPham) {
         return savedDanhGiaList;
     }
 
-    public NormalTableResponse<DanhGiaSanPham> getDanhGiaByKhachHangId(TableLongRequest request) {
+    public NormalTableResponse<DanhGiaSanPham> getDanhGiaByKhachHangId(DanhGiaByKhachHangIdRequest request) {
 
         if (request.getPage() ==  null) {
             request.setPage(1);
@@ -197,7 +199,7 @@ private void updateTrungBinhDanhGia(Long idSanPham) {
         Pageable pageable = PageRequest.of(request.getPage() - 1,request.getPageSize());
         Page<DanhGiaSanPham> danhGiaSanPhamPage;
 
-        danhGiaSanPhamPage = danhGiaSanPhamRepository.findDanhGiaByKhachHangId(request.getKeyWord(), pageable);
+        danhGiaSanPhamPage = danhGiaSanPhamRepository.findDanhGiaByKhachHangId(request.getIdKhachHang(), pageable);
 
         List<DanhGiaSanPham> lichSuSuDungs = danhGiaSanPhamPage.getContent().stream().toList();
 
@@ -210,7 +212,7 @@ private void updateTrungBinhDanhGia(Long idSanPham) {
     }
 
 
-    public NormalTableResponse<DanhGiaSanPham> getDanhGiaBySanPhamId(TableLongRequest request) {
+    public NormalTableResponse<DanhGiaSanPham> getDanhGiaBySanPhamId(DanhGiaBySanPhamIdRequest request) {
 
         if (request.getPage() ==  null) {
             request.setPage(1);
@@ -226,7 +228,7 @@ private void updateTrungBinhDanhGia(Long idSanPham) {
         Pageable pageable = PageRequest.of(request.getPage() - 1,request.getPageSize());
         Page<DanhGiaSanPham> danhGiaSanPhamPage;
 
-        danhGiaSanPhamPage = danhGiaSanPhamRepository.findDanhGiaBySanPhamId(request.getKeyWord(), pageable);
+        danhGiaSanPhamPage = danhGiaSanPhamRepository.findDanhGiaBySanPhamId(request.getIdSanPham(), pageable);
 
         List<DanhGiaSanPham> lichSuSuDungs = danhGiaSanPhamPage.getContent().stream().toList();
 
