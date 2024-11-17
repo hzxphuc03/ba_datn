@@ -3,6 +3,8 @@ package datn.be.mycode.RESTController;
 import datn.be.mycode.entity.DanhGiaSanPham;
 import datn.be.mycode.request.DanhGiaSanPhamRequest;
 import datn.be.mycode.request.customRequest.TableLongRequest;
+import datn.be.mycode.request.danhGiaSanPham.DanhGiaByKhachHangIdRequest;
+import datn.be.mycode.request.danhGiaSanPham.DanhGiaBySanPhamIdRequest;
 import datn.be.mycode.request.khachHang.DanhGiaSanPhamChungRequest;
 import datn.be.mycode.service.DanhGiaSanPhamService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,23 +24,35 @@ public class DanhGiaSanPhamController {
     public ResponseEntity<?> getAll(
             @RequestParam(name = "page",required = false) Integer page,
             @RequestParam(name = "pageSize",required = false) Integer pageSize,
-            @RequestParam(name = "keyWord",required = false) Long keyWord,
+            @RequestParam Long idKhachHang,
             @RequestParam(name = "status",required = false) Integer status
     ){
 
-        TableLongRequest request = new TableLongRequest(page,pageSize,keyWord,status);
+        TableLongRequest request = new TableLongRequest(page,pageSize,idKhachHang,status);
         return ResponseEntity.ok(danhGiaSanPhamService.getAll(request));
     }
 
 
     @GetMapping("/get-by-khach-hang-id")
     public ResponseEntity<?> getDanhGiaByKhachHangId(
+            @RequestParam(name = "page",required = false) Integer page,
+            @RequestParam(name = "pageSize",required = false) Integer pageSize,
             @RequestParam Long idKhachHang,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
+            @RequestParam(name = "status",required = false) Integer status) {
 
-        Page<DanhGiaSanPham> danhGiaPage = danhGiaSanPhamService.getDanhGiaByKhachHangId(idKhachHang, page, size);
-        return ResponseEntity.ok(danhGiaPage);
+        DanhGiaByKhachHangIdRequest request = new DanhGiaByKhachHangIdRequest(page,pageSize,idKhachHang,status);
+        return ResponseEntity.ok(danhGiaSanPhamService.getDanhGiaByKhachHangId(request));
+    }
+
+    @GetMapping("/get-by-san-pham-id")
+    public ResponseEntity<?> getDanhGiaBySanPhamId(
+            @RequestParam(name = "page",required = false) Integer page,
+            @RequestParam(name = "pageSize",required = false) Integer pageSize,
+            @RequestParam Long idSanPham,
+            @RequestParam(name = "status",required = false) Integer status) {
+
+        DanhGiaBySanPhamIdRequest request = new DanhGiaBySanPhamIdRequest(page,pageSize,idSanPham,status);
+        return ResponseEntity.ok(danhGiaSanPhamService.getDanhGiaBySanPhamId(request));
     }
 
 //    @PutMapping("/update")

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,10 +23,13 @@ public class DanhGiaSanPham {
     private Long id;
 
     @Column(name = "sao")
-    private int sao;
+    private Integer sao;
 
     @Column(name = "cmt")
     private String cmt;
+
+    @Column(name = "ngay_tao")
+    private LocalDateTime ngayTao;
 
 
     @OneToMany(mappedBy = "danhGiaSanPham", cascade = CascadeType.ALL, orphanRemoval = true)
