@@ -1,5 +1,6 @@
 package datn.be.mycode.repository;
 
+import datn.be.mycode.entity.HoaDon;
 import datn.be.mycode.entity.HoaDonChiTiet;
 import datn.be.mycode.entity.SanPham;
 import org.springframework.data.domain.Page;
@@ -24,11 +25,16 @@ public interface HoaDonChiTietRepository extends JpaRepository<HoaDonChiTiet, Lo
 
     List<HoaDonChiTiet> findAllByHoaDon_Id(Long idHoaDon);
 
+    List<HoaDonChiTiet> findBySanPhamChiTiet_Id(Long idSanPhamChiTiet);
+    List<HoaDonChiTiet> findBySanPhamChiTiet_SanPham_Id(Long idSanPham);
+    List<HoaDonChiTiet> findByHoaDon(HoaDon hoaDon);
+
+
     Page<HoaDonChiTiet> findAllByHoaDon_Id(Long idHoaDon, Pageable pageable);
 
     @Query("SELECT DISTINCT hdc.sanPhamChiTiet.sanPham FROM HoaDonChiTiet hdc " +
             "JOIN hdc.hoaDon hd " +
-            "WHERE hdc.isCMT = false " +
+            "WHERE hdc.danhGia = false " +
             "AND hd.ngayThanhToan >= :startDate " +
             "AND hd.ngayThanhToan <= :endDate")
     List<SanPham> timSanPhamChuaCmtTrong7NgayThanhToan(
@@ -38,7 +44,7 @@ public interface HoaDonChiTietRepository extends JpaRepository<HoaDonChiTiet, Lo
     @Query("SELECT DISTINCT hdc.sanPhamChiTiet.sanPham " +
             "FROM HoaDonChiTiet hdc " +
             "WHERE hdc.hoaDon.khachHang.id = :idKhachHang " +
-            "AND hdc.isCMT = false " +
+            "AND hdc.danhGia = false " +
             "AND hdc.hoaDon.ngayThanhToan IS NOT NULL " +
             "AND hdc.hoaDon.ngayThanhToan BETWEEN :startDate AND :endDate")
     List<SanPham> getNhungSanPhamTrongHoaDonChiTietIsCMTFalseByIdKh(
@@ -50,7 +56,7 @@ public interface HoaDonChiTietRepository extends JpaRepository<HoaDonChiTiet, Lo
     // Lọc các sản phẩm chưa được đánh giá (isCMT = false) theo idKhachHang và trong vòng 7 ngày kể từ ngàyThanhToan
     @Query("SELECT hdc FROM HoaDonChiTiet hdc " +
             "WHERE hdc.hoaDon.khachHang.id = :idKhachHang " +
-            "AND hdc.isCMT = false " +
+            "AND hdc.danhGia = false " +
             "AND hdc.hoaDon.ngayThanhToan IS NOT NULL " +
             "AND hdc.hoaDon.ngayThanhToan >= :sevenDaysAgo")
     List<HoaDonChiTiet> findAllByKhachHangIdAndIsCMTFalseAndIn7Days(
@@ -61,11 +67,10 @@ public interface HoaDonChiTietRepository extends JpaRepository<HoaDonChiTiet, Lo
             "FROM HoaDonChiTiet hdc " +
             "JOIN FETCH hdc.hoaDon hd " +
             "JOIN FETCH hd.khachHang kh " +
-            "WHERE kh.id = :idKhachHang AND hdc.isCMT = false " +
+            "WHERE kh.id = :idKhachHang AND hdc.danhGia = false " +
             "AND hd.ngayTao >= :sevenDaysAgo")
     List<HoaDonChiTiet> findAllByKhachHangIdAndWithin7Days(@Param("idKhachHang") Long idKhachHang,
                                                            @Param("sevenDaysAgo") LocalDateTime sevenDaysAgo);
-
 
 
 

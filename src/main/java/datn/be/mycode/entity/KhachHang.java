@@ -53,4 +53,7 @@ public class KhachHang implements Serializable {
     @Column(name = "trang_thai")
     private int trangThai;
 
+    public KhachHang(Long id) {
+        this.id = id;
+    }
 }

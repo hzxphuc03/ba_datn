@@ -147,7 +147,7 @@ public class HoaDonChiTietService {
                         .giaHienHanh(gia)
                         .giaDaGiam(giaDaGiam)
                         .trangThai(1)
-                        .isCMT(false)
+                        .danhGia(false)
                         .hoaDon(hd)
                         .sanPhamChiTiet(spct)
                         .build();

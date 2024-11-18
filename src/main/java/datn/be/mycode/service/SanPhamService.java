@@ -1,6 +1,7 @@
 package datn.be.mycode.service;
 
 
+import datn.be.mycode.entity.HoaDon;
 import datn.be.mycode.entity.HoaDonChiTiet;
 import datn.be.mycode.entity.SanPham;
 import datn.be.mycode.entity.SanPhamChiTiet;
@@ -21,7 +22,10 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class SanPhamService {
@@ -42,6 +46,8 @@ public class SanPhamService {
     private LoaiDeRepository loaiDeRepository;
     @Autowired
     private SanPhamChiTietRepository sanPhamChiTietRepository;
+    @Autowired
+    private HoaDonRepository hoaDonRepository;
     @Autowired
     private HoaDonChiTietRepository hoaDonChiTietRepository;
 
@@ -243,5 +249,33 @@ public class SanPhamService {
     public List<SanPham> getTop5SanPhamByTheLoai(Long theLoaiId) {
         Pageable pageable = PageRequest.of(0, 5); // Trang đầu tiên và giới hạn 5 sản phẩm
         return repo.findTop5SanPhamByTheLoai(theLoaiId, pageable);
+    }
+
+
+    public List<Long> laySanPhamChuaDanhGiaCuaKhachHang(Long idKhachHang) {
+        LocalDateTime sevenDaysAgo = LocalDateTime.now().minusDays(7);
+        List<HoaDon> recentHoaDons = hoaDonRepository.findRecentHoaDonsByKhachHangId(idKhachHang,sevenDaysAgo);
+        Set<Long> productIds = new HashSet<>();
+
+        for (HoaDon hoaDon : recentHoaDons) {
+            List<HoaDonChiTiet> chiTietHoaDons = hoaDonChiTietRepository.findByHoaDon(hoaDon);
+            for (HoaDonChiTiet chiTiet : chiTietHoaDons) {
+                if (!chiTiet.isDanhGia()) {
+                    productIds.add(chiTiet.getSanPhamChiTiet().getSanPham().getId());
+                }
+            }
+        }
+
+        return productIds.stream().collect(Collectors.toList());
+    }
+    public List<SanPhamRequest> layThongTinSanPhamTuIds(List<Long> idSanPham) {
+        List<SanPham> sanPhams = repo.findAllById(idSanPham);
+        return sanPhams.stream()
+                .map(sanPham -> {
+                    SanPhamRequest request = new SanPhamRequest();
+                    request.setSanPhamRequest(sanPham);
+                    return request;
+                })
+                .collect(Collectors.toList());
     }
 }

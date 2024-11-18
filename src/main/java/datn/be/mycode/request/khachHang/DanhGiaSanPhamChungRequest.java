@@ -12,7 +12,7 @@ import java.util.List;
 public class DanhGiaSanPhamChungRequest {
 
     private int sao;
-    private String cmt;
+    private String binhLuan;
     private Long idKhachHang;
     private Long idSanPham;
 

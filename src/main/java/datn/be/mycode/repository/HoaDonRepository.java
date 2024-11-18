@@ -9,6 +9,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -30,4 +31,11 @@ public interface HoaDonRepository extends JpaRepository<HoaDon, Long> {
 
     @Query("SELECT u FROM HoaDon u WHERE u.id = :id")
     Optional<HoaDon> searchById(@Param("id") Long id);
+
+//    @Query("SELECT h FROM HoaDon h WHERE h.khachHang.id = :idKhachHang AND h.ngayThanhToan >= CURRENT_DATE - INTERVAL '7' DAY")
+//    List<HoaDon> findRecentHoaDonsByKhachHangId(@Param("idKhachHang") Long idKhachHang);
+
+    @Query("SELECT h FROM HoaDon h WHERE h.khachHang.id = :idKhachHang AND h.ngayThanhToan >= :sevenDaysAgo")
+    List<HoaDon> findRecentHoaDonsByKhachHangId(@Param("idKhachHang") Long idKhachHang, @Param("sevenDaysAgo") LocalDateTime sevenDaysAgo);
+
 }

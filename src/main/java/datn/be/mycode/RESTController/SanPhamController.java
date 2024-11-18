@@ -113,6 +113,19 @@ public class SanPhamController {
     public List<SanPham> getTop5SanPhamGiamGiaTheLoai(@RequestParam Long theLoaiId) {
         return sanPhamService.getTop5SanPhamByTheLoai(theLoaiId);
     }
+
+//    @GetMapping("/san-pham-chua-danh-gia/{idKhachHang}")
+//    public ResponseEntity<List<Long>> laySanPhamChuaDanhGiaCuaKhachHang(@PathVariable Long idKhachHang) {
+//        List<Long> productIds = sanPhamService.laySanPhamChuaDanhGiaCuaKhachHang(idKhachHang);
+//        return ResponseEntity.ok(productIds);
+//    }
+    @GetMapping("/san-pham-chua-danh-gia/{idKhachHang}")
+    public ResponseEntity<List<SanPhamRequest>> laySanPhamChuaDanhGiaCuaKhachHang(@PathVariable Long idKhachHang) {
+        List<Long> idSanPham = sanPhamService.laySanPhamChuaDanhGiaCuaKhachHang(idKhachHang);
+        List<SanPhamRequest> thongTinSanPham = sanPhamService.layThongTinSanPhamTuIds(idSanPham);
+        return ResponseEntity.ok(thongTinSanPham);
+    }
+
     @PostMapping("/add")
     public ResponseEntity<?> add(@RequestBody SanPhamRequest sanPhamRequest){
 

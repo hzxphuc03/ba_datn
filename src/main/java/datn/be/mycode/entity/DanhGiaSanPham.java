@@ -25,8 +25,8 @@ public class DanhGiaSanPham {
     @Column(name = "sao")
     private Integer sao;
 
-    @Column(name = "cmt")
-    private String cmt;
+    @Column(name = "binh_luan")
+    private String binhLuan;
 
     @Column(name = "ngay_tao")
     private LocalDateTime ngayTao;
