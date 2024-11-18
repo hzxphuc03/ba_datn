@@ -94,4 +94,8 @@ public class SanPham implements Serializable {
     @ManyToOne()
     @JoinColumn(name = "id_loai_de", referencedColumnName = "id")
     private LoaiDe loaiDe;
+
+    public SanPham(Long id) {
+        this.id = id;
+    }
 }

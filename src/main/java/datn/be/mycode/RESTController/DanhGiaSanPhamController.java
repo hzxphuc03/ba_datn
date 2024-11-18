@@ -67,21 +67,20 @@ public class DanhGiaSanPhamController {
         return ResponseEntity.ok(danhGiaSanPhamService.udateTrangThai(id, trangThai));
     }
 
-    @PostMapping("/add-danh-gia-theo-id-chi-tiet-hoa-don")
-    public ResponseEntity<?> addDanhGiaTheoIDChiTietHoaDon(@RequestParam Long idChiTietHoaDon,
-                                                        @RequestBody DanhGiaSanPhamChungRequest request) {
-
-        DanhGiaSanPham danhGiaSanPham = danhGiaSanPhamService.danhGiaTheoIDChiTietHoaDon(idChiTietHoaDon, request);
-
-        return ResponseEntity.ok(danhGiaSanPham);
+// add 1sp
+    @PostMapping("/danh-gia-tung-san-pham")
+    public ResponseEntity<DanhGiaSanPham> danhGiaTungSanPham(@RequestBody DanhGiaSanPhamChungRequest request) {
+        DanhGiaSanPham danhGia = danhGiaSanPhamService.danhGiaTungSanPham(request);
+    return ResponseEntity.ok(danhGia);
     }
 
-    @PostMapping("/add-danh-gia-chung")
-    public ResponseEntity<?> addDanhGiaChungByIDKH(@RequestParam Long idKhachHang,
-                                                   @RequestBody DanhGiaSanPhamChungRequest request) {
+// add danh gia tất cả
+    @PostMapping("/danh-gia-tat-ca")
+    public ResponseEntity<List<DanhGiaSanPham>> addRatingsForPurchasedProducts(
+        @RequestParam Long idKhachHang,
+        @RequestBody DanhGiaSanPhamChungRequest request) {
 
-        List<DanhGiaSanPham> danhGiaList = danhGiaSanPhamService.danhGiaChungByIDKH(idKhachHang, request);
-
+        List<DanhGiaSanPham> danhGiaList = danhGiaSanPhamService.danhGiaTatCaSanPham(idKhachHang, request);
         return ResponseEntity.ok(danhGiaList);
     }
 
