@@ -10,6 +10,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 
 @Repository
@@ -22,5 +23,7 @@ public interface ThaoTacHoaDonRepository extends JpaRepository<ThaoTacHoaDon, Lo
             "(:idNhanVien IS NULL OR tthd.nhanVien.id = :idNhanVien)"
     )
     Page<ThaoTacHoaDonResponse> searchAll(Long idHoaDon, Long idNhanVien, Pageable pageable);
+
+    List<ThaoTacHoaDon> findAllByHoaDonId(Long idHoaDon);
 
 }

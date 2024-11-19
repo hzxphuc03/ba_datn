@@ -1,5 +1,7 @@
 package datn.be.mycode.RESTController;
 
+import datn.be.mycode.entity.HoaDonChiTiet;
+import datn.be.mycode.request.HoaDon.HoaDonByKhachHang;
 import datn.be.mycode.request.HoaDon.HuyHoaDonRequest;
 import datn.be.mycode.request.HoaDon.NextStep;
 import datn.be.mycode.request.HoaDonRequest;
@@ -12,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @CrossOrigin("*")
 @RestController
@@ -58,6 +61,22 @@ public class HoaDonCotroller {
             @PathVariable(name = "idHoaDon",required = false) Long idHoaDon
     ){
         return ResponseEntity.ok(hoaDonService.getById(idHoaDon));
+    }
+
+    @GetMapping("/get-hoa-don-by-khach-hang")
+    public ResponseEntity<?> getByKhachHang(
+            @RequestParam(name = "page",required = false) Integer page,
+            @RequestParam(name = "pageSize",required = false) Integer pageSize,
+            @RequestParam(name = "idKhachHang",required = false) Long idKhachHang
+    ){
+        HoaDonByKhachHang hoaDonByKhachHang = new HoaDonByKhachHang(page,pageSize,idKhachHang);
+        return ResponseEntity.ok(hoaDonService.getByKhachHang(hoaDonByKhachHang));
+    }
+
+    @GetMapping("/get-hoa-don-chi-tiet-cho-view-khach-hang/{idHoaDon}")
+    public ResponseEntity<?> getHoaDonChiTietChoViewKhachHang(@PathVariable Long idHoaDon) {
+
+        return ResponseEntity.ok(hoaDonService.getHoaDonChiTietChoViewKhachHang(idHoaDon));
     }
 
     @PostMapping("/add")

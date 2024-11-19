@@ -30,11 +30,11 @@ public class ThaoTacHoaDon implements Serializable {
     @Column(name = "trang_thai")
     private int trangThai;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne()
     @JoinColumn(name = "id_hoa_don", referencedColumnName = "id")
     private HoaDon hoaDon;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne()
     @JoinColumn(name = "id_nhan_vien", referencedColumnName = "id")
     private NhanVien nhanVien;
 

@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface VoucherKhachHangRepository extends JpaRepository<VoucherKhachHang,Long> {
@@ -32,4 +33,6 @@ public interface VoucherKhachHangRepository extends JpaRepository<VoucherKhachHa
     Page<VoucherKhachHangResponse> findAllByTrangThai(Integer trangThai, Pageable pageable);
 
     List<VoucherKhachHang> findAllByKhachHangId(Long idKhachHang);
+
+    Optional<VoucherKhachHang> findByVoucherId(Long idVoucher);
 }

@@ -2,6 +2,7 @@ package datn.be.mycode.service;
 
 import datn.be.mycode.entity.*;
 import datn.be.mycode.repository.*;
+import datn.be.mycode.request.HoaDon.HoaDonByKhachHang;
 import datn.be.mycode.request.HoaDon.HuyHoaDonRequest;
 import datn.be.mycode.request.HoaDon.NextStep;
 import datn.be.mycode.request.HoaDonRequest;
@@ -9,16 +10,19 @@ import datn.be.mycode.request.VoucherHoaDonRequest;
 import datn.be.mycode.request.customRequest.BanHang.*;
 import datn.be.mycode.request.customRequest.TableHoaDonRequest;
 import datn.be.mycode.request.thaoTacHoaDon.ThaoTacHoaDonAddRequest;
+import datn.be.mycode.response.hoaDon.HoaDonChiTietChoViewKhachHang;
 import datn.be.mycode.response.hoaDon.HoaDonResponse;
 import datn.be.mycode.response.NormalTableResponse;
 import datn.be.mycode.response.erroResponse;
 import datn.be.mycode.response.hoaDon.HoaDonThanhToanXong;
+import datn.be.mycode.util.EmailSender;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -47,6 +51,18 @@ public class HoaDonService {
     private VNPayService vnPayService;
     @Autowired
     private SanPhamChiTietRepository sanPhamChiTietRepository;
+    @Autowired
+    private HoaDonChiTietRepository hoaDonChiTietRepository;
+    @Autowired
+    private ThaoTacHoaDonRepository thaoTacHoaDonRepository;
+    @Autowired
+    private NhanVienService nhanVienService;
+    @Autowired
+    private ThongBaoRepository thongBaoRepository;
+    @Autowired
+    private SimpMessagingTemplate messagingTemplate;
+    @Autowired
+    private EmailSender emailSender;
 
     @Autowired
     private HoaDonChiTietService hoaDonChiTietService;
@@ -401,6 +417,12 @@ public class HoaDonService {
         hoaDon.setNgayThanhToan(LocalDateTime.now());
         repo.save(hoaDon);
         thaoTacHoaDonService.add(thaoTacHoaDon);
+
+        if(hoaDon.getKhachHang().getEmail() != null) {
+            String thongBao = "Bạn đã đặt thành công đơn hàng "+hoaDon.getMa();
+            TaoThongBao(hoaDon,thongBao);
+            emailSender.sendEmailHoaDon(hoaDon.getKhachHang().getEmail(),hoaDonChiTietService.getListByHoaDonId(hoaDon.getId()),hoaDon);
+        }
         return ResponseEntity.ok("Thành công");
     }
 
@@ -474,11 +496,18 @@ public class HoaDonService {
         repo.save(hoaDon);
         thaoTacHoaDonService.add(thaoTacHoaDon);
         hoaDonChiTietService.setTrangThaiByHoaDonDone(hoaDon);
+
+        if(hoaDon.getKhachHang().getEmail() != null) {
+            String thongBao = "Bạn đã đặt thành công đơn hàng "+hoaDon.getMa();
+            TaoThongBao(hoaDon,thongBao);
+            emailSender.sendEmailHoaDon(hoaDon.getKhachHang().getEmail(),hoaDonChiTietService.getListByHoaDonId(hoaDon.getId()),hoaDon);
+        }
         return ResponseEntity.ok("thành công");
     }
 
     public ResponseEntity<?> nextSetp(NextStep request) {
         HoaDon hoaDon = repo.findById(request.getIdHoaDon()).orElse(null);
+        var nhanVien = nhanVienRepository.findById(nhanVienService.idNhanVien).orElse(null);
         if(hoaDon == null) return getErro("Hóa đơn này không tồn tại");
         if(hoaDon.getTrangThai() == 6) return getErro("Hóa đơn này đã hoàn thành không để chỉnh sửa");
         if(hoaDon.getTrangThai() == 5) {
@@ -493,7 +522,7 @@ public class HoaDonService {
 
         thaoTacHoaDon.setThaoTac(getStringThaoTac(hoaDon.getTrangThai()));
         thaoTacHoaDon.setIdHoaDon(hoaDon.getId());
-        thaoTacHoaDon.setIdNhanVien(request.getIdNhanVien());
+        thaoTacHoaDon.setIdNhanVien(nhanVien.getId());
 
 
         var trangThai = hoaDon.getTrangThai();
@@ -503,7 +532,37 @@ public class HoaDonService {
         hoaDon = repo.save(hoaDon);
         thaoTacHoaDonService.add(thaoTacHoaDon);
 
+        if(hoaDon.getKhachHang().getEmail() != null && trangThai != 6) {
+            String thongBao = "Hóa đơn "+hoaDon.getMa()+": "+thaoTacHoaDon.getThaoTac();
+            TaoThongBao(hoaDon,thongBao);
+            emailSender.sendEmailTrangThaiHoaDon(hoaDon.getKhachHang().getEmail(),thaoTacHoaDon);
+        }
+        if(hoaDon.getKhachHang().getEmail() != null && trangThai == 6) {
+            String thongBao = "Bạn đã đặt thành công đơn hàng "+hoaDon.getMa();
+            TaoThongBao(hoaDon,thongBao);
+            emailSender.sendEmailHoaDon(hoaDon.getKhachHang().getEmail(),hoaDonChiTietService.getListByHoaDonId(hoaDon.getId()),hoaDon);
+        }
+        HoaDon finalHoaDon = hoaDon;
+        Object myObject = new Object() {
+            Long idKhachHang = finalHoaDon.getKhachHang().getId();
+            Long idHoaDon = finalHoaDon.getId();
+
+        };
+        messagingTemplate.convertAndSend("/topic/notifications-bill", myObject);
         return ResponseEntity.ok("ThanhCong");
+    }
+
+    private void TaoThongBao(HoaDon hoaDon, String conten) {
+        ThongBao thongBao = new ThongBao();
+        thongBao.setNoiDung(conten);
+        thongBao.setUrl("/g4/shop/khach-hang?activeItem=1&idHoaDon="+hoaDon.getId());
+        thongBao.setDaDoc(false);
+        thongBao.setNgayTao(LocalDateTime.now());
+        thongBao.setTrangThai(1);
+        thongBao.setKhachHang(hoaDon.getKhachHang());
+
+        thongBaoRepository.save(thongBao);
+        messagingTemplate.convertAndSend("/topic/notifications", hoaDon.getKhachHang().getId());
     }
 
     private String getStringThaoTac(int trangThai){
@@ -571,5 +630,39 @@ public class HoaDonService {
 
 
         return ResponseEntity.ok("ThanhCong");
+    }
+
+    public Object getByKhachHang(HoaDonByKhachHang request) {
+        if (request.getPage() ==  null) {
+            request.setPage(1);
+        }
+        if (request.getPageSize() == null) {
+            request.setPageSize(10);
+        }
+
+        Pageable pageable = PageRequest.of(request.getPage() - 1,request.getPageSize());
+        var hoaDonPage = repo.findAllByKhachHangIdOrderByNgayTaoDesc(request.getIdKhachHang(),pageable);
+
+        NormalTableResponse<HoaDon> thongBaoNormalTableResponse = new NormalTableResponse<>();
+        thongBaoNormalTableResponse.setItem(hoaDonPage.getContent());
+        thongBaoNormalTableResponse.setPage(request.getPage());
+        thongBaoNormalTableResponse.setPageSize(request.getPageSize());
+        thongBaoNormalTableResponse.setTotalItem(hoaDonPage.getTotalElements());
+        return thongBaoNormalTableResponse;
+    }
+
+    public Object getHoaDonChiTietChoViewKhachHang(Long idHoaDon) {
+        var hoaDon = repo.findById(idHoaDon).orElse(null);
+        if(hoaDon == null)return null;
+
+        var hoaDonChiTietList = hoaDonChiTietRepository.findAllByHoaDon_Id(hoaDon.getId());
+
+        var thaoTacHoaDonList = thaoTacHoaDonRepository.findAllByHoaDonId(hoaDon.getId());
+
+        HoaDonChiTietChoViewKhachHang hoaDonChiTietChoViewKhachHang = new HoaDonChiTietChoViewKhachHang();
+        hoaDonChiTietChoViewKhachHang.setHoaDon(hoaDon);
+        hoaDonChiTietChoViewKhachHang.setHoaDonChiTietList(hoaDonChiTietList);
+        hoaDonChiTietChoViewKhachHang.setThaoTacHoaDons(thaoTacHoaDonList);
+        return hoaDonChiTietChoViewKhachHang;
     }
 }

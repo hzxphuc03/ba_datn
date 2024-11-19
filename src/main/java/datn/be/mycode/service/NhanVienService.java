@@ -36,6 +36,8 @@ public class NhanVienService {
     @Autowired
     private JwtTokenProvider jwtTokenProvider;
 
+    public Long idNhanVien = Long.valueOf(0);
+
     public NormalTableResponse<NhanVien> getAll(TableNhanVienRequest request) {
         if (request.getPage() == null) {
             request.setPage(1);
@@ -160,6 +162,7 @@ public class NhanVienService {
             String token = jwtTokenProvider.generateToken(nhanVien.getTaiKhoan(), nhanVien.getChucVu().getTen(), user);
             response.clear();
             response.put("token", token);
+            this.idNhanVien = nhanVien.getId();
             return ResponseEntity.ok(response);
         }
 
