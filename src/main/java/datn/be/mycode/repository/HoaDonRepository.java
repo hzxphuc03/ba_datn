@@ -23,7 +23,8 @@ public interface HoaDonRepository extends JpaRepository<HoaDon, Long> {
             "(:endDate IS NULL OR hd.ngayTao <= :endDate) AND " +
             "(:idKhachHang IS NULL OR hd.khachHang.id = :idKhachHang) AND " +
             "(:idNhanVien IS NULL OR hd.nhanVien.id = :idNhanVien) AND " +
-            "hd.trangThai = :trangThai"
+            "hd.trangThai = :trangThai " +
+            "ORDER BY hd.ngayTao DESC"
     )
     Page<HoaDon> searchAll(String ma, LocalDateTime startDate, LocalDateTime endDate, Long idKhachHang, Long idNhanVien, int trangThai, Pageable pageable);
 
@@ -38,4 +39,5 @@ public interface HoaDonRepository extends JpaRepository<HoaDon, Long> {
     @Query("SELECT h FROM HoaDon h WHERE h.khachHang.id = :idKhachHang AND h.ngayThanhToan >= :sevenDaysAgo")
     List<HoaDon> findRecentHoaDonsByKhachHangId(@Param("idKhachHang") Long idKhachHang, @Param("sevenDaysAgo") LocalDateTime sevenDaysAgo);
 
+    Page<HoaDon> findAllByKhachHangIdOrderByNgayTaoDesc(Long idKhachHang, Pageable pageable);
 }

@@ -1,10 +1,10 @@
 package datn.be.mycode.service;
 
 import datn.be.mycode.entity.ChiPhieuGiamGiaSuKien;
+import datn.be.mycode.entity.HoaDon;
 import datn.be.mycode.entity.SuKien;
-import datn.be.mycode.repository.ChiPhieuGiamGiaSuKienRepository;
-import datn.be.mycode.repository.SuKienRepository;
-import datn.be.mycode.repository.VoucherRepository;
+import datn.be.mycode.entity.ThongBao;
+import datn.be.mycode.repository.*;
 import datn.be.mycode.request.SuKien.SuKienRequest;
 import datn.be.mycode.request.SuKien.SuKienUpdateReq;
 import datn.be.mycode.request.customRequest.TableLongRequest;
@@ -17,6 +17,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -31,6 +32,12 @@ public class SuKienService {
     private ChiPhieuGiamGiaSuKienRepository chiPhieuGiamGiaSuKienRepository;
     @Autowired
     private VoucherRepository voucherRepository;
+    @Autowired
+    private ThongBaoRepository thongBaoRepository;
+    @Autowired
+    private SimpMessagingTemplate messagingTemplate;
+    @Autowired
+    private KhachHangRepository khachHangRepository;
 
     public NormalTableResponse<SuKien> getAll(TableLongRequest request) {
 
@@ -212,9 +219,30 @@ public class SuKienService {
                 suKien.setKeySuKien(keySuKien);
 
                 setVoucher(suKien);
+                guiThongBao(suKien);
             }
             suKienRepository.save(suKien);
         }
+
+    }
+
+    private void guiThongBao(SuKien suKien) {
+        var khachHangList = khachHangRepository.findAll();
+        var khachHangEmail = khachHangList.stream().filter(khachHang -> khachHang.getEmail() != null).collect(Collectors.toList());
+
+        khachHangEmail.forEach(khachHang -> {
+            ThongBao thongBao = new ThongBao();
+            thongBao.setNoiDung("Có sự kiện mới, nhanh tay vào mua hàng");
+            thongBao.setUrl("/g4/shop/su-kien-thang");
+            thongBao.setDaDoc(false);
+            thongBao.setNgayTao(LocalDateTime.now());
+            thongBao.setTrangThai(1);
+            thongBao.setKhachHang(khachHang);
+
+            thongBaoRepository.save(thongBao);
+            messagingTemplate.convertAndSend("/topic/notifications", khachHang.getId());
+            //email
+        });
 
     }
 

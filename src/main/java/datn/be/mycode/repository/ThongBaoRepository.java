@@ -14,7 +14,8 @@ public interface ThongBaoRepository extends JpaRepository<ThongBao, Long> {
 
     List<ThongBao> findAllByKhachHangId(Long idkhachHang);
 
-    @Query("SELECT t FROM ThongBao t WHERE t.khachHang.id = :khachHangId ORDER BY t.ngayTao desc , t.daDoc ASC")
+//    @Query("SELECT t FROM ThongBao t WHERE t.khachHang.id = :khachHangId ORDER BY t.ngayTao desc , t.daDoc ASC")
+    @Query("SELECT t FROM ThongBao t WHERE t.khachHang.id = :khachHangId ORDER BY CASE WHEN t.daDoc = true THEN 1 ELSE 0 END, t.ngayTao DESC")
     Page<ThongBao> findAllByKhachHangIdOrderByNgayTaoAndDaDoc(Long khachHangId, Pageable pageable);
 
     @Query("SELECT COUNT(t) FROM ThongBao t WHERE t.daDoc = false AND t.khachHang.id = :khachHangId")

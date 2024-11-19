@@ -109,7 +109,7 @@ public interface SanPhamRepository extends JpaRepository<SanPham, Long> {
             "(:#{#request.idVatLieu} IS NULL OR sp.vatLieu.id = :#{#request.idVatLieu}) AND " +
             "(:#{#request.idLoaiDe} IS NULL OR sp.loaiDe.id = :#{#request.idLoaiDe}) AND " +
             "sp.trangThai = 1 " +
-            "GROUP BY sp.id, sp.ma, sp.ten, sp.moTa, sp.hinhAnh, sp.trongLuong, sp.beMatSuDung, sp.congNghe, sp.kieuDang, sp.giaThapNhat, sp.giaCaoNhat, sp.ngayTao, sp.ngaySua, sp.nguoiTao, sp.soLuong, sp.trangThai, sp.giamGia, sp.thuongHieu, sp.theLoai, sp.loaiCo, sp.vatLieu, sp.loaiDe " +
+            "GROUP BY sp.id, sp.ma, sp.ten, sp.moTa, sp.hinhAnh, sp.trongLuong, sp.beMatSuDung, sp.congNghe, sp.kieuDang, sp.giaThapNhat, sp.giaCaoNhat, sp.ngayTao, sp.ngaySua, sp.nguoiTao, sp.soLuong, sp.trangThai, sp.giamGia, sp.thuongHieu, sp.theLoai, sp.loaiCo, sp.vatLieu, sp.loaiDe, sp.trungBinhDanhGia " +
             "ORDER BY " +
             "CASE WHEN :#{#request.sort} = 0 THEN sp.giaThapNhat END ASC, " +
             "CASE WHEN :#{#request.sort} = 1 THEN sp.giaThapNhat END DESC"

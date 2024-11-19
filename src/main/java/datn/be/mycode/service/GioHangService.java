@@ -8,9 +8,11 @@ import datn.be.mycode.request.GioHang.GioHangAdd;
 import datn.be.mycode.request.GioHang.GioHangPhuongThucThanhToan;
 import datn.be.mycode.request.GioHang.GioHangVoucher;
 import datn.be.mycode.response.erroResponse;
+import datn.be.mycode.util.EmailSender;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -49,6 +51,12 @@ public class GioHangService {
     private VNPayService vnPayService;
     @Autowired
     private ThongBaoRepository thongBaoRepository;
+    @Autowired
+    private ThaoTacHoaDonRepository thaoTacHoaDonRepository;
+    @Autowired
+    private SimpMessagingTemplate messagingTemplate;
+    @Autowired
+    private EmailSender emailSender;
 
     public ResponseEntity<?> getByKhachHang(Long idKhachHang) {
         var gioHang = gioHangRepository.findByKhachHangId(idKhachHang).orElse(null);
@@ -200,7 +208,7 @@ public class GioHangService {
         setGiohang(gioHang);
 
         TaoThongBao(hoaDon);
-
+        emailSender.sendEmailHoaDon(hoaDon.getKhachHang().getEmail(),hoaDonChiTietList,hoaDon);
         return ResponseEntity.ok(hoaDon);
 
     }
@@ -208,12 +216,27 @@ public class GioHangService {
     private void TaoThongBao(HoaDon hoaDon) {
         ThongBao thongBao = new ThongBao();
         thongBao.setNoiDung("Bạn đã đặt thành công đơn hàng "+hoaDon.getMa());
-        thongBao.setUrl("http://localhost:4200/g4/shop/khach-hang?activeItem=1&idHoaDon="+hoaDon.getId());
+        thongBao.setUrl("/g4/shop/khach-hang?activeItem=1&idHoaDon="+hoaDon.getId());
         thongBao.setDaDoc(false);
+        thongBao.setNgayTao(LocalDateTime.now());
         thongBao.setTrangThai(1);
         thongBao.setKhachHang(hoaDon.getKhachHang());
 
         thongBaoRepository.save(thongBao);
+        messagingTemplate.convertAndSend("/topic/notifications", hoaDon.getKhachHang().getId());
+    }
+
+    private void TaoThongBaoAddVoucher(HoaDon hoaDon) {
+        ThongBao thongBao = new ThongBao();
+        thongBao.setNoiDung("Bạn đã được tặng 1 phiếu miễn phí gửi hàng khi thanh toán hóa đơn trên 500000 đ");
+        thongBao.setUrl("/g4/shop/khach-hang?activeItem=2");
+        thongBao.setDaDoc(false);
+        thongBao.setNgayTao(LocalDateTime.now());
+        thongBao.setTrangThai(1);
+        thongBao.setKhachHang(hoaDon.getKhachHang());
+
+        thongBaoRepository.save(thongBao);
+        messagingTemplate.convertAndSend("/topic/notifications", hoaDon.getKhachHang().getId());
     }
 
     public String taoURLThanhToan(int orderTotal,String maHoaDon) {
@@ -224,7 +247,8 @@ public class GioHangService {
     public ResponseEntity<?> thanhToanThanhCong(ThanhToanKhiNhanHang request) {
         var pttt = phuongThucThanhToanRepository.findById(Long.valueOf(2)).orElse(null);
         var gioHang = gioHangRepository.findByKhachHangId(request.getIdKhachHang()).orElse(null);
-        if(gioHang == null) return getErro("Khách hàng này đã dừng");
+        if(gioHang == null) return getErro("Khách hàng này không hoạt động hoặc chưa tạo tài khoản");
+        if(request.getIdTinhThanh() == null) return getErro("");
 
 //        tao hoa don
         HoaDon hoaDon = taoHoaDonThanhToan(request);
@@ -240,7 +264,46 @@ public class GioHangService {
         setGiohang(gioHang);
 
         TaoThongBao(hoaDon);
+        emailSender.sendEmailHoaDon(hoaDon.getKhachHang().getEmail(),hoaDonChiTietList,hoaDon);
+
+        AddVouchherFreeShip(hoaDon);
+        messagingTemplate.convertAndSend("/topic/notifications", hoaDon.getKhachHang().getId());
         return ResponseEntity.ok(hoaDon);
+    }
+
+    private void AddVouchherFreeShip(HoaDon hoaDon) {
+        BigDecimal giaTraThuong = BigDecimal.valueOf(500000);
+        if(hoaDon.getTongTien().compareTo(giaTraThuong) >= 0){
+            var voucherFreeShip = voucherRepository.findByMa("G5FP").orElse(null);
+            if(voucherFreeShip == null){
+                Voucher voucher = new Voucher();
+                voucher.setTen("Phiếu giảm giá cho hóa đơn trên 500000 đ");
+                voucher.setTheLoai(1);
+                voucher.setNgayBatDau(LocalDateTime.parse("1753-11-10T10:15:30"));
+                voucher.setNgayKetThuc(LocalDateTime.parse("5024-11-10T10:15:30"));
+                voucher.setPhanTramGiam(100);
+                voucher.setGiamToiDa(BigDecimal.valueOf(100000));
+                voucher.setGiaTriGiamToiThieu(BigDecimal.valueOf(0));
+                voucher.setTrangThai(3);
+
+                voucherFreeShip = voucherRepository.save(voucher);
+            }
+            var voucherKhachHhang = voucherKhachHangRepository.findByVoucherId(voucherFreeShip.getId()).orElse(null);
+            if(voucherKhachHhang == null){
+                VoucherKhachHang voucherKhachHang = new VoucherKhachHang();
+                voucherKhachHang.setNgayTao(LocalDateTime.now());
+                voucherKhachHang.setNgayBatDau(LocalDateTime.now());
+                voucherKhachHang.setNgayKetThuc(LocalDateTime.now().plusDays(7));
+                voucherKhachHang.setSoLuong(1);
+                voucherKhachHang.setTrangThai(1);
+                voucherKhachHang.setVoucher(voucherFreeShip);
+                voucherKhachHang.setKhachHang(hoaDon.getKhachHang());
+                voucherKhachHangRepository.save(voucherKhachHang);
+            }else {
+                voucherKhachHhang.setSoLuong(voucherKhachHhang.getSoLuong()+1);
+            }
+            TaoThongBaoAddVoucher(hoaDon);
+        }
     }
 
     private void xoaHoaDon(HoaDon hoaDon) {
@@ -367,7 +430,19 @@ public class GioHangService {
         hoaDon.setMa("HD"+hoaDon.getId());
         addVoucher(hoaDon, request.getIdVoucherKhachHangList());
 
+        TaoThaoTacHoaDon(hoaDon);
+
         return hoaDon;
+    }
+
+    private void TaoThaoTacHoaDon(HoaDon hoaDon) {
+        ThaoTacHoaDon thaoTacHoaDon = new ThaoTacHoaDon();
+        thaoTacHoaDon.setThaoTac("Đặt hàng thành công");
+        thaoTacHoaDon.setNgayTao(LocalDateTime.now());
+        thaoTacHoaDon.setTrangThai(1);
+        thaoTacHoaDon.setHoaDon(hoaDon);
+        thaoTacHoaDonRepository.save(thaoTacHoaDon);
+
     }
 
     private String addVoucher(HoaDon hoaDon, List<Long> idVoucherKhachHangList) {
