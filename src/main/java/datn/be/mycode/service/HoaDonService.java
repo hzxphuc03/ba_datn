@@ -16,6 +16,8 @@ import datn.be.mycode.response.NormalTableResponse;
 import datn.be.mycode.response.erroResponse;
 import datn.be.mycode.response.hoaDon.HoaDonThanhToanXong;
 import datn.be.mycode.util.EmailSender;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -507,7 +509,7 @@ public class HoaDonService {
 
     public ResponseEntity<?> nextSetp(NextStep request) {
         HoaDon hoaDon = repo.findById(request.getIdHoaDon()).orElse(null);
-        var nhanVien = nhanVienRepository.findById(nhanVienService.idNhanVien).orElse(null);
+        var nhanVien = nhanVienRepository.findById(request.getIdNhanVien()).orElse(null);
         if(hoaDon == null) return getErro("Hóa đơn này không tồn tại");
         if(hoaDon.getTrangThai() == 6) return getErro("Hóa đơn này đã hoàn thành không để chỉnh sửa");
         if(hoaDon.getTrangThai() == 5) {
@@ -540,15 +542,8 @@ public class HoaDonService {
         if(hoaDon.getKhachHang().getEmail() != null && trangThai == 6) {
             String thongBao = "Bạn đã đặt thành công đơn hàng "+hoaDon.getMa();
             TaoThongBao(hoaDon,thongBao);
-            emailSender.sendEmailHoaDon(hoaDon.getKhachHang().getEmail(),hoaDonChiTietService.getListByHoaDonId(hoaDon.getId()),hoaDon);
+//            emailSender.sendEmailHoaDon(hoaDon.getKhachHang().getEmail(),hoaDonChiTietService.getListByHoaDonId(hoaDon.getId()),hoaDon);
         }
-        HoaDon finalHoaDon = hoaDon;
-        Object myObject = new Object() {
-            Long idKhachHang = finalHoaDon.getKhachHang().getId();
-            Long idHoaDon = finalHoaDon.getId();
-
-        };
-        messagingTemplate.convertAndSend("/topic/notifications-bill", myObject);
         return ResponseEntity.ok("ThanhCong");
     }
 

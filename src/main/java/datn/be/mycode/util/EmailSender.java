@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
@@ -49,6 +50,7 @@ public class EmailSender {
     }
 
 
+    @Async
     public void sendEmailOtp(String to) {
         var optCode = 100000 + new Random().nextInt(999999);
         String otp = String.valueOf(optCode);
@@ -88,7 +90,7 @@ public class EmailSender {
         }
         return false;
     }
-
+    @Async
     public void sendEmailHoaDon(String to, List<HoaDonChiTiet> hoaDonChiTiets, HoaDon hoaDon) {
         try {
             MimeMessage message = javaMailSender.createMimeMessage();
@@ -130,6 +132,7 @@ public class EmailSender {
         }
     }
 
+    @Async
     public void sendEmailHoaDonAddVoucher(String to, List<HoaDonChiTiet> hoaDonChiTiets, HoaDon hoaDon, String maVoucher) {
         try {
             MimeMessage message = javaMailSender.createMimeMessage();
@@ -187,6 +190,7 @@ public class EmailSender {
         return productDetailsBuilder.toString();
     }
 
+    @Async
     public void sendEmailTrangThaiHoaDon(String email, ThaoTacHoaDonAddRequest thaoTacHoaDon) {
         try {
             MimeMessage message = javaMailSender.createMimeMessage();

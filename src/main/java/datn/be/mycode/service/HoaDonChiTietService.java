@@ -150,6 +150,7 @@ public class HoaDonChiTietService {
                         .danhGia(false)
                         .hoaDon(hd)
                         .sanPhamChiTiet(spct)
+                        .danhGia(false)
                         .build();
             }
             else{
