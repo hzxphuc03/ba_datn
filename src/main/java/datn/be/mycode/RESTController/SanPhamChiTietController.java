@@ -13,6 +13,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Map;
 
 @CrossOrigin("*")
 @RestController
@@ -82,6 +84,12 @@ public class SanPhamChiTietController {
     ){
         var request = new GetBySanPhamAndMauReq(idSanPham,idMau);
         return ResponseEntity.ok(sanPhamChiTietService.getAllSizeBySanPhamAndMau(request));
+    }
+
+    @GetMapping("/{idSanPham}/mau-sac-kich-co")
+    public ResponseEntity<?> getDistinctMauSacAndKichCo(@PathVariable Long idSanPham) {
+        Map<String, List<Long>> response = sanPhamChiTietService.getDistinctMauSacAndKichCoBySanPhamId(idSanPham);
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/add")

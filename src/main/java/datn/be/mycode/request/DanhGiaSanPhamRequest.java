@@ -14,9 +14,7 @@ public class DanhGiaSanPhamRequest {
 
     private Long id;
     private int sao;
-    private String cmt;
+    private String binhLuan;
     private List<String> listHinhAnh;
-    private int trangThai;
-    private Long idKhachHang;
-    private Long idSanPham;
+
 }

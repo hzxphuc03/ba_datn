@@ -10,6 +10,8 @@ import datn.be.mycode.repository.KhachHangRepository;
 import datn.be.mycode.request.KhachHangRequest;
 import datn.be.mycode.request.NormalTableRequest;
 import datn.be.mycode.request.NormalTableRequestKhachHang;
+import datn.be.mycode.request.khachHang.CapNhatEmailKhachHangRequest;
+import datn.be.mycode.request.khachHang.CapNhatSoDienThoaiKhachHangRequest;
 import datn.be.mycode.request.khachHang.UpdateKhachHangRequest;
 import datn.be.mycode.response.NormalTableResponse;
 import datn.be.mycode.response.UserLoginResponse;
@@ -211,4 +213,16 @@ public class KhachHangService {
             return ResponseEntity.ok(response);
 
     }
+
+    public KhachHang updateSoDienThoaiKhachHang(CapNhatSoDienThoaiKhachHangRequest request) {
+        KhachHang khachHang = repository.findById(request.getId()).get();
+        khachHang.setSoDienThoai(request.getSoDienThoai());
+        return repository.save(khachHang);
+    }
+    public KhachHang updateEmailKhachHang(CapNhatEmailKhachHangRequest request) {
+        KhachHang khachHang = repository.findById(request.getId()).get();
+        khachHang.setEmail(request.getEmail());
+        return repository.save(khachHang);
+    }
+
 }

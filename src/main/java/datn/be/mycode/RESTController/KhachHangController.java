@@ -3,9 +3,12 @@ package datn.be.mycode.RESTController;
 import datn.be.mycode.request.KhachHangRequest;
 import datn.be.mycode.request.NormalTableRequest;
 import datn.be.mycode.request.NormalTableRequestKhachHang;
+import datn.be.mycode.request.khachHang.CapNhatEmailKhachHangRequest;
+import datn.be.mycode.request.khachHang.CapNhatSoDienThoaiKhachHangRequest;
 import datn.be.mycode.request.khachHang.UpdateKhachHangRequest;
 import datn.be.mycode.response.khachHang.ThongTinKhachHangResponse;
 import datn.be.mycode.service.KhachHangService;
+import datn.be.mycode.util.EmailSender;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,6 +18,8 @@ import org.springframework.web.bind.annotation.*;
 public class KhachHangController {
     @Autowired
     private KhachHangService khachHangService;
+    @Autowired
+    EmailSender emailSender;
 
     @GetMapping("")
     public ResponseEntity<?> getAll(
@@ -28,7 +33,6 @@ public class KhachHangController {
         NormalTableRequestKhachHang request = new NormalTableRequestKhachHang(page,pageSize,keyWord,status);
         return ResponseEntity.ok(khachHangService.getAll(request));
     }
-
     @GetMapping("/get-by-id/{id}")
     public ResponseEntity<?> getByIdSanPham(
             @PathVariable(name = "id",required = false) Long id
@@ -71,4 +75,29 @@ public class KhachHangController {
     public ResponseEntity<?> dangKy(){
         return ResponseEntity.ok("");
     }
+
+    // gửi mã - kiểm tra OTP
+    @PostMapping("gui-ma-otp")
+    public ResponseEntity<?> guiMaOtp(@RequestBody CapNhatEmailKhachHangRequest request) {
+        emailSender.sendEmailOtp(request.getEmail());
+        return ResponseEntity.ok("OTP đã được gửi đến email.");
+    }
+
+    @GetMapping("kiem-tra-otp")
+    public ResponseEntity<?> kiemTraOtp(@RequestParam String email, @RequestParam String otp) {
+        return emailSender.kiemTraOtp(email, otp);
+    }
+    // sau khi kiểm tra ok thì cập nhật
+    @PutMapping("cap-nhat-so-dien-thoai")
+    public ResponseEntity<?> capNhatSoDienThoaiKhachHang(@RequestBody CapNhatSoDienThoaiKhachHangRequest request){
+
+        return ResponseEntity.ok(khachHangService.updateSoDienThoaiKhachHang(request));
+    }
+
+    @PutMapping("cap-nhat-email")
+    public ResponseEntity<?> capNhatEmailKhachHang(@RequestBody CapNhatEmailKhachHangRequest request){
+
+        return ResponseEntity.ok(khachHangService.updateEmailKhachHang(request));
+    }
+
 }

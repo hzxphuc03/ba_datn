@@ -40,4 +40,6 @@ public interface HoaDonRepository extends JpaRepository<HoaDon, Long> {
     List<HoaDon> findRecentHoaDonsByKhachHangId(@Param("idKhachHang") Long idKhachHang, @Param("sevenDaysAgo") LocalDateTime sevenDaysAgo);
 
     Page<HoaDon> findAllByKhachHangIdOrderByNgayTaoDesc(Long idKhachHang, Pageable pageable);
+
+    List<HoaDon> findByKhachHangId(@Param("idKhachHang") Long idKhachHang);
 }

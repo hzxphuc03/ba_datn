@@ -12,6 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,7 +35,8 @@ public class DanhGiaSanPhamService {
      HoaDonChiTietRepository hoaDonChiTietRepository;
     @Autowired
     SanPhamService sanPhamService;
-
+    @Autowired
+    HinhAnhBinhLuanRepository hinhAnhBinhLuanRepository;
     public NormalTableResponse<DanhGiaSanPham> getAll(TableLongRequest request) {
 
         if (request.getPage() ==  null) {
@@ -180,14 +183,14 @@ public class DanhGiaSanPhamService {
         danhGiaSanPham.setIdSanPham(new SanPham(request.getIdSanPham())); // Thay đổi để sử dụng ID từ request
 
         // Xử lý danh sách hình ảnh từ request
-        List<HinhAnhComment> hinhAnhList = request.getListHinhAnh().stream().map(hinhAnh -> {
-            HinhAnhComment hinhAnhComment = new HinhAnhComment();
-            hinhAnhComment.setAnh(hinhAnh);
-            hinhAnhComment.setTrangThai(1);
-            hinhAnhComment.setDanhGiaSanPham(danhGiaSanPham);
-            return hinhAnhComment;
+        List<HinhAnhBinhLuan> hinhAnhList = request.getListHinhAnh().stream().map(hinhAnh -> {
+            HinhAnhBinhLuan hinhAnhBinhLuan = new HinhAnhBinhLuan();
+            hinhAnhBinhLuan.setAnh(hinhAnh);
+            hinhAnhBinhLuan.setTrangThai(1);
+            hinhAnhBinhLuan.setDanhGiaSanPham(danhGiaSanPham);
+            return hinhAnhBinhLuan;
         }).collect(Collectors.toList());
-        danhGiaSanPham.setHinhAnhComment(hinhAnhList);
+        danhGiaSanPham.setHinhAnhBinhLuan(hinhAnhList);
 
         // Lưu đánh giá sản phẩm
         DanhGiaSanPham savedDanhGia = danhGiaSanPhamRepository.save(danhGiaSanPham);
@@ -257,6 +260,38 @@ public class DanhGiaSanPhamService {
         return savedDanhGiaList; // Trả về danh sách đánh giá đã lưu
     }
 
+    @Transactional
+    public ResponseEntity<?> updateDanhGiaSanPham(DanhGiaSanPhamRequest request) {
+        // Tìm đánh giá sản phẩm theo idKhachHang và idSanPham
+        Optional<DanhGiaSanPham> optionalDanhGia = danhGiaSanPhamRepository.findById(request.getId());
 
+        if (optionalDanhGia.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Không tìm thấy đánh giá để cập nhật.");
+        }
+
+        DanhGiaSanPham danhGiaSanPham = optionalDanhGia.get();
+
+        // Cập nhật thông tin đánh giá
+        danhGiaSanPham.setSao(request.getSao());
+        danhGiaSanPham.setBinhLuan(request.getBinhLuan());
+
+        // Xóa tất cả các hình ảnh cũ trước khi cập nhật
+        hinhAnhBinhLuanRepository.deleteByDanhGiaSanPham_Id(danhGiaSanPham.getId());
+
+        // Thêm các hình ảnh mới từ request
+        List<HinhAnhBinhLuan> hinhAnhList = request.getListHinhAnh().stream().map(anh -> {
+            HinhAnhBinhLuan hinhAnhComment = new HinhAnhBinhLuan();
+            hinhAnhComment.setAnh(anh);
+            hinhAnhComment.setTrangThai(1);
+            hinhAnhComment.setDanhGiaSanPham(danhGiaSanPham);
+            return hinhAnhComment;
+        }).collect(Collectors.toList());
+        danhGiaSanPham.setHinhAnhBinhLuan(hinhAnhList);
+
+        // Lưu lại đánh giá đã cập nhật
+        DanhGiaSanPham updatedDanhGia = danhGiaSanPhamRepository.save(danhGiaSanPham);
+
+        return ResponseEntity.ok(updatedDanhGia);
+    }
 
 }

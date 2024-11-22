@@ -95,4 +95,9 @@ public interface SanPhamChiTietRepository extends JpaRepository<SanPhamChiTiet, 
             @Param("mauSacId") Long mauSacId,
             @Param("sanPhamChiTietId") Long sanPhamChiTietId);
 
+    @Query("SELECT DISTINCT sct.mauSac.id FROM SanPhamChiTiet sct WHERE sct.sanPham.id = :idSanPham")
+    List<Long> findDistinctMauSacBySanPhamId(@Param("idSanPham") Long idSanPham);
+
+    @Query("SELECT DISTINCT sct.kichCo.id FROM SanPhamChiTiet sct WHERE sct.sanPham.id = :idSanPham")
+    List<Long> findDistinctKichCoBySanPhamId(@Param("idSanPham") Long idSanPham);
 }

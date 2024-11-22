@@ -24,6 +24,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class SanPhamChiTietService {
@@ -274,4 +275,14 @@ public class SanPhamChiTietService {
         var sanPhamChiTiets = sanPhamChiTietRepository.findAllBySanPham_IdAndMauSacId(request.getIdSanPham(),request.getIdMau());
         return ResponseEntity.ok(sanPhamChiTiets);
     }
+
+    public Map<String, List<Long>> getDistinctMauSacAndKichCoBySanPhamId(Long idSanPham) {
+        // Lấy danh sách idMauSac và idKichCo không trùng lặp
+        List<Long> mauSacList = sanPhamChiTietRepository.findDistinctMauSacBySanPhamId(idSanPham);
+        List<Long> kichCoList = sanPhamChiTietRepository.findDistinctKichCoBySanPhamId(idSanPham);
+
+        // Trả về dưới dạng Map hoặc có thể trả về List nếu cần
+        return Map.of("idMauSac", mauSacList, "idKichCo", kichCoList);
+    }
+
 }

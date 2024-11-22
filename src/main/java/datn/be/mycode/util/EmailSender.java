@@ -3,8 +3,11 @@ package datn.be.mycode.util;
 import datn.be.mycode.entity.HoaDon;
 import datn.be.mycode.entity.HoaDonChiTiet;
 import datn.be.mycode.request.thaoTacHoaDon.ThaoTacHoaDonAddRequest;
+import datn.be.mycode.response.erroResponse;
 import jakarta.mail.internet.MimeMessage;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -90,6 +93,31 @@ public class EmailSender {
         }
         return false;
     }
+
+    private ResponseEntity<?> getErro(String message) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new erroResponse(message));
+    }
+    public ResponseEntity<?> kiemTraOtp(String email, String otpReq) {
+        // Lấy OTP từ bộ nhớ
+        String otp = otpStorage.get(email);
+
+        // Trường hợp OTP không tồn tại (do hết hạn hoặc email không đúng)
+        if (otp == null) {
+            return getErro("OTP đã hết hạn hoặc email không hợp lệ.");
+        }
+
+        // Trường hợp OTP không đúng
+        if (!otp.equals(otpReq)) {
+            return getErro("OTP không đúng. Vui lòng thử lại.");
+        }
+
+        // OTP hợp lệ, xóa khỏi bộ nhớ để tránh tái sử dụng
+        otpStorage.remove(email);
+
+        // Trả về thông báo thành công
+        return ResponseEntity.ok("Xác thực OTP thành công.");
+    }
+
     @Async
     public void sendEmailHoaDon(String to, List<HoaDonChiTiet> hoaDonChiTiets, HoaDon hoaDon) {
         try {

@@ -84,4 +84,9 @@ public class DanhGiaSanPhamController {
         return ResponseEntity.ok(danhGiaList);
     }
 
+    @PutMapping("/danh-gia-cap-nhat")
+    public ResponseEntity<?> capNhatDanhGiaSanPham(@RequestBody DanhGiaSanPhamRequest request) {
+        return danhGiaSanPhamService.updateDanhGiaSanPham(request);
+    }
+
 }
