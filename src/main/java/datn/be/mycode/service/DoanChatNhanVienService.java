@@ -73,7 +73,7 @@ public class DoanChatNhanVienService {
 
         Pageable pageable = PageRequest.of(request.getPage() - 1,request.getPageSize());
 
-        var doanChatByHopThoaiList = doanChatNhanVienRepository.findAllByHopThoaiNhanVienId(request.getIdHopThoai(), pageable);
+        var doanChatByHopThoaiList = doanChatNhanVienRepository.findAllByHopThoaiNhanVienIdOrderByThoiGianDesc(request.getIdHopThoai(), pageable);
         if(doanChatByHopThoaiList.isEmpty()) getErro("hộp thoại này chua có chat");
 
         List<DoanChatGet> doanChatGets = new ArrayList<>();
@@ -81,8 +81,10 @@ public class DoanChatNhanVienService {
             List<String> hinhAnh = Arrays.stream(doanChatNhanVien.getHinhAnh().split(",")).toList();
 
             DoanChatGet doanChatGet = new DoanChatGet();
+            doanChatGet.setId(doanChatNhanVien.getId());
             doanChatGet.setTheLoai(doanChatNhanVien.getTheLoai());
             doanChatGet.setHinhAnhList(hinhAnh);
+            doanChatGet.setNgayGui(doanChatNhanVien.getThoiGian());
             doanChatGet.setVoice(doanChatNhanVien.getVoice());
             doanChatGet.setTinNhan(doanChatNhanVien.getTinNhan());
             doanChatGet.setNguoiGui(doanChatNhanVien.getNguoiGui());

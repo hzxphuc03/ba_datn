@@ -16,5 +16,5 @@ public interface DoanChatNhanVienRepository extends JpaRepository<DoanChatNhanVi
             "WHERE d.thoiGian = (SELECT MAX(d2.thoiGian) FROM DoanChatNhanVien d2 WHERE d2.hopThoaiNhanVien.id = :idHopThoai)")
     Optional<DoanChatNhanVien> findNewestMessageByHopThoai(Long idHopThoai);
 
-    Page<DoanChatNhanVien> findAllByHopThoaiNhanVienId(Long idHopThoai, Pageable pageable);
+    Page<DoanChatNhanVien> findAllByHopThoaiNhanVienIdOrderByThoiGianDesc(Long idHopThoai, Pageable pageable);
 }

@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
@@ -15,8 +16,10 @@ import java.util.List;
 @AllArgsConstructor
 public class DoanChatGet {
 
+    private Long id;
     private String theLoai;
     private List<String> hinhAnhList;
+    private LocalDateTime ngayGui;
     private String voice;
     private String tinNhan;
     private NhanVien nguoiGui;
