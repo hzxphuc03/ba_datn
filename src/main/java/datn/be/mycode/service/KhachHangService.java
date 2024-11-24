@@ -81,6 +81,11 @@ public class KhachHangService {
         return khachHangNormalTableResponse;
     }
 
+    public List<KhachHang> getAll() {
+
+        return repository.findAll();
+    }
+
     public KhachHang getById(Long id){
         return repository.findById(id).get();
     }

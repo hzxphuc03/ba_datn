@@ -13,14 +13,14 @@ import java.time.LocalDateTime;
 @ToString
 
 @Entity
-@Table(name = "hop_thoai")
-public class HopThoai implements Serializable {
+@Table(name = "hop_thoai_khach_hang")
+public class HopThoaiKhachHang implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "tin_nhan_cuoi")
+    @Column(name = "tin_nhan_cuoi",columnDefinition = "NVARCHAR(MAX)")
     private String tinNhanCuoi;
 
     @Column(name = "thoi_gian_nhan_cuoi")
