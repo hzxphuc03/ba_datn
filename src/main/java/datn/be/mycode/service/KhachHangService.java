@@ -200,6 +200,7 @@ public class KhachHangService {
         UserLoginResponse user = UserLoginResponse.builder()
                     .id(khachHang.getId())
                     .hoTen(khachHang.getHoTen())
+                    .hinhAnh(khachHang.getHinhAnh())
                     .ngaySinh(khachHang.getNgaySinh()+"")
                     .ngayTao(khachHang.getNgayTao()+"")
                     .soDienThoai(khachHang.getSoDienThoai())
