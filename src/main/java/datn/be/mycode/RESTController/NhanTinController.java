@@ -32,8 +32,11 @@ public class NhanTinController {
     }
 
     @GetMapping("/get-hop-thoai-by-nhan-vien/{idNhanVien}")
-    public ResponseEntity<?> getHopThoaiByNhanVien(@PathVariable Long idNhanVien){
-        return ResponseEntity.ok(nhanTinService.getHopThoaiNhanVienByIdNhanVien(idNhanVien));
+    public ResponseEntity<?> getHopThoaiByNhanVien(
+            @PathVariable("idNhanVien") Long idNhanVien,
+            @RequestParam(name = "keyWord",required = false) String keyWord
+    ){
+        return ResponseEntity.ok(nhanTinService.getHopThoaiNhanVienByIdNhanVien(idNhanVien, keyWord));
     }
 
     @PutMapping("/update-trang-thai-by-hoi-thoai-nhan-vien")
