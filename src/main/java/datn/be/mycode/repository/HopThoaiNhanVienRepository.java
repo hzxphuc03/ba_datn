@@ -12,6 +12,9 @@ import java.util.List;
 @Repository
 public interface HopThoaiNhanVienRepository extends JpaRepository<HopThoaiNhanVien, Long> {
 
-    @Query("SELECT h FROM HopThoaiNhanVien h WHERE h.nhanVien1.id = :nhanVienId OR h.nhanVien2.id = :nhanVienId")
-    List<HopThoaiNhanVien> findByNhanVien(@Param("nhanVienId") Long nhanVienId);
+    @Query("SELECT h FROM HopThoaiNhanVien h WHERE " +
+            "(h.nhanVien1.id = :nhanVienId AND (:keyWord IS null OR h.nhanVien2.soDienThoai LIKE :keyWord OR h.nhanVien2.hoTen LIKE %:keyWord%))" +
+            "OR h.nhanVien2.id = :nhanVienId AND (:keyWord IS null OR h.nhanVien1.soDienThoai LIKE :keyWord OR h.nhanVien1.hoTen LIKE %:keyWord%)")
+    List<HopThoaiNhanVien> findByNhanVien(@Param("nhanVienId") Long nhanVienId, @Param("keyWord") String keyWord);
+
 }

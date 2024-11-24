@@ -22,16 +22,16 @@ public class NhanTinService {
     @Autowired
     private HopThoaiKhachHangRepository hopThoaiKhachHangRepository;
 
-    public List<HopThoaiByNhanVien> getHopThoaiNhanVienByIdNhanVien(Long idNhanVien){
-        var hopThoaiNhanVienList = hopThoaiNhanVienRepository.findByNhanVien(idNhanVien);
+    public List<HopThoaiByNhanVien> getHopThoaiNhanVienByIdNhanVien(Long idNhanVien, String keyWord){
+        var hopThoaiNhanVienList = hopThoaiNhanVienRepository.findByNhanVien(idNhanVien,keyWord);
         List<HopThoaiByNhanVien> hopThoaiByNhanViens = new ArrayList<>();
         if(hopThoaiNhanVienList.isEmpty()) return hopThoaiByNhanViens;
         hopThoaiNhanVienList.forEach(hopThoaiNhanVien -> {
            var doanChatNhanVienMoiNhat = doanChatNhanVienRepository.findNewestMessageByHopThoai(hopThoaiNhanVien.getId()).orElse(null);
-//           if(doanChatNhanVienMoiNhat != null){
+
                HopThoaiByNhanVien hopThoaiByNhanVien = new HopThoaiByNhanVien(hopThoaiNhanVien,doanChatNhanVienMoiNhat);
                hopThoaiByNhanViens.add(hopThoaiByNhanVien);
-//           }
+
         });
 
         return hopThoaiByNhanViens;
