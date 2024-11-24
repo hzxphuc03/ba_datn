@@ -152,6 +152,7 @@ public class NhanVienService {
             UserLoginResponse user = UserLoginResponse.builder()
                     .id(nhanVien.getId())
                     .hoTen(nhanVien.getHoTen())
+                    .hinhAnh(nhanVien.getHinhAnh())
                     .ngaySinh(nhanVien.getNgaySinh()+"")
                     .ngayTao(nhanVien.getNgayTao()+"")
                     .soDienThoai(nhanVien.getSoDienThoai())

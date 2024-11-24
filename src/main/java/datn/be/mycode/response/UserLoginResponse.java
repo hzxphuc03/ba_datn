@@ -16,6 +16,7 @@ public class UserLoginResponse {
 
     private Long id;
     private String hoTen;
+    private String hinhAnh;
     private String ngaySinh;
     private String ngayTao;
     private String soDienThoai;
