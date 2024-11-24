@@ -35,17 +35,16 @@ public class DoanChatNhanVien implements Serializable {
     @Column(name = "thoi_gian")
     private LocalDateTime thoiGian;
 
-    @Column(name = "nguoi_dung_1")
-    private NhanVien nguoiDung1;
+    @ManyToOne()
+    @JoinColumn(name = "id_nguoi_gui", referencedColumnName = "id")
+    private NhanVien nguoiGui;
 
-    @Column(name = "nguoi_dung_2")
-    private NhanVien nguoiDung2;
+    @ManyToOne()
+    @JoinColumn(name = "id_nguoi_nhan", referencedColumnName = "id")
+    private NhanVien nguoiNhan;
 
     @Column(name = "trang_thai")
     private int trangThai;
-
-    @Column(name = "nguoi_gui")
-    private boolean nguoiGui;
 
     @ManyToOne()
     @JoinColumn(name = "id_hop_thoai_nhan_vien", referencedColumnName = "id")
