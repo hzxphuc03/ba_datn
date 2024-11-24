@@ -1,4 +1,4 @@
-package datn.be.mycode.response.NhanTin;
+package datn.be.mycode.response.NhanTin.NhanVien;
 
 import datn.be.mycode.entity.DoanChatNhanVien;
 import datn.be.mycode.entity.HopThoaiNhanVien;

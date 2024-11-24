@@ -2,7 +2,7 @@ package datn.be.mycode.service;
 
 import datn.be.mycode.entity.HopThoaiNhanVien;
 import datn.be.mycode.repository.*;
-import datn.be.mycode.response.NhanTin.HopThoaiByNhanVien;
+import datn.be.mycode.response.NhanTin.NhanVien.HopThoaiByNhanVien;
 import datn.be.mycode.response.NhanTin.TrangThai;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
