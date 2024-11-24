@@ -74,6 +74,10 @@ public class NhanVienService {
             return nhanvienNormalTableResponse;
     }
 
+    public List<NhanVien> getAll() {
+        return repo.findAll();
+    }
+
     public NhanVien getById(Long id){
         return repo.findById(id).get();
     }

@@ -146,7 +146,7 @@ public class SuKienService {
         suKien.setThoiGianHetHanPhieu(thoiGianHetHanPhieu);// <= 30
         suKien.setHinhAnh(request.getHinhAnh());
         suKien.setMoTa(request.getMoTa());
-        suKien.setTrangThai(0);
+//        suKien.setTrangThai(0);
 
         SuKien savedSuKien = suKienRepository.save(suKien);
 
