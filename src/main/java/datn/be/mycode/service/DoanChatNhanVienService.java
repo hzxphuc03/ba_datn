@@ -78,7 +78,10 @@ public class DoanChatNhanVienService {
 
         List<DoanChatGet> doanChatGets = new ArrayList<>();
         doanChatByHopThoaiList.forEach(doanChatNhanVien -> {
-            List<String> hinhAnh = Arrays.stream(doanChatNhanVien.getHinhAnh().split(",")).toList();
+            List<String> hinhAnh = null;
+            if(doanChatNhanVien.getHinhAnh()!= null){
+            hinhAnh = Arrays.stream(doanChatNhanVien.getHinhAnh().split(",")).toList();
+            }
 
             DoanChatGet doanChatGet = new DoanChatGet();
             doanChatGet.setId(doanChatNhanVien.getId());
