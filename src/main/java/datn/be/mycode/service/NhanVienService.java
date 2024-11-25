@@ -74,6 +74,10 @@ public class NhanVienService {
             return nhanvienNormalTableResponse;
     }
 
+    public List<NhanVien> getAll() {
+        return repo.findAll();
+    }
+
     public NhanVien getById(Long id){
         return repo.findById(id).get();
     }
@@ -148,6 +152,7 @@ public class NhanVienService {
             UserLoginResponse user = UserLoginResponse.builder()
                     .id(nhanVien.getId())
                     .hoTen(nhanVien.getHoTen())
+                    .hinhAnh(nhanVien.getHinhAnh())
                     .ngaySinh(nhanVien.getNgaySinh()+"")
                     .ngayTao(nhanVien.getNgayTao()+"")
                     .soDienThoai(nhanVien.getSoDienThoai())

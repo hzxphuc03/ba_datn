@@ -102,7 +102,7 @@ public class GioHangService {
 
     public ResponseEntity<?> getSoLuong(Long request){
         var khachHang = khachHangRepository.findById(request).orElse(null);
-        if(khachHang == null) return getErro("Khách hàng này chưa tồn tại hoặc đã dừng hoạt động");
+        if(khachHang == null) return ResponseEntity.ok(0);
         var gioHang = gioHangRepository.findByKhachHangId(khachHang.getId()).orElse(null);
         if(khachHang == null) return getErro("Khách hàng này chưa tồn tại hoặc đã dừng hoạt động");
 
