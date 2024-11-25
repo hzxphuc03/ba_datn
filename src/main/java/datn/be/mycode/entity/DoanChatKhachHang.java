@@ -23,10 +23,10 @@ public class DoanChatKhachHang implements Serializable {
     @Column(name = "the_loai")
     private String theLoai;
 
-    @Column(name = "hinh_anh")
+    @Column(name = "hinh_anh", columnDefinition = "nvarchar(max)")
     private String hinhAnh;
 
-    @Column(name = "duong_dan_ghi_am")
+    @Column(name = "duong_dan_ghi_am", columnDefinition = "varchar(max)")
     private String voice;
 
     @Column(name = "tin_nhan", columnDefinition = "nvarchar(max)")
