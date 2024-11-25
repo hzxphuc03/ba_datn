@@ -9,7 +9,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @Getter
 @Setter
-public class AddHopThoai {
+public class AddHopThoaiNhanVien {
     private Long idNhanVien1;
     private Long idNhanVien2;
 }

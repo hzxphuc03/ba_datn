@@ -6,7 +6,7 @@ import datn.be.mycode.repository.DoanChatNhanVienRepository;
 import datn.be.mycode.repository.HopThoaiNhanVienRepository;
 import datn.be.mycode.repository.NhanVienRepository;
 import datn.be.mycode.request.NhanTin.NhanVien.DoanChat.AddDoanChat;
-import datn.be.mycode.request.NhanTin.NhanVien.DoanChat.GetByHopThoai;
+import datn.be.mycode.request.NhanTin.NhanVien.DoanChat.GetByHopThoaiNhanVien;
 import datn.be.mycode.response.NhanTin.NhanVien.DoanChat.DoanChatGet;
 import datn.be.mycode.response.NormalTableResponse;
 import datn.be.mycode.response.erroResponse;
@@ -63,7 +63,7 @@ public class DoanChatNhanVienService {
         return ResponseEntity.ok(doanChatNhanVienRepository.save(doanChatNhanVien));
     }
 
-    public NormalTableResponse<DoanChatGet> getDoanChatNhanVienByHopThoai(GetByHopThoai request){
+    public NormalTableResponse<DoanChatGet> getDoanChatNhanVienByHopThoai(GetByHopThoaiNhanVien request){
         if (request.getPage() == null) {
             request.setPage(1);
         }
