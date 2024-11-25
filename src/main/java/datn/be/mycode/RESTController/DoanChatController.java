@@ -1,7 +1,8 @@
 package datn.be.mycode.RESTController;
 
+import datn.be.mycode.request.NhanTin.KhachHang.DoanChat.GetByHopThoaiKhachHang;
 import datn.be.mycode.request.NhanTin.NhanVien.DoanChat.AddDoanChat;
-import datn.be.mycode.request.NhanTin.NhanVien.DoanChat.GetByHopThoai;
+import datn.be.mycode.request.NhanTin.NhanVien.DoanChat.GetByHopThoaiNhanVien;
 import datn.be.mycode.service.DoanChatNhanVienService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -13,14 +14,17 @@ public class DoanChatController {
 
     @Autowired
     private DoanChatNhanVienService doanChatNhanVienService;
+//    @Autowired
+//    private Doan doanChatNhanVienService;
 
+//    Nhan vien
     @GetMapping("/get-doan-chat-by-hop-thoai")
     public ResponseEntity<?> getDoanChat(
             @RequestParam(name = "page",required = false) Integer page,
             @RequestParam(name = "pageSize",required = false) Integer pageSize,
             @RequestParam(name = "idHopThoai",required = false) Long idHopThoai
     ){
-        GetByHopThoai request = new GetByHopThoai(page,pageSize,idHopThoai);
+        GetByHopThoaiNhanVien request = new GetByHopThoaiNhanVien(page,pageSize,idHopThoai);
         return ResponseEntity.ok(doanChatNhanVienService.getDoanChatNhanVienByHopThoai(request));
     }
 
@@ -29,4 +33,16 @@ public class DoanChatController {
 
         return ResponseEntity.ok(doanChatNhanVienService.addDoanChatNhanVien(request));
     }
+
+////    Khach Hang
+//    @GetMapping("/get-doan-chat-khach-hang-by-hop-thoai")
+//    public ResponseEntity<?> getDoanChatKhachHang(
+//           @RequestParam(name = "page",required = false) Integer page,
+//           @RequestParam(name = "pageSize",required = false) Integer pageSize,
+//           @RequestParam(name = "idHopThoai",required = false) Long idHopThoai
+//    ){
+//    GetByHopThoaiKhachHang request = new GetByHopThoaiKhachHang(page,pageSize,idHopThoai);
+//    return ResponseEntity.ok(doanChatNhanVienService.getDoanChatNhanVienByHopThoai(request));
+//    }
+
 }
