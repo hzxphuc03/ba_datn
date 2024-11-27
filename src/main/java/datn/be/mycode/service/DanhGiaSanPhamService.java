@@ -8,6 +8,8 @@ import datn.be.mycode.request.danhGiaSanPham.DanhGiaByKhachHangIdRequest;
 import datn.be.mycode.request.danhGiaSanPham.DanhGiaBySanPhamIdRequest;
 import datn.be.mycode.request.khachHang.DanhGiaSanPhamChungRequest;
 import datn.be.mycode.response.NormalTableResponse;
+import datn.be.mycode.response.sanPham.DanhGiaSanPhamResponse;
+import datn.be.mycode.response.sanPham.SanPhamDanhGiaResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -292,6 +294,53 @@ public class DanhGiaSanPhamService {
         DanhGiaSanPham updatedDanhGia = danhGiaSanPhamRepository.save(danhGiaSanPham);
 
         return ResponseEntity.ok(updatedDanhGia);
+    }
+
+    @Transactional
+    public ResponseEntity<?> deleteDanhGiaSanPham(Long id) {
+        Optional<DanhGiaSanPham> optionalDanhGia = danhGiaSanPhamRepository.findById(id);
+
+        if (optionalDanhGia.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("Không tìm thấy đánh giá sản phẩm với ID: " + id);
+        }
+
+        // Xóa đánh giá sản phẩm
+        danhGiaSanPhamRepository.deleteById(id);
+        return ResponseEntity.ok("Đánh giá sản phẩm đã được xóa thành công!");
+    }
+
+
+    public List<SanPhamDanhGiaResponse> laySanPhamCoDanhGia() {
+        List<SanPham> sanPhamList = sanPhamRepository.findSanPhamCoDanhGia();
+
+        return sanPhamList.stream().map(sp -> {
+            // Lấy số lượng đánh giá theo sao
+            Map<Integer, Long> saoThongKe = danhGiaSanPhamRepository.thongKeDanhGiaTheoSao(sp.getId());
+
+            // Đếm số đánh giá có bình luận và hình ảnh
+            Long coBinhLuan = danhGiaSanPhamRepository.demDanhGiaCoBinhLuan(sp.getId());
+            Long coHinhAnh = danhGiaSanPhamRepository.demDanhGiaCoHinhAnh(sp.getId());
+
+            return new SanPhamDanhGiaResponse(
+                    sp.getId(),
+                    sp.getTen(),
+                    saoThongKe,
+                    coBinhLuan,
+                    coHinhAnh
+            );
+        }).collect(Collectors.toList());
+    }
+
+    public List<DanhGiaSanPhamResponse> layDanhGiaTheoSanPham(Long idSanPham) {
+        List<DanhGiaSanPham> danhGiaSanPhamList = danhGiaSanPhamRepository.findByIdSanPham_Id(idSanPham);
+
+        return danhGiaSanPhamList.stream().map(dg -> new DanhGiaSanPhamResponse(
+                dg.getId(),
+                dg.getSao(),
+                dg.getBinhLuan(),
+                dg.getHinhAnhBinhLuan().stream().map(HinhAnhBinhLuan::getAnh).collect(Collectors.toList())
+        )).collect(Collectors.toList());
     }
 
 }

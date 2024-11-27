@@ -86,6 +86,32 @@ public class EmailSender {
         }
     }
 
+    @Async
+    public String guiEmailOtp(String to) {
+        String otp = String.valueOf(100000 + new Random().nextInt(900000));
+        try {
+            MimeMessage message = javaMailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true);
+            helper.setFrom(EMAIL_HOST);
+            helper.setTo(to);
+            helper.setSubject("OTP");
+
+            // Đọc tệp HTML
+            String htmlTemplate = readFile("src/main/resources/view/otp/otp.html");
+
+            // Thay thế OTP trong HTML
+            String htmlContent = htmlTemplate.replace("${otp}", otp);
+
+            // Gửi email
+            helper.setText(htmlContent, true);
+            javaMailSender.send(message);
+
+            return otp; // Trả về OTP
+        } catch (Exception e) {
+            throw new RuntimeException("Lỗi khi gửi email OTP: " + e.getMessage());
+        }
+    }
+
     public Boolean checkOtp(String email, String otpReq){
         var otp = otpStorage.get(email);
         if(otp != null && otp.equals(otpReq)){

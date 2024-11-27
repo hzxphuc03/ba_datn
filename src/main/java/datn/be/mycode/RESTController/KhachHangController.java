@@ -6,10 +6,13 @@ import datn.be.mycode.request.NormalTableRequestKhachHang;
 import datn.be.mycode.request.khachHang.CapNhatEmailKhachHangRequest;
 import datn.be.mycode.request.khachHang.CapNhatSoDienThoaiKhachHangRequest;
 import datn.be.mycode.request.khachHang.UpdateKhachHangRequest;
+import datn.be.mycode.response.erroResponse;
+import datn.be.mycode.response.khachHang.OtpResponse;
 import datn.be.mycode.response.khachHang.ThongTinKhachHangResponse;
 import datn.be.mycode.service.KhachHangService;
 import datn.be.mycode.util.EmailSender;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -77,16 +80,24 @@ public class KhachHangController {
     }
 
     // gửi mã - kiểm tra OTP
+//    @PostMapping("gui-ma-otp")
+//    public ResponseEntity<?> guiMaOtp(@RequestBody CapNhatEmailKhachHangRequest request) {
+//        emailSender.sendEmailOtp(request.getEmail());
+//        return ResponseEntity.ok("OTP đã được gửi đến email.");
+//    }
+
+    // Gửi mã OTP và trả về mã OTP cho FE
     @PostMapping("gui-ma-otp")
     public ResponseEntity<?> guiMaOtp(@RequestBody CapNhatEmailKhachHangRequest request) {
-        emailSender.sendEmailOtp(request.getEmail());
-        return ResponseEntity.ok("OTP đã được gửi đến email.");
+        try {
+            String otp = emailSender.guiEmailOtp(request.getEmail());
+            return ResponseEntity.ok(new OtpResponse(otp, "OTP đã được gửi thành công."));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new erroResponse("Lỗi khi gửi OTP: " + e.getMessage()));
+        }
     }
 
-    @GetMapping("kiem-tra-otp")
-    public ResponseEntity<?> kiemTraOtp(@RequestParam String email, @RequestParam String otp) {
-        return emailSender.kiemTraOtp(email, otp);
-    }
     // sau khi kiểm tra ok thì cập nhật
     @PutMapping("cap-nhat-so-dien-thoai")
     public ResponseEntity<?> capNhatSoDienThoaiKhachHang(@RequestBody CapNhatSoDienThoaiKhachHangRequest request){
