@@ -20,9 +20,6 @@ public class HopThoaiKhachHang implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "tin_nhan_cuoi",columnDefinition = "NVARCHAR(MAX)")
-    private String tinNhanCuoi;
-
     @Column(name = "thoi_gian_nhan_cuoi")
     private LocalDateTime thoiGianNhanCuoi;
 

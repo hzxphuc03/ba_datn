@@ -23,7 +23,7 @@ public class DoanChatKhachHang implements Serializable {
     @Column(name = "the_loai")
     private String theLoai;
 
-    @Column(name = "hinh_anh", columnDefinition = "nvarchar(max)")
+    @Column(name = "hinh_anh", columnDefinition = "varchar(max)")
     private String hinhAnh;
 
     @Column(name = "duong_dan_ghi_am", columnDefinition = "varchar(max)")
@@ -35,11 +35,16 @@ public class DoanChatKhachHang implements Serializable {
     @Column(name = "thoi_gian")
     private LocalDateTime thoiGian;
 
-    @Column(name = "nguoi_dung_1")
-    private KhachHang nguoiDung1;
+    @Column(name = "huong_gui")
+    private String huongGui;
 
-    @Column(name = "nguoi_dung_2")
-    private NhanVien nguoiDung2;
+    @ManyToOne
+    @JoinColumn(name = "id_khach_hang", referencedColumnName = "id")
+    private KhachHang khachHang;
+
+    @ManyToOne
+    @JoinColumn(name = "id_nhan_vien", referencedColumnName = "id")
+    private NhanVien nhanVien;
 
     @Column(name = "trang_thai")
     private int trangThai;
