@@ -17,8 +17,8 @@ public class AddDoanChatKhachHang {
     private List<String> hinhAnhList;
     private String voice;
     private String tinNhan;
-    private Long idNguoiDung1;
-    private Long idNguoiDung2;
-    private Integer trangThai;
+    private Long idKhachHang;
+    private Long idNhanVien;
+    private String huongGui;
     private Long idHopThoaiKhachHang;
 }
