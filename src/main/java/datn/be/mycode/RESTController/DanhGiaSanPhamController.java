@@ -61,6 +61,7 @@ public class DanhGiaSanPhamController {
 //        return ResponseEntity.ok(danhGiaSanPhamService.update(request));
 //    } hop/15/11/2024
 
+    // ẩn/hiện đánh giá
     @PutMapping("/update-trang-thai/{id}")
     public ResponseEntity<?> updateTrangThai(@PathVariable("id") Long id,
                                              @RequestParam(name = "status",required = true) Integer trangThai){
@@ -82,6 +83,17 @@ public class DanhGiaSanPhamController {
 
         List<DanhGiaSanPham> danhGiaList = danhGiaSanPhamService.danhGiaTatCaSanPham(idKhachHang, request);
         return ResponseEntity.ok(danhGiaList);
+    }
+    // update đánh giá
+    @PutMapping("/danh-gia-cap-nhat")
+    public ResponseEntity<?> capNhatDanhGiaSanPham(@RequestBody DanhGiaSanPhamRequest request) {
+        return danhGiaSanPhamService.updateDanhGiaSanPham(request);
+    }
+
+    // xóa đánh giá
+    @DeleteMapping("/xoa/{id}")
+    public ResponseEntity<?> xoaDanhGiaSanPham(@PathVariable Long id) {
+        return danhGiaSanPhamService.deleteDanhGiaSanPham(id);
     }
 
 }

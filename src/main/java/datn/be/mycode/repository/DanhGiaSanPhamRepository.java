@@ -9,6 +9,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Map;
 
 @Repository
 public interface DanhGiaSanPhamRepository extends JpaRepository<DanhGiaSanPham,Long> {
@@ -27,5 +28,19 @@ public interface DanhGiaSanPhamRepository extends JpaRepository<DanhGiaSanPham,L
 
     @Query("SELECT d FROM DanhGiaSanPham d WHERE d.idSanPham.id = :idSanPham ORDER BY d.ngayTao DESC")
     Page<DanhGiaSanPham> findDanhGiaBySanPhamId(@Param("idSanPham") Long idSanPham, Pageable pageable);
+
+    void deleteById(Long id);
+
+
+    @Query("SELECT d.sao, COUNT(d.id) FROM DanhGiaSanPham d WHERE d.idSanPham.id = :idSanPham GROUP BY d.sao")
+    Map<Integer, Long> thongKeDanhGiaTheoSao(@Param("idSanPham") Long idSanPham);
+
+    @Query("SELECT COUNT(d.id) FROM DanhGiaSanPham d WHERE d.idSanPham.id = :idSanPham AND d.binhLuan IS NOT NULL")
+    Long demDanhGiaCoBinhLuan(@Param("idSanPham") Long idSanPham);
+
+    @Query("SELECT COUNT(d.id) FROM DanhGiaSanPham d WHERE d.idSanPham.id = :idSanPham AND d.hinhAnhBinhLuan IS NOT EMPTY")
+    Long demDanhGiaCoHinhAnh(@Param("idSanPham") Long idSanPham);
+
+    List<DanhGiaSanPham> findByIdSanPham_Id(Long idSanPham);
 
 }

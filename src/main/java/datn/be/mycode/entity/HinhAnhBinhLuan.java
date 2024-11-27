@@ -11,8 +11,8 @@ import lombok.*;
 @ToString
 
 @Entity
-@Table(name = "hinh_anh_comment")
-public class HinhAnhComment {
+@Table(name = "hinh_anh_binh_luan")
+public class HinhAnhBinhLuan {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

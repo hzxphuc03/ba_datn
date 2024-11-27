@@ -132,4 +132,8 @@ public interface SanPhamRepository extends JpaRepository<SanPham, Long> {
 
     @Query("SELECT u FROM SanPham u WHERE u.id = :id")
     Optional<SanPham> timTheoId(@Param("id") Long id);
+
+
+    @Query("SELECT DISTINCT sp FROM SanPham sp JOIN DanhGiaSanPham dg ON sp.id = dg.idSanPham.id")
+    List<SanPham> findSanPhamCoDanhGia();
 }

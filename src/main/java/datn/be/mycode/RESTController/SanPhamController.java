@@ -1,10 +1,14 @@
 package datn.be.mycode.RESTController;
 
+import datn.be.mycode.entity.DanhGiaSanPham;
 import datn.be.mycode.entity.SanPham;
 import datn.be.mycode.request.SanPhamRequest;
 import datn.be.mycode.request.customRequest.TableSanPhamRequest;
 import datn.be.mycode.request.sanPham.SanPhamByAllReq;
+import datn.be.mycode.response.sanPham.DanhGiaSanPhamResponse;
+import datn.be.mycode.response.sanPham.SanPhamDanhGiaResponse;
 import datn.be.mycode.service.ChucVuService;
+import datn.be.mycode.service.DanhGiaSanPhamService;
 import datn.be.mycode.service.SanPhamService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +25,9 @@ public class SanPhamController {
 
     @Autowired
     private SanPhamService sanPhamService;
+    @Autowired
+    private DanhGiaSanPhamService danhGiaSanPhamService;
+
 
     @GetMapping("")
     public ResponseEntity<?> getAll(
@@ -114,7 +121,19 @@ public class SanPhamController {
         return sanPhamService.getTop5SanPhamByTheLoai(theLoaiId);
     }
 
-//    @GetMapping("/san-pham-chua-danh-gia/{idKhachHang}")
+    @GetMapping("/co-danh-gia")
+    public ResponseEntity<?> layDanhSachSanPhamCoDanhGia() {
+        List<SanPhamDanhGiaResponse> sanPhamDanhGiaResponses = danhGiaSanPhamService.laySanPhamCoDanhGia();
+        return ResponseEntity.ok(sanPhamDanhGiaResponses);
+    }
+
+    @GetMapping("/san-pham/{idSanPham}/danh-gia")
+    public ResponseEntity<?> layDanhSachDanhGiaSanPham(@PathVariable Long idSanPham) {
+        List<DanhGiaSanPhamResponse> danhGiaResponses = danhGiaSanPhamService.layDanhGiaTheoSanPham(idSanPham);
+        return ResponseEntity.ok(danhGiaResponses);
+    }
+
+    //    @GetMapping("/san-pham-chua-danh-gia/{idKhachHang}")
 //    public ResponseEntity<List<Long>> laySanPhamChuaDanhGiaCuaKhachHang(@PathVariable Long idKhachHang) {
 //        List<Long> productIds = sanPhamService.laySanPhamChuaDanhGiaCuaKhachHang(idKhachHang);
 //        return ResponseEntity.ok(productIds);

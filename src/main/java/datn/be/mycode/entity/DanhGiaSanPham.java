@@ -34,7 +34,7 @@ public class DanhGiaSanPham {
 
     @OneToMany(mappedBy = "danhGiaSanPham", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
-    private List<HinhAnhComment> hinhAnhComment = new ArrayList<>();
+    private List<HinhAnhBinhLuan> hinhAnhBinhLuan = new ArrayList<>();
 
     @Column(name = "trang_thai")
     private int trangThai;

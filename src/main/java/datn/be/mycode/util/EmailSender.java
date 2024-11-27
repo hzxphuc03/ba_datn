@@ -3,8 +3,11 @@ package datn.be.mycode.util;
 import datn.be.mycode.entity.HoaDon;
 import datn.be.mycode.entity.HoaDonChiTiet;
 import datn.be.mycode.request.thaoTacHoaDon.ThaoTacHoaDonAddRequest;
+import datn.be.mycode.response.erroResponse;
 import jakarta.mail.internet.MimeMessage;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -83,6 +86,32 @@ public class EmailSender {
         }
     }
 
+    @Async
+    public String guiEmailOtp(String to) {
+        String otp = String.valueOf(100000 + new Random().nextInt(900000));
+        try {
+            MimeMessage message = javaMailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true);
+            helper.setFrom(EMAIL_HOST);
+            helper.setTo(to);
+            helper.setSubject("OTP");
+
+            // Đọc tệp HTML
+            String htmlTemplate = readFile("src/main/resources/view/otp/otp.html");
+
+            // Thay thế OTP trong HTML
+            String htmlContent = htmlTemplate.replace("${otp}", otp);
+
+            // Gửi email
+            helper.setText(htmlContent, true);
+            javaMailSender.send(message);
+
+            return otp; // Trả về OTP
+        } catch (Exception e) {
+            throw new RuntimeException("Lỗi khi gửi email OTP: " + e.getMessage());
+        }
+    }
+
     public Boolean checkOtp(String email, String otpReq){
         var otp = otpStorage.get(email);
         if(otp != null && otp.equals(otpReq)){
@@ -90,6 +119,31 @@ public class EmailSender {
         }
         return false;
     }
+
+    private ResponseEntity<?> getErro(String message) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new erroResponse(message));
+    }
+    public ResponseEntity<?> kiemTraOtp(String email, String otpReq) {
+        // Lấy OTP từ bộ nhớ
+        String otp = otpStorage.get(email);
+
+        // Trường hợp OTP không tồn tại (do hết hạn hoặc email không đúng)
+        if (otp == null) {
+            return getErro("OTP đã hết hạn hoặc email không hợp lệ.");
+        }
+
+        // Trường hợp OTP không đúng
+        if (!otp.equals(otpReq)) {
+            return getErro("OTP không đúng. Vui lòng thử lại.");
+        }
+
+        // OTP hợp lệ, xóa khỏi bộ nhớ để tránh tái sử dụng
+        otpStorage.remove(email);
+
+        // Trả về thông báo thành công
+        return ResponseEntity.ok("Xác thực OTP thành công.");
+    }
+
     @Async
     public void sendEmailHoaDon(String to, List<HoaDonChiTiet> hoaDonChiTiets, HoaDon hoaDon) {
         try {
