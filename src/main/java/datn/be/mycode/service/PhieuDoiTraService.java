@@ -23,6 +23,8 @@ import java.util.List;
 public class PhieuDoiTraService {
 
     @Autowired
+    private HoaDonRepository hoaDonRepository;
+    @Autowired
     private NhanVienRepository nhanVienRepository;
     @Autowired
     private PhieuDoiTraRepository phieuDoiTraRepository;
@@ -67,7 +69,8 @@ public class PhieuDoiTraService {
 
         String erroMess = validateAddPhieuDoiTra(request);
         if(!erroMess.isBlank()) return getErro(erroMess);
-        HoaDon hoaDonCu = null;
+        HoaDon hoaDonCu = hoaDonRepository.findById(request.getIdHoaDon()).orElse(null);
+        if(hoaDonCu == null) return getErro("Hóa đơn này không tồn tại");
 
 //        San Pham Doi Tra
         List<SanPhamDoiTra> sanPhamDoiTraList = new ArrayList<>();
@@ -78,8 +81,7 @@ public class PhieuDoiTraService {
             if (soLuongDoiCuaSanPham>hoaDonChiTiet.getSoLuong()) return getErro("Không vượt quá số lượng đã mua");
             if (soLuongDoiCuaSanPham <=0) return getErro("số Lượng phải lớn hơn 0");
             if (soLuongDoiCuaSanPham == null) return getErro("Bạn phải nhập số lượng");
-            hoaDonCu = hoaDonChiTiet.getHoaDon();
-
+            if (!hoaDonCu.equals(hoaDonChiTiet.getHoaDon())) return getErro("hóa đơn không có sản phẩm này");
             SanPhamDoiTra sanPhamDoiTra = new SanPhamDoiTra();
             sanPhamDoiTra.setSoLuong(soLuongDoiCuaSanPham);
             sanPhamDoiTra.setGia_san_pham(hoaDonChiTiet.getGiaDaGiam());
@@ -94,9 +96,9 @@ public class PhieuDoiTraService {
         var khachHang = hoaDonCu.getKhachHang();
 
         PhieuDoiTra phieuDoiTra = new PhieuDoiTra();
-        phieuDoiTra.setSoTaiKhoanNganHang(request.getSoTaiKhoanNganHang());
-        phieuDoiTra.setTenNganHang(request.getTenNganHang());
-        phieuDoiTra.setTenChuTaiKhoan(request.getTenChuTaiKhoan());
+//        phieuDoiTra.setSoTaiKhoanNganHang(request.getSoTaiKhoanNganHang());
+//        phieuDoiTra.setTenNganHang(request.getTenNganHang());
+//        phieuDoiTra.setTenChuTaiKhoan(request.getTenChuTaiKhoan());
         phieuDoiTra.setNgayTao(LocalDateTime.now());
         phieuDoiTra.setLyDoDoiTra(request.getLyDoDoiTra());
         phieuDoiTra.setThaoTac(1);
@@ -127,8 +129,8 @@ public class PhieuDoiTraService {
     }
 
     private String validateAddPhieuDoiTra(AddPhieuDoiTraReq request) {
-        if(request.getSoTaiKhoanNganHang().isBlank()) return "Bạn chưa nhập số tài khoản ngân hàng";
-        if(request.getTenChuTaiKhoan().isBlank()) return "Bạn chưa nhập tên chủ tài khoản ngân hàng";
+//        if(request.getSoTaiKhoanNganHang().isBlank()) return "Bạn chưa nhập số tài khoản ngân hàng";
+//        if(request.getTenChuTaiKhoan().isBlank()) return "Bạn chưa nhập tên chủ tài khoản ngân hàng";
         if(request.getHinhAnhList().isEmpty()) return "Bạn chưa thêm video hoặc ảnh";
         if(request.getLyDoDoiTra().isBlank()) return "Bạn chưa nhập lý do đổi hàng";
         if(request.getTheLoai() == null) return "Bạn chưa chọn thể loại";
