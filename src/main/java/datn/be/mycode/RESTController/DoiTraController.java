@@ -1,9 +1,6 @@
 package datn.be.mycode.RESTController;
 
-import datn.be.mycode.request.DoiTra.PhieuDoiTra.AddPhieuDoiTraReq;
-import datn.be.mycode.request.DoiTra.PhieuDoiTra.GetPhieuDoiTraReq;
-import datn.be.mycode.request.DoiTra.PhieuDoiTra.KiemTraHangReq;
-import datn.be.mycode.request.DoiTra.PhieuDoiTra.XacNhanReq;
+import datn.be.mycode.request.DoiTra.PhieuDoiTra.*;
 import datn.be.mycode.service.PhieuDoiTraService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -30,6 +27,16 @@ public class DoiTraController {
         return ResponseEntity.ok(phieuDoiTraService.getPhieuDoiTra(getPhieuDoiTraReq));
     }
 
+    @GetMapping("/get-phieu-doi-tra-by-khach-hang")
+    public ResponseEntity<?> getPhieuDoiTraKhachHang(
+            @RequestParam(name = "page",required = false) Integer page,
+            @RequestParam(name = "pageSize",required = false) Integer pageSize,
+            @RequestParam(name = "idKhachHang",required = false) Long idKhachHang
+    ){
+        GetPhieuDoiTraByKhachHangReq request = new GetPhieuDoiTraByKhachHangReq(page, pageSize, idKhachHang);
+        return ResponseEntity.ok(phieuDoiTraService.getPhieuDoiTraByKhachHang(request));
+    }
+
     @PostMapping("/add-pheu-doi-tra")
     public ResponseEntity<?> addPhieuDoiTra(@RequestBody AddPhieuDoiTraReq request){
         return ResponseEntity.ok(phieuDoiTraService.addPhieuDoiTra(request));
@@ -45,8 +52,8 @@ public class DoiTraController {
         return ResponseEntity.ok(phieuDoiTraService.xacNhanPhieuDoiTra(request, 0));
     }
 
-//    @PostMapping("/nhan-vien-kiem-tra-hang")
-//    public ResponseEntity<?> kiemTraHang(@RequestBody KiemTraHangReq request){
-//        return ResponseEntity.ok(phieuDoiTraService.xacNhanPhieuDoiTra(request, 0));
-//    }
+    @PostMapping("/nhan-vien-kiem-tra-hang")
+    public ResponseEntity<?> kiemTraHang(@RequestBody KiemTraHangReq request){
+        return ResponseEntity.ok(phieuDoiTraService.nhanVienKiemTra(request));
+    }
 }

@@ -17,4 +17,6 @@ public interface PhieuDoiTraRepository extends JpaRepository<PhieuDoiTra, Long> 
             "ORDER BY h.ngayTao DESC "
     )
     Page<PhieuDoiTra> findAllByKhachHangAndStatus(String keyWord, String maPhieuDoiTra, Integer status, Pageable pageable);
+
+    Page<PhieuDoiTra> findAllByKhachHangId(Long idKhachHang, Pageable pageable);
 }

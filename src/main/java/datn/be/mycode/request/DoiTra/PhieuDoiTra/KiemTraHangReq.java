@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
+
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
@@ -12,6 +14,7 @@ import lombok.Setter;
 
 public class KiemTraHangReq {
     private Long idPhieuDoiTra;
-    private String video;
+    private Long idNhanVien;
+    private List<String> hinhAnhList;
     private String ghiChu;
 }

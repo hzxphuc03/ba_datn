@@ -19,7 +19,7 @@ public class ThaoTacPhieuDoiTra {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "thao_tac")
+    @Column(name = "thao_tac", columnDefinition = "nvarchar(50)")
     private String thaoTac;
 
     @Column(name = "ngay_tao")
