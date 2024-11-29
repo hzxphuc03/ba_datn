@@ -19,7 +19,5 @@ public class GetPhieuDoiTraReq {
 
     private String keyWord;
 
-    private String maPhieuDoiTra;
-
     private Integer status;
 }

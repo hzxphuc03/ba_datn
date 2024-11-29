@@ -5,6 +5,10 @@ import datn.be.mycode.entity.ThaoTacPhieuDoiTra;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface ThaoTacPhieuDoiTraRepository extends JpaRepository<ThaoTacPhieuDoiTra, Long> {
+
+    List<ThaoTacPhieuDoiTra> findAllByPhieuDoiTraId(Long idPhieuDoiTra);
 }
