@@ -2,10 +2,7 @@ package datn.be.mycode.service;
 
 import datn.be.mycode.entity.*;
 import datn.be.mycode.repository.*;
-import datn.be.mycode.request.DoiTra.PhieuDoiTra.AddPhieuDoiTraReq;
-import datn.be.mycode.request.DoiTra.PhieuDoiTra.AddSanPhamDoiTraReq;
-import datn.be.mycode.request.DoiTra.PhieuDoiTra.GetPhieuDoiTraReq;
-import datn.be.mycode.request.DoiTra.PhieuDoiTra.XacNhanReq;
+import datn.be.mycode.request.DoiTra.PhieuDoiTra.*;
 import datn.be.mycode.response.NormalTableResponse;
 import datn.be.mycode.response.erroResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,6 +32,8 @@ public class PhieuDoiTraService {
     @Autowired
     private ThongTinKiemTraRepositpry thongTinKiemTraRepositpry;
     @Autowired
+    private ThaoTacPhieuDoiTraRepository thaoTacPhieuDoiTraRepository;
+    @Autowired
     private ThongTinLyDoDoiTraRepository thongTinLyDoDoiTraRepository;
 
     public Object getPhieuDoiTra(GetPhieuDoiTraReq request) {
@@ -55,6 +54,26 @@ public class PhieuDoiTraService {
         }
         Pageable pageable = PageRequest.of(request.getPage() - 1,request.getPageSize());
         var phieuGiamGiaPage = phieuDoiTraRepository.findAllByKhachHangAndStatus(request.getKeyWord(), request.getMaPhieuDoiTra(), request.getStatus(), pageable);
+
+
+        var phieuDoiTraNormalTableResponse = new NormalTableResponse<PhieuDoiTra>();
+        phieuDoiTraNormalTableResponse.setItem(phieuGiamGiaPage.getContent());
+        phieuDoiTraNormalTableResponse.setPage(request.getPage());
+        phieuDoiTraNormalTableResponse.setPageSize(request.getPageSize());
+        phieuDoiTraNormalTableResponse.setTotalItem(phieuGiamGiaPage.getTotalElements());
+        return phieuDoiTraNormalTableResponse;
+    }
+
+    public Object getPhieuDoiTraByKhachHang(GetPhieuDoiTraByKhachHangReq request) {
+        if (request.getPage() == null) {
+            request.setPage(1);
+        }
+        if (request.getPageSize() == null) {
+            request.setPageSize(10);
+        }
+
+        Pageable pageable = PageRequest.of(request.getPage() - 1,request.getPageSize());
+        var phieuGiamGiaPage = phieuDoiTraRepository.findAllByKhachHangId(request.getIdKhachHang(), pageable);
 
 
         var phieuDoiTraNormalTableResponse = new NormalTableResponse<PhieuDoiTra>();
@@ -142,16 +161,32 @@ public class PhieuDoiTraService {
         if (nhanVien == null) return getErro("Nhân viên này chưa có tài khoản hoặc đã nghỉ");
         var phieuDoiTra = phieuDoiTraRepository.findById(request.getIdPhieuDoiTra()).orElse(null);
         if (phieuDoiTra == null) return getErro("Không tìm thấy phiếu đổi trả này");
-        if(phieuDoiTra.getTrangThai() == 0) return getErro("Không được thao tác trên phiếu đổi trả này");
+        if(phieuDoiTra.getTrangThai() != 1) return getErro("Không được thao tác trên phiếu đổi trả này");
 
         phieuDoiTra.setNhanVien(nhanVien);
         phieuDoiTra.setThaoTac(thaoTac);
         phieuDoiTra.setTrangThai(2);
-        if (thaoTac == 0) phieuDoiTra.setTrangThai(0);
+
+        ThaoTacPhieuDoiTra thaoTacPhieuDoiTra = new ThaoTacPhieuDoiTra();
+        thaoTacPhieuDoiTra.setThaoTac("Xác nhận phiếu");
+        thaoTacPhieuDoiTra.setNgayTao(LocalDateTime.now());
+        thaoTacPhieuDoiTra.setNhanVien(nhanVien);
+        thaoTacPhieuDoiTra.setPhieuDoiTra(phieuDoiTra);
+        if (thaoTac == 0) {
+            phieuDoiTra.setTrangThai(0);
+            thaoTacPhieuDoiTra.setThaoTac("Không chấp nhận phiếu");
+        }
+
+        thaoTacPhieuDoiTraRepository.save(thaoTacPhieuDoiTra);
 
         return ResponseEntity.ok(phieuDoiTraRepository.save(phieuDoiTra));
     }
 
+    public Object nhanVienKiemTra(KiemTraHangReq request) {
+
+
+        return ResponseEntity.ok();
+    }
 
 
     private ResponseEntity<?> getErro(String s){
