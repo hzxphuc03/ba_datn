@@ -646,6 +646,25 @@ public class HoaDonService {
         return thongBaoNormalTableResponse;
     }
 
+    public Object getHoaDonHoanThanhByKhachHang(HoaDonByKhachHang request) {
+        if (request.getPage() ==  null) {
+            request.setPage(1);
+        }
+        if (request.getPageSize() == null) {
+            request.setPageSize(10);
+        }
+
+        Pageable pageable = PageRequest.of(request.getPage() - 1,request.getPageSize());
+        var hoaDonPage = repo.findAllByTrangThaiAndKhachHangIdOrderByNgayTaoDesc(6, request.getIdKhachHang(),pageable);
+
+        NormalTableResponse<HoaDon> thongBaoNormalTableResponse = new NormalTableResponse<>();
+        thongBaoNormalTableResponse.setItem(hoaDonPage.getContent());
+        thongBaoNormalTableResponse.setPage(request.getPage());
+        thongBaoNormalTableResponse.setPageSize(request.getPageSize());
+        thongBaoNormalTableResponse.setTotalItem(hoaDonPage.getTotalElements());
+        return thongBaoNormalTableResponse;
+    }
+
     public Object getHoaDonChiTietChoViewKhachHang(Long idHoaDon) {
         var hoaDon = repo.findById(idHoaDon).orElse(null);
         if(hoaDon == null)return null;
