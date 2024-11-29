@@ -75,6 +75,16 @@ public class HoaDonCotroller {
         return ResponseEntity.ok(hoaDonService.getByKhachHang(hoaDonByKhachHang));
     }
 
+    @GetMapping("/get-hoa-don-hoan-thanh-by-khach-hang")
+    public ResponseEntity<?> getHoaDonHoanThanhByKhachHang(
+            @RequestParam(name = "page",required = false) Integer page,
+            @RequestParam(name = "pageSize",required = false) Integer pageSize,
+            @RequestParam(name = "idKhachHang",required = false) Long idKhachHang
+    ){
+        HoaDonByKhachHang hoaDonByKhachHang = new HoaDonByKhachHang(page,pageSize,idKhachHang);
+        return ResponseEntity.ok(hoaDonService.getHoaDonHoanThanhByKhachHang(hoaDonByKhachHang));
+    }
+
     @GetMapping("/get-hoa-don-chi-tiet-cho-view-khach-hang/{idHoaDon}")
     public ResponseEntity<?> getHoaDonChiTietChoViewKhachHang(@PathVariable Long idHoaDon) {
 
