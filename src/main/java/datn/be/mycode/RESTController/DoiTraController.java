@@ -18,7 +18,7 @@ public class DoiTraController {
     @Autowired
     private PhieuDoiTraService phieuDoiTraService;
 
-    @GetMapping("/get-phieu-doi-tra")
+    @GetMapping("/get-phieu-doi-tra-admin")
     public ResponseEntity<?> getPhieuDoiTra(
             @RequestParam(name = "page",required = false) Integer page,
             @RequestParam(name = "pageSize",required = false) Integer pageSize,
