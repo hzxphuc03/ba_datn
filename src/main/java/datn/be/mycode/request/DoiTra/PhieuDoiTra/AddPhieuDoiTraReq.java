@@ -13,11 +13,12 @@ import java.util.List;
 @Setter
 public class AddPhieuDoiTraReq {
 
+    private Long idHoaDon;
     private List<AddSanPhamDoiTraReq> sanPhamDoiTraList;
     private List<String> hinhAnhList;
     private String lyDoDoiTra;
-    private String soTaiKhoanNganHang;
-    private String tenChuTaiKhoan;
-    private String tenNganHang;
+//    private String soTaiKhoanNganHang;
+//    private String tenChuTaiKhoan;
+//    private String tenNganHang;
     private Integer theLoai;
 }
