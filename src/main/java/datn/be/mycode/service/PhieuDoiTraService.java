@@ -86,6 +86,8 @@ public class PhieuDoiTraService {
 
     public Object getDetailPhieuDoiTra(Long idPhieuDoiTra) {
         var phieuDoiTra = phieuDoiTraRepository.findById(idPhieuDoiTra).orElse(null);
+        DetailPhieuDoiTraRes detailPhieuDoiTraRes = new DetailPhieuDoiTraRes();
+        if (phieuDoiTra == null) return detailPhieuDoiTraRes;
 
         var sanPhamDoiTraList = sanPhamDoiTraRepository.findAllByPhieuDoiTraId(phieuDoiTra.getId());
         var thaoTacPhieuDoiTraList = thaoTacPhieuDoiTraRepository.findAllByPhieuDoiTraId(phieuDoiTra.getId());
@@ -94,7 +96,7 @@ public class PhieuDoiTraService {
         var thongTinKiemTraList = getThongTinKiemTraList.stream().filter(thongTinKiemTra -> thongTinKiemTra.getTrangThai()==1).collect(Collectors.toList());
         var thongTinCuaHangChuyenKhoanList = getThongTinKiemTraList.stream().filter(thongTinKiemTra -> thongTinKiemTra.getTrangThai()==2).collect(Collectors.toList());
 
-        DetailPhieuDoiTraRes detailPhieuDoiTraRes = new DetailPhieuDoiTraRes();
+
         detailPhieuDoiTraRes.setPhieuDoiTra(phieuDoiTra);
         detailPhieuDoiTraRes.setSanPhamDoiTraList(sanPhamDoiTraList);
         detailPhieuDoiTraRes.setThaoTacPhieuDoiTraList(thaoTacPhieuDoiTraList);
