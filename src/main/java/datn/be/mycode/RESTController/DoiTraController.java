@@ -20,10 +20,9 @@ public class DoiTraController {
             @RequestParam(name = "page",required = false) Integer page,
             @RequestParam(name = "pageSize",required = false) Integer pageSize,
             @RequestParam(name = "keyWord",required = false) String keyWord,
-            @RequestParam(name = "maPhieuGiamGia",required = false) String maPhieuGiamGia,
             @RequestParam(name = "status",required = false) Integer status
     ){
-        GetPhieuDoiTraReq getPhieuDoiTraReq = new GetPhieuDoiTraReq(page, pageSize, keyWord, maPhieuGiamGia, status);
+        GetPhieuDoiTraReq getPhieuDoiTraReq = new GetPhieuDoiTraReq(page, pageSize, keyWord, status);
         return ResponseEntity.ok(phieuDoiTraService.getPhieuDoiTra(getPhieuDoiTraReq));
     }
 
@@ -35,6 +34,13 @@ public class DoiTraController {
     ){
         GetPhieuDoiTraByKhachHangReq request = new GetPhieuDoiTraByKhachHangReq(page, pageSize, idKhachHang);
         return ResponseEntity.ok(phieuDoiTraService.getPhieuDoiTraByKhachHang(request));
+    }
+
+    @GetMapping("/get-detail-phieu-doi-tra/{idPhieuDoiTra}")
+    public ResponseEntity<?> getDetailPhieuDoiTra(
+            @PathVariable("idPhieuDoiTra") Long idPhieuDoiTra
+    ){
+        return ResponseEntity.ok(phieuDoiTraService.getDetailPhieuDoiTra(idPhieuDoiTra));
     }
 
     @PostMapping("/add-pheu-doi-tra")

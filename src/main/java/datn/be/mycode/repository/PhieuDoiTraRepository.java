@@ -11,12 +11,11 @@ import org.springframework.stereotype.Repository;
 public interface PhieuDoiTraRepository extends JpaRepository<PhieuDoiTra, Long> {
 
     @Query("SELECT h FROM PhieuDoiTra h WHERE " +
-            "(:keyWord IS null OR h.khachHang.soDienThoai LIKE :keyWord OR h.khachHang.hoTen LIKE %:keyWord% OR h.khachHang.ma LIKE %:keyWord%) AND" +
-            "(:maPhieuDoiTra IS null OR h.ma LIKE %:maPhieuDoiTra% ) AND " +
+            "(:keyWord IS null OR h.khachHang.soDienThoai LIKE :keyWord OR h.khachHang.hoTen LIKE %:keyWord% OR h.khachHang.ma LIKE :keyWord% OR h.ma LIKE :keyWord%) AND " +
             "h.trangThai = :status " +
             "ORDER BY h.ngayTao DESC "
     )
-    Page<PhieuDoiTra> findAllByKhachHangAndStatus(String keyWord, String maPhieuDoiTra, Integer status, Pageable pageable);
+    Page<PhieuDoiTra> findAllByKhachHangAndStatus(String keyWord, Integer status, Pageable pageable);
 
     Page<PhieuDoiTra> findAllByKhachHangId(Long idKhachHang, Pageable pageable);
 }

@@ -3,6 +3,7 @@ package datn.be.mycode.service;
 import datn.be.mycode.entity.*;
 import datn.be.mycode.repository.*;
 import datn.be.mycode.request.DoiTra.PhieuDoiTra.*;
+import datn.be.mycode.response.DoiTra.DetailPhieuDoiTraRes;
 import datn.be.mycode.response.NormalTableResponse;
 import datn.be.mycode.response.erroResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +16,8 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 @Service
 public class PhieuDoiTraService {
@@ -49,11 +52,8 @@ public class PhieuDoiTraService {
         if (request.getKeyWord() == null || request.getKeyWord().isBlank()){
             request.setKeyWord(null);
         }
-        if (request.getMaPhieuDoiTra() == null || request.getMaPhieuDoiTra().isBlank()){
-            request.setKeyWord(null);
-        }
         Pageable pageable = PageRequest.of(request.getPage() - 1,request.getPageSize());
-        var phieuGiamGiaPage = phieuDoiTraRepository.findAllByKhachHangAndStatus(request.getKeyWord(), request.getMaPhieuDoiTra(), request.getStatus(), pageable);
+        var phieuGiamGiaPage = phieuDoiTraRepository.findAllByKhachHangAndStatus(request.getKeyWord(), request.getStatus(), pageable);
 
 
         var phieuDoiTraNormalTableResponse = new NormalTableResponse<PhieuDoiTra>();
@@ -82,6 +82,26 @@ public class PhieuDoiTraService {
         phieuDoiTraNormalTableResponse.setPageSize(request.getPageSize());
         phieuDoiTraNormalTableResponse.setTotalItem(phieuGiamGiaPage.getTotalElements());
         return phieuDoiTraNormalTableResponse;
+    }
+
+    public Object getDetailPhieuDoiTra(Long idPhieuDoiTra) {
+        var phieuDoiTra = phieuDoiTraRepository.findById(idPhieuDoiTra).orElse(null);
+
+        var sanPhamDoiTraList = sanPhamDoiTraRepository.findAllByPhieuDoiTraId(phieuDoiTra.getId());
+        var thaoTacPhieuDoiTraList = thaoTacPhieuDoiTraRepository.findAllByPhieuDoiTraId(phieuDoiTra.getId());
+        var khachHangDoiTraThongTinList = thongTinLyDoDoiTraRepository.findAllByPhieuDoiTraId(phieuDoiTra.getId());
+        var getThongTinKiemTraList = thongTinKiemTraRepositpry.findAllByPhieuDoiTraId(phieuDoiTra.getId());
+        var thongTinKiemTraList = getThongTinKiemTraList.stream().filter(thongTinKiemTra -> thongTinKiemTra.getTrangThai()==1).collect(Collectors.toList());
+        var thongTinCuaHangChuyenKhoanList = getThongTinKiemTraList.stream().filter(thongTinKiemTra -> thongTinKiemTra.getTrangThai()==2).collect(Collectors.toList());
+
+        DetailPhieuDoiTraRes detailPhieuDoiTraRes = new DetailPhieuDoiTraRes();
+        detailPhieuDoiTraRes.setPhieuDoiTra(phieuDoiTra);
+        detailPhieuDoiTraRes.setSanPhamDoiTraList(sanPhamDoiTraList);
+        detailPhieuDoiTraRes.setThaoTacPhieuDoiTraList(thaoTacPhieuDoiTraList);
+        detailPhieuDoiTraRes.setKhachHangDoiTraThongTinList(khachHangDoiTraThongTinList);
+        detailPhieuDoiTraRes.setThongTinKiemTraList(thongTinKiemTraList);
+        detailPhieuDoiTraRes.setThongTinCuaHangChuyenKhoanList(thongTinCuaHangChuyenKhoanList);
+        return detailPhieuDoiTraRes;
     }
 
     public Object addPhieuDoiTra(AddPhieuDoiTraReq request) {
@@ -184,6 +204,38 @@ public class PhieuDoiTraService {
 
     public Object nhanVienKiemTra(KiemTraHangReq request) {
 
+//        var phieuDoiTra = phieuDoiTraRepository.findById(request.getIdPhieuDoiTra()).orElse(null);
+//        if(phieuDoiTra == null) return getErro("Không tìm thấy phiếu đổi trả này");
+//        var nhanVien = nhanVienRepository.findById(request.getIdNhanVien()).orElse(null);
+//        if(nhanVien == null) return getErro("Không tìm thấy nhân viên này");
+//
+//        if(request.getTrangThaiPhieuDoiTra() == null) getErro("Chưa có trạng thái phiếu đổi trả");
+//        if(request.getGhiChu().isBlank()) getErro("Chưa nhập ghi chú");
+//        if(request.getHinhAnhList().isEmpty()) getErro("Chưa có hình ảnh hoặc video");
+//
+//        phieuDoiTra.setGhiChuNhanVien(request.getGhiChu());
+//        phieuDoiTra.setTrangThai(request.getTrangThaiPhieuDoiTra());
+//        var phieuDoiTraGet = phieuDoiTraRepository.save(phieuDoiTra);
+//
+//        request.getHinhAnhList().forEach(s -> {
+//        ThongTinKiemTra thongTinKiemTra = new ThongTinKiemTra();
+//            thongTinKiemTra.setPhieuDoiTra(phieuDoiTraGet);
+//            thongTinKiemTra.setVideo(s);
+//            thongTinKiemTra.setTrangThai(1);
+//            thongTinKiemTraRepositpry.save(thongTinKiemTra);
+//        });
+//
+//
+//        ThaoTacPhieuDoiTra thaoTacPhieuDoiTra = new ThaoTacPhieuDoiTra();
+//        thaoTacPhieuDoiTra.setThaoTac("Kiểm tra sản phẩm");
+//        thaoTacPhieuDoiTra.setNgayTao(LocalDateTime.now());
+//        thaoTacPhieuDoiTra.setNhanVien(nhanVien);
+//        thaoTacPhieuDoiTra.setPhieuDoiTra(phieuDoiTraGet);
+//        thaoTacPhieuDoiTraRepository.save(thaoTacPhieuDoiTra);
+//
+//        if (phieuDoiTra.getTrangThai() == 0){
+//
+//        }
 
         return ResponseEntity.ok();
     }
