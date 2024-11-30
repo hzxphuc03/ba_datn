@@ -63,11 +63,14 @@ public class PhieuDoiTraService {
         if (request.getStatus() == null) {
             request.setStatus(1);
         }
+        if (request.getTheLoai() == null) {
+            request.setTheLoai(1);
+        }
         if (request.getKeyWord() == null || request.getKeyWord().isBlank()){
             request.setKeyWord(null);
         }
         Pageable pageable = PageRequest.of(request.getPage() - 1,request.getPageSize());
-        var phieuGiamGiaPage = phieuDoiTraRepository.findAllByKhachHangAndStatus(request.getKeyWord(), request.getStatus(), pageable);
+        var phieuGiamGiaPage = phieuDoiTraRepository.findAllByKhachHangAndStatus(request.getKeyWord(), request.getStatus(), request.getTheLoai(), pageable);
 
 
         var phieuDoiTraNormalTableResponse = new NormalTableResponse<PhieuDoiTra>();
