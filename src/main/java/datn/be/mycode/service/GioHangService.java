@@ -370,7 +370,7 @@ public class GioHangService {
             hoaDonChiTiet.setHoaDon(hoaDon);
             hoaDonChiTiet.setSanPhamChiTiet(gioHangChiTiet.getSanPhamChiTiet());
 
-            setSanPham(gioHangChiTiet);
+            setSanPham(hoaDon,gioHangChiTiet);
 
             hoaDonChiTiets.add(hoaDonChiTiet);
         }
@@ -378,15 +378,17 @@ public class GioHangService {
         return hoaDonChiTietRepository.saveAll(hoaDonChiTiets);
     }
 
-    private void setSanPham(GioHangChiTiet gioHangChiTiet) {
+    private void setSanPham(HoaDon hoaDon, GioHangChiTiet gioHangChiTiet) {
 
 
             var sanPhamChiTiet = gioHangChiTiet.getSanPhamChiTiet();
             var sanPham = sanPhamChiTiet.getSanPham();
-            sanPhamChiTiet.setSoLuong(sanPhamChiTiet.getSoLuong() - gioHangChiTiet.getSoLuong());
-            if (sanPhamChiTiet.getSoLuong() == 0) sanPhamChiTiet.setTrangThai(0);
+            if(hoaDon.getPhuongThucThanhToan().getId() != 3) {
+                sanPhamChiTiet.setSoLuong(sanPhamChiTiet.getSoLuong() - gioHangChiTiet.getSoLuong());
+                if (sanPhamChiTiet.getSoLuong() == 0) sanPhamChiTiet.setTrangThai(0);
 
-            sanPhamChiTietRepository.save(sanPhamChiTiet);
+                sanPhamChiTietRepository.save(sanPhamChiTiet);
+            }
             gioHangChiTietRepository.delete(gioHangChiTiet);
 //            tinh lai so luong cua san pham
         int soLuongTong = sanPhamChiTietRepository.sumSoLuongByTrangThai(sanPham.getId());

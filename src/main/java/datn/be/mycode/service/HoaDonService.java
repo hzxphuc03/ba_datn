@@ -403,7 +403,7 @@ public class HoaDonService {
             if(hoaDon.getGiaoHang()) {
                 hoaDon.setThanhToan(false);
                 hoaDon.setTrangThai(2);
-                setSoLuongSanPham(hoaDon);
+//                setSoLuongSanPham(hoaDon);
                 setVoucher(hoaDon);
                 repo.save(hoaDon);
                 thaoTacHoaDonService.add(thaoTacHoaDon);
@@ -517,6 +517,7 @@ public class HoaDonService {
 
                 hoaDon.setNgayThanhToan(LocalDateTime.now());
                 hoaDon.setThanhToan(true);
+                setSoLuongSanPham(hoaDon);
                 hoaDonChiTietService.setTrangThaiByHoaDonDone(hoaDon);
             }
         }
@@ -679,4 +680,20 @@ public class HoaDonService {
         hoaDonChiTietChoViewKhachHang.setThaoTacHoaDons(thaoTacHoaDonList);
         return hoaDonChiTietChoViewKhachHang;
     }
+
+//
+//    public Object getTop5NhanVienXuatSacCuaThang() {
+//        var dauThang = LocalDateTime.now().with(TemporalAdjusters.firstDayOfMonth()).withHour(0).withMinute(0).withSecond(0).withNano(0);
+//        var cuoiThang = dauThang.with(TemporalAdjusters.lastDayOfMonth());
+//
+//        var nhanVienThang = repo.findDistinctNhanVienByNgayTaoInCurrentMonth(dauThang, cuoiThang);
+//        return nhanVienThang.stream().limit(5).collect(Collectors.toList());
+//    }
+//
+//    public Object getNhanVienXuatSacTungThang(LocalDateTime ngayBatDau) {
+//        var dauThang = ngayBatDau.with(TemporalAdjusters.firstDayOfMonth()).withHour(0).withMinute(0).withSecond(0).withNano(0);
+//        var cuoiThang = LocalDateTime.now().with(TemporalAdjusters.lastDayOfMonth());
+//
+//        return repo.findNhanVienByHoaDonPerMonth(dauThang, cuoiThang);
+//    }
 }
