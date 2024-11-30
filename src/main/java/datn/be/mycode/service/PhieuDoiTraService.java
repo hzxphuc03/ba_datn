@@ -8,7 +8,6 @@ import datn.be.mycode.response.DoiTra.HoaDonChiTietDoiTraRes;
 import datn.be.mycode.response.DoiTra.KhachHangGetHoaDonChiTietRes;
 import datn.be.mycode.response.NormalTableResponse;
 import datn.be.mycode.response.erroResponse;
-import datn.be.mycode.response.hoaDon.HoaDonChiTietChoViewKhachHang;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -21,7 +20,6 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 @Service
@@ -227,7 +225,7 @@ public class PhieuDoiTraService {
         return ResponseEntity.ok(phieuDoiTraRepository.save(phieuDoiTra));
     }
 
-    public Object nhanVienKiemTra(KiemTraHangReq request) {
+    public Object nhanVienKiemTra(KiemTraHangReq request, int trangThaiThongTinKiemTra) {
 
         var phieuDoiTra = phieuDoiTraRepository.findById(request.getIdPhieuDoiTra()).orElse(null);
         if(phieuDoiTra == null) return getErro("Không tìm thấy phiếu đổi trả này");
@@ -242,7 +240,7 @@ public class PhieuDoiTraService {
         ThongTinKiemTra thongTinKiemTra = new ThongTinKiemTra();
             thongTinKiemTra.setPhieuDoiTra(phieuDoiTra);
             thongTinKiemTra.setVideo(s);
-            thongTinKiemTra.setTrangThai(1);
+            thongTinKiemTra.setTrangThai(trangThaiThongTinKiemTra);
             thongTinKiemTraRepositpry.save(thongTinKiemTra);
         });
 
