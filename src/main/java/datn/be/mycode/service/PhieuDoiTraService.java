@@ -235,39 +235,26 @@ public class PhieuDoiTraService {
         if(nhanVien == null) return getErro("Không tìm thấy nhân viên này");
         var sanPhamDoiTraList = sanPhamDoiTraRepository.findAllByPhieuDoiTraId(phieuDoiTra.getId());
 
-        if(request.getTrangThaiPhieuDoiTra() == null) getErro("Chưa có trạng thái phiếu đổi trả");
-        if(request.getGhiChu().isBlank()) getErro("Chưa nhập ghi chú");
         if(request.getHinhAnhList().isEmpty()) getErro("Chưa có hình ảnh hoặc video");
 
-        phieuDoiTra.setGhiChuNhanVien(request.getGhiChu());
-        phieuDoiTra.setTrangThai(request.getTrangThaiPhieuDoiTra());
-        var phieuDoiTraGet = phieuDoiTraRepository.save(phieuDoiTra);
 
         request.getHinhAnhList().forEach(s -> {
         ThongTinKiemTra thongTinKiemTra = new ThongTinKiemTra();
-            thongTinKiemTra.setPhieuDoiTra(phieuDoiTraGet);
+            thongTinKiemTra.setPhieuDoiTra(phieuDoiTra);
             thongTinKiemTra.setVideo(s);
             thongTinKiemTra.setTrangThai(1);
             thongTinKiemTraRepositpry.save(thongTinKiemTra);
         });
 
-
         ThaoTacPhieuDoiTra thaoTacPhieuDoiTra = new ThaoTacPhieuDoiTra();
         thaoTacPhieuDoiTra.setGhiChu("Kiểm tra sản phẩm");
         thaoTacPhieuDoiTra.setNgayTao(LocalDateTime.now());
         thaoTacPhieuDoiTra.setNhanVien(nhanVien);
-        thaoTacPhieuDoiTra.setPhieuDoiTra(phieuDoiTraGet);
+        thaoTacPhieuDoiTra.setPhieuDoiTra(phieuDoiTra);
         thaoTacPhieuDoiTraRepository.save(thaoTacPhieuDoiTra);
 
-//        if (phieuDoiTra.getTrangThai() != 0){
-//            sanPhamDoiTraList.forEach(sanPhamDoiTra -> {
-//                var sanPhamChiTiet= sanPhamDoiTra.getSanPham();
-//                sanPhamChiTiet.setSoLuong(sanPhamChiTiet.getSoLuong() + sanPhamDoiTra.getSoLuong());
-//                sanPhamChiTietRepository.save(sanPhamChiTiet);
-//            });
-//        }
 
-        return ResponseEntity.ok();
+        return ResponseEntity.ok(phieuDoiTra);
     }
 
     public Object nextSetp(NextStepDoiTraReq request) {

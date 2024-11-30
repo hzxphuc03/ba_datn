@@ -16,6 +16,4 @@ public class KiemTraHangReq {
     private Long idPhieuDoiTra;
     private Long idNhanVien;
     private List<String> hinhAnhList;
-    private String ghiChu;
-    private Integer trangThaiPhieuDoiTra;
 }
