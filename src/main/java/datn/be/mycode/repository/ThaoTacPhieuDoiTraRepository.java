@@ -10,5 +10,5 @@ import java.util.List;
 @Repository
 public interface ThaoTacPhieuDoiTraRepository extends JpaRepository<ThaoTacPhieuDoiTra, Long> {
 
-    List<ThaoTacPhieuDoiTra> findAllByPhieuDoiTraId(Long idPhieuDoiTra);
+    List<ThaoTacPhieuDoiTra> findAllByPhieuDoiTraIdOrderByNgayTaoDesc(Long idPhieuDoiTra);
 }
