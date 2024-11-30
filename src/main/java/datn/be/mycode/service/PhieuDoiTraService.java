@@ -212,7 +212,7 @@ public class PhieuDoiTraService {
         phieuDoiTra.setTrangThai(1);
 
         ThaoTacPhieuDoiTra thaoTacPhieuDoiTra = new ThaoTacPhieuDoiTra();
-        thaoTacPhieuDoiTra.setThaoTac("Xác nhận phiếu");
+        thaoTacPhieuDoiTra.setGhiChu("Xác nhận phiếu");
         thaoTacPhieuDoiTra.setNgayTao(LocalDateTime.now());
         thaoTacPhieuDoiTra.setNhanVien(nhanVien);
         thaoTacPhieuDoiTra.setPhieuDoiTra(phieuDoiTra);
@@ -252,7 +252,7 @@ public class PhieuDoiTraService {
 
 
         ThaoTacPhieuDoiTra thaoTacPhieuDoiTra = new ThaoTacPhieuDoiTra();
-        thaoTacPhieuDoiTra.setThaoTac("Kiểm tra sản phẩm");
+        thaoTacPhieuDoiTra.setGhiChu("Kiểm tra sản phẩm");
         thaoTacPhieuDoiTra.setNgayTao(LocalDateTime.now());
         thaoTacPhieuDoiTra.setNhanVien(nhanVien);
         thaoTacPhieuDoiTra.setPhieuDoiTra(phieuDoiTraGet);
