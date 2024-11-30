@@ -186,6 +186,7 @@ public class PhieuDoiTraService {
         });
 
         TaoThaoTac(null, khachHang, phieuDoiTraGet);
+        TaoThongBao(phieuDoiTra,"Bạn đã tạo phiếu đổi trả");
 
         phieuDoiTraGet.setMa("PDT"+phieuDoiTraGet.getId());
         return ResponseEntity.ok(phieuDoiTraRepository.save(phieuDoiTraGet));
@@ -220,8 +221,8 @@ public class PhieuDoiTraService {
             phieuDoiTra.setTrangThai(0);
             thaoTacPhieuDoiTra.setThaoTac("Không chấp nhận phiếu");
         }
-
         thaoTacPhieuDoiTraRepository.save(thaoTacPhieuDoiTra);
+        TaoThongBao(phieuDoiTra,"Phiếu đổi trả của bạn đã được xác nhận");
 
         return ResponseEntity.ok(phieuDoiTraRepository.save(phieuDoiTra));
     }
@@ -512,8 +513,9 @@ public class PhieuDoiTraService {
         phieuDoiTraRepository.save(phieuDoiTra);
 
         TaoThaoTacPhieuDoiTra(nhanVien, null, phieuDoiTra, request.getGhiChu());
+        TaoThongBao(phieuDoiTra,"Phiếu đổi trả của bạn đã bị hủy");
         return ResponseEntity.ok(phieuDoiTra);
-    }
+}
 
     private void TaoThaoTacPhieuDoiTra(NhanVien nhanVien, KhachHang khachHang, PhieuDoiTra phieuDoiTra,String conten) {
         ThaoTacPhieuDoiTra thaoTacPhieuDoiTra = new ThaoTacPhieuDoiTra();
