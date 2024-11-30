@@ -43,9 +43,20 @@ public class DoiTraController {
         return ResponseEntity.ok(phieuDoiTraService.getDetailPhieuDoiTra(idPhieuDoiTra));
     }
 
+    @GetMapping("/get-hoa-don-chi-tiet-cho-khach-hang/{idHoaDon}")
+    public ResponseEntity<?> getHoaDonChiTietChoViewKhachHang(@PathVariable Long idHoaDon) {
+
+        return ResponseEntity.ok(phieuDoiTraService.getHoaDonChiTietChoViewKhachHang(idHoaDon));
+    }
+
     @PostMapping("/add-pheu-doi-tra")
     public ResponseEntity<?> addPhieuDoiTra(@RequestBody AddPhieuDoiTraReq request){
         return ResponseEntity.ok(phieuDoiTraService.addPhieuDoiTra(request));
+    }
+
+    @PostMapping("/nhan-vien-note")
+    public ResponseEntity<?> nhanVienNote(@RequestBody NhanVienNoteReq request){
+        return ResponseEntity.ok(phieuDoiTraService.nhanVienNote(request));
     }
 
     @PutMapping("/nhan-vien-xac-nhan-phieu-doi-tra")
@@ -54,8 +65,8 @@ public class DoiTraController {
     }
 
     @PutMapping("/nhan-vien-huy-phieu-doi-tra")
-    public ResponseEntity<?> huyPhieuDoiTra(@RequestBody XacNhanReq request){
-        return ResponseEntity.ok(phieuDoiTraService.xacNhanPhieuDoiTra(request, 0));
+    public ResponseEntity<?> huyPhieuDoiTra(@RequestBody HuyPhieuDoiTraReq request){
+        return ResponseEntity.ok(phieuDoiTraService.huyPhieuDoiTra(request));
     }
 
     @PostMapping("/nhan-vien-kiem-tra-hang")
