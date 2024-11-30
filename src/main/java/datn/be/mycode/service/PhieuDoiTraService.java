@@ -64,7 +64,7 @@ public class PhieuDoiTraService {
             request.setStatus(1);
         }
         if (request.getTheLoai() == null) {
-            request.setTheLoai(1);
+            request.setTheLoai(null);
         }
         if (request.getKeyWord() == null || request.getKeyWord().isBlank()){
             request.setKeyWord(null);
