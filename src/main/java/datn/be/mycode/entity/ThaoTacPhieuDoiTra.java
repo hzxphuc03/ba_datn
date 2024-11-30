@@ -22,7 +22,7 @@ public class ThaoTacPhieuDoiTra {
     @Column(name = "thao_tac", columnDefinition = "nvarchar(50)")
     private String thaoTac;
 
-    @Column(name = "chi_chu", columnDefinition = "nvarchar(150)")
+    @Column(name = "ghi_chu", columnDefinition = "nvarchar(max)")
     private String ghiChu;
 
     @Column(name = "ngay_tao")
