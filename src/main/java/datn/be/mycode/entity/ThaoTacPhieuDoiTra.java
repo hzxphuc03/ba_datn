@@ -22,6 +22,9 @@ public class ThaoTacPhieuDoiTra {
     @Column(name = "thao_tac", columnDefinition = "nvarchar(50)")
     private String thaoTac;
 
+    @Column(name = "chi_chu", columnDefinition = "nvarchar(150)")
+    private String ghiChu;
+
     @Column(name = "ngay_tao")
     private LocalDateTime ngayTao;
 
@@ -35,4 +38,8 @@ public class ThaoTacPhieuDoiTra {
     @ManyToOne()
     @JoinColumn(name = "id_nhan_vien", referencedColumnName = "id")
     private NhanVien nhanVien;
+
+    @ManyToOne()
+    @JoinColumn(name = "id_khach_hang", referencedColumnName = "id")
+    private KhachHang khachHang;
 }

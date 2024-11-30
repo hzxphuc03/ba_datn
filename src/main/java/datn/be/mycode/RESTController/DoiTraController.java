@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
 
 @RestController
 @RequestMapping("/api/doi-tra")
@@ -61,5 +60,16 @@ public class DoiTraController {
     @PostMapping("/nhan-vien-kiem-tra-hang")
     public ResponseEntity<?> kiemTraHang(@RequestBody KiemTraHangReq request){
         return ResponseEntity.ok(phieuDoiTraService.nhanVienKiemTra(request));
+    }
+
+    @PutMapping("/cap-nhat-trang-thai-phieu-doi-tra")
+    public ResponseEntity<?> nextStep(
+            @RequestParam(value = "idNhanVien",required = false) Long idNhanVien,
+            @RequestParam(value = "idPhieuDoiTra", required = false) Long idPhieuDoiTra,
+            @RequestParam(value = "idKhachHang",required = false) Long idKhachHang,
+            @RequestParam(value = "trangThai",required = false) Integer trangThai
+    ){
+        NextStepDoiTraReq request = new NextStepDoiTraReq(idNhanVien,idPhieuDoiTra,idKhachHang,trangThai);
+        return ResponseEntity.ok(phieuDoiTraService.nextSetp(request));
     }
 }

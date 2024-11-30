@@ -11,6 +11,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -27,11 +28,19 @@ public class PhieuDoiTraService {
     @Autowired
     private NhanVienRepository nhanVienRepository;
     @Autowired
+    private ThongBaoRepository thongBaoRepository;
+    @Autowired
+    private SimpMessagingTemplate messagingTemplate;
+    @Autowired
+    private KhachHangRepository khachHangRepository;
+    @Autowired
     private PhieuDoiTraRepository phieuDoiTraRepository;
     @Autowired
     private SanPhamDoiTraRepository sanPhamDoiTraRepository;
     @Autowired
     private HoaDonChiTietRepository hoaDonChiTietRepository;
+    @Autowired
+    private SanPhamChiTietRepository sanPhamChiTietRepository;
     @Autowired
     private ThongTinKiemTraRepositpry thongTinKiemTraRepositpry;
     @Autowired
@@ -187,7 +196,7 @@ public class PhieuDoiTraService {
 
         phieuDoiTra.setNhanVien(nhanVien);
         phieuDoiTra.setThaoTac(thaoTac);
-        phieuDoiTra.setTrangThai(2);
+        phieuDoiTra.setTrangThai(1);
 
         ThaoTacPhieuDoiTra thaoTacPhieuDoiTra = new ThaoTacPhieuDoiTra();
         thaoTacPhieuDoiTra.setThaoTac("Xác nhận phiếu");
@@ -206,42 +215,117 @@ public class PhieuDoiTraService {
 
     public Object nhanVienKiemTra(KiemTraHangReq request) {
 
-//        var phieuDoiTra = phieuDoiTraRepository.findById(request.getIdPhieuDoiTra()).orElse(null);
-//        if(phieuDoiTra == null) return getErro("Không tìm thấy phiếu đổi trả này");
-//        var nhanVien = nhanVienRepository.findById(request.getIdNhanVien()).orElse(null);
-//        if(nhanVien == null) return getErro("Không tìm thấy nhân viên này");
-//
-//        if(request.getTrangThaiPhieuDoiTra() == null) getErro("Chưa có trạng thái phiếu đổi trả");
-//        if(request.getGhiChu().isBlank()) getErro("Chưa nhập ghi chú");
-//        if(request.getHinhAnhList().isEmpty()) getErro("Chưa có hình ảnh hoặc video");
-//
-//        phieuDoiTra.setGhiChuNhanVien(request.getGhiChu());
-//        phieuDoiTra.setTrangThai(request.getTrangThaiPhieuDoiTra());
-//        var phieuDoiTraGet = phieuDoiTraRepository.save(phieuDoiTra);
-//
-//        request.getHinhAnhList().forEach(s -> {
-//        ThongTinKiemTra thongTinKiemTra = new ThongTinKiemTra();
-//            thongTinKiemTra.setPhieuDoiTra(phieuDoiTraGet);
-//            thongTinKiemTra.setVideo(s);
-//            thongTinKiemTra.setTrangThai(1);
-//            thongTinKiemTraRepositpry.save(thongTinKiemTra);
-//        });
-//
-//
-//        ThaoTacPhieuDoiTra thaoTacPhieuDoiTra = new ThaoTacPhieuDoiTra();
-//        thaoTacPhieuDoiTra.setThaoTac("Kiểm tra sản phẩm");
-//        thaoTacPhieuDoiTra.setNgayTao(LocalDateTime.now());
-//        thaoTacPhieuDoiTra.setNhanVien(nhanVien);
-//        thaoTacPhieuDoiTra.setPhieuDoiTra(phieuDoiTraGet);
-//        thaoTacPhieuDoiTraRepository.save(thaoTacPhieuDoiTra);
-//
-//        if (phieuDoiTra.getTrangThai() == 0){
-//
-//        }
+        var phieuDoiTra = phieuDoiTraRepository.findById(request.getIdPhieuDoiTra()).orElse(null);
+        if(phieuDoiTra == null) return getErro("Không tìm thấy phiếu đổi trả này");
+        var nhanVien = nhanVienRepository.findById(request.getIdNhanVien()).orElse(null);
+        if(nhanVien == null) return getErro("Không tìm thấy nhân viên này");
+        var sanPhamDoiTraList = sanPhamDoiTraRepository.findAllByPhieuDoiTraId(phieuDoiTra.getId());
+
+        if(request.getTrangThaiPhieuDoiTra() == null) getErro("Chưa có trạng thái phiếu đổi trả");
+        if(request.getGhiChu().isBlank()) getErro("Chưa nhập ghi chú");
+        if(request.getHinhAnhList().isEmpty()) getErro("Chưa có hình ảnh hoặc video");
+
+        phieuDoiTra.setGhiChuNhanVien(request.getGhiChu());
+        phieuDoiTra.setTrangThai(request.getTrangThaiPhieuDoiTra());
+        var phieuDoiTraGet = phieuDoiTraRepository.save(phieuDoiTra);
+
+        request.getHinhAnhList().forEach(s -> {
+        ThongTinKiemTra thongTinKiemTra = new ThongTinKiemTra();
+            thongTinKiemTra.setPhieuDoiTra(phieuDoiTraGet);
+            thongTinKiemTra.setVideo(s);
+            thongTinKiemTra.setTrangThai(1);
+            thongTinKiemTraRepositpry.save(thongTinKiemTra);
+        });
+
+
+        ThaoTacPhieuDoiTra thaoTacPhieuDoiTra = new ThaoTacPhieuDoiTra();
+        thaoTacPhieuDoiTra.setThaoTac("Kiểm tra sản phẩm");
+        thaoTacPhieuDoiTra.setNgayTao(LocalDateTime.now());
+        thaoTacPhieuDoiTra.setNhanVien(nhanVien);
+        thaoTacPhieuDoiTra.setPhieuDoiTra(phieuDoiTraGet);
+        thaoTacPhieuDoiTraRepository.save(thaoTacPhieuDoiTra);
+
+        if (phieuDoiTra.getTrangThai() != 0){
+            sanPhamDoiTraList.forEach(sanPhamDoiTra -> {
+                var sanPhamChiTiet= sanPhamDoiTra.getSanPham();
+                sanPhamChiTiet.setSoLuong(sanPhamChiTiet.getSoLuong() + sanPhamDoiTra.getSoLuong());
+                sanPhamChiTietRepository.save(sanPhamChiTiet);
+            });
+        }
 
         return ResponseEntity.ok();
     }
 
+    public Object nextSetp(NextStepDoiTraReq request) {
+        if (request.getIdKhachHang() == null) request.setIdKhachHang(Long.valueOf(0));
+        if (request.getIdNhanVien() == null) request.setIdNhanVien(Long.valueOf(0));
+        var phieuDoiTra = phieuDoiTraRepository.findById(request.getIdPhieuDoiTra()).orElse(null);
+        if(phieuDoiTra == null) return getErro("Không tìm thấy phiếu đổi trả này");
+        var nhanVien = nhanVienRepository.findById(request.getIdNhanVien()).orElse(null);
+        var khachHang = khachHangRepository.findById(request.getIdKhachHang()).orElse(null);
+        if (nhanVien == null && khachHang == null) return getErro("Chưa rõ người thực hiện");
+        var trangThaiCu = phieuDoiTra.getTrangThai();
+
+        if (request.getTrangThai() == null) return getErro("Chưa có trạng thái");
+        phieuDoiTra.setTrangThai(request.getTrangThai());
+        if(phieuDoiTra.getTrangThai()<trangThaiCu) return getErro("Trạng thái phải lớn hơn trạng thái cũ");
+        phieuDoiTraRepository.save(phieuDoiTra);
+        
+        ThaoTacPhieuDoiTra thaoTacPhieuDoiTra = new ThaoTacPhieuDoiTra();
+        if (khachHang == null)thaoTacPhieuDoiTra.setGhiChu("Nhân viên: "+ nhanVien.getHoTen()+ " "+ ghiChuNhanVien(phieuDoiTra.getTrangThai()));
+        if (nhanVien == null)thaoTacPhieuDoiTra.setGhiChu("Khách hàng: "+ khachHang.getHoTen()+ " "+ ghiChuKhachHang(phieuDoiTra.getTrangThai()));
+        thaoTacPhieuDoiTra.setNgayTao(LocalDateTime.now());
+        thaoTacPhieuDoiTra.setTrangThai(1);
+        thaoTacPhieuDoiTra.setPhieuDoiTra(phieuDoiTra);
+        thaoTacPhieuDoiTra.setNhanVien(nhanVien);
+        thaoTacPhieuDoiTra.setKhachHang(khachHang);
+        thaoTacPhieuDoiTraRepository.save(thaoTacPhieuDoiTra);
+
+        TaoThongBao(phieuDoiTra, "Phiếu đổi trả đã được cập nhật");
+
+        return ResponseEntity.ok(phieuDoiTra);
+    }
+
+    private void TaoThongBao(PhieuDoiTra phieuDoiTra, String conten) {
+        ThongBao thongBao = new ThongBao();
+        thongBao.setNoiDung(conten);
+        thongBao.setUrl("/g4/shop/khach-hang?activeItem=9&idphieu="+phieuDoiTra.getId());
+        thongBao.setDaDoc(false);
+        thongBao.setNgayTao(LocalDateTime.now());
+        thongBao.setTrangThai(1);
+        thongBao.setKhachHang(phieuDoiTra.getKhachHang());
+
+        thongBaoRepository.save(thongBao);
+        messagingTemplate.convertAndSend("/topic/notifications", phieuDoiTra.getKhachHang().getId());
+    }
+
+    private String ghiChuKhachHang(int trangThai) {
+        switch (trangThai){
+            case 2:
+                return "đã đóng gói và gửi trả sản phẩm";
+            case 3:
+                return "Đóng gói => Kiểm tra";
+            case 4:
+                return "Kiểm tra => Cho phép hoàn tiền";
+            case 5:
+                return "đã xác nhận hoàn thành phiếu trả hàng";
+        }
+        return null;
+    }
+
+    private String ghiChuNhanVien(int trangThai) {
+        switch (trangThai){
+            case 2:
+                return "Mặc định => Đóng gói sản phẩm";
+            case 3:
+                return "đã kiểm tra sản phảm";
+            case 4:
+                return "đã xác nhận cho phép hoàn tiền";
+            case 5:
+                return "đã xác nhận hoàn thành phiếu trả hàng";
+        }
+        return null;
+    }
 
     private ResponseEntity<?> getErro(String s){
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new erroResponse(s));
