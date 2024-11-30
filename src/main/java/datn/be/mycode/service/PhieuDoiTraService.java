@@ -8,7 +8,6 @@ import datn.be.mycode.response.DoiTra.HoaDonChiTietDoiTraRes;
 import datn.be.mycode.response.DoiTra.KhachHangGetHoaDonChiTietRes;
 import datn.be.mycode.response.NormalTableResponse;
 import datn.be.mycode.response.erroResponse;
-import datn.be.mycode.response.hoaDon.HoaDonChiTietChoViewKhachHang;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -21,7 +20,6 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 @Service
@@ -227,7 +225,7 @@ public class PhieuDoiTraService {
         return ResponseEntity.ok(phieuDoiTraRepository.save(phieuDoiTra));
     }
 
-    public Object nhanVienKiemTra(KiemTraHangReq request) {
+    public Object nhanVienKiemTra(KiemTraHangReq request, int trangThaiThongTinKiemTra) {
 
         var phieuDoiTra = phieuDoiTraRepository.findById(request.getIdPhieuDoiTra()).orElse(null);
         if(phieuDoiTra == null) return getErro("Không tìm thấy phiếu đổi trả này");
@@ -235,39 +233,26 @@ public class PhieuDoiTraService {
         if(nhanVien == null) return getErro("Không tìm thấy nhân viên này");
         var sanPhamDoiTraList = sanPhamDoiTraRepository.findAllByPhieuDoiTraId(phieuDoiTra.getId());
 
-        if(request.getTrangThaiPhieuDoiTra() == null) getErro("Chưa có trạng thái phiếu đổi trả");
-        if(request.getGhiChu().isBlank()) getErro("Chưa nhập ghi chú");
         if(request.getHinhAnhList().isEmpty()) getErro("Chưa có hình ảnh hoặc video");
 
-        phieuDoiTra.setGhiChuNhanVien(request.getGhiChu());
-        phieuDoiTra.setTrangThai(request.getTrangThaiPhieuDoiTra());
-        var phieuDoiTraGet = phieuDoiTraRepository.save(phieuDoiTra);
 
         request.getHinhAnhList().forEach(s -> {
         ThongTinKiemTra thongTinKiemTra = new ThongTinKiemTra();
-            thongTinKiemTra.setPhieuDoiTra(phieuDoiTraGet);
+            thongTinKiemTra.setPhieuDoiTra(phieuDoiTra);
             thongTinKiemTra.setVideo(s);
-            thongTinKiemTra.setTrangThai(1);
+            thongTinKiemTra.setTrangThai(trangThaiThongTinKiemTra);
             thongTinKiemTraRepositpry.save(thongTinKiemTra);
         });
-
 
         ThaoTacPhieuDoiTra thaoTacPhieuDoiTra = new ThaoTacPhieuDoiTra();
         thaoTacPhieuDoiTra.setGhiChu("Kiểm tra sản phẩm");
         thaoTacPhieuDoiTra.setNgayTao(LocalDateTime.now());
         thaoTacPhieuDoiTra.setNhanVien(nhanVien);
-        thaoTacPhieuDoiTra.setPhieuDoiTra(phieuDoiTraGet);
+        thaoTacPhieuDoiTra.setPhieuDoiTra(phieuDoiTra);
         thaoTacPhieuDoiTraRepository.save(thaoTacPhieuDoiTra);
 
-//        if (phieuDoiTra.getTrangThai() != 0){
-//            sanPhamDoiTraList.forEach(sanPhamDoiTra -> {
-//                var sanPhamChiTiet= sanPhamDoiTra.getSanPham();
-//                sanPhamChiTiet.setSoLuong(sanPhamChiTiet.getSoLuong() + sanPhamDoiTra.getSoLuong());
-//                sanPhamChiTietRepository.save(sanPhamChiTiet);
-//            });
-//        }
 
-        return ResponseEntity.ok();
+        return ResponseEntity.ok(phieuDoiTra);
     }
 
     public Object nextSetp(NextStepDoiTraReq request) {

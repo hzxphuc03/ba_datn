@@ -71,7 +71,12 @@ public class DoiTraController {
 
     @PostMapping("/nhan-vien-kiem-tra-hang")
     public ResponseEntity<?> kiemTraHang(@RequestBody KiemTraHangReq request){
-        return ResponseEntity.ok(phieuDoiTraService.nhanVienKiemTra(request));
+        return ResponseEntity.ok(phieuDoiTraService.nhanVienKiemTra(request, 1));
+    }
+
+    @PostMapping("/nhan-vien-gui-bang-chung-thanh-toan")
+    public ResponseEntity<?> thongTinThanhToan(@RequestBody KiemTraHangReq request){
+        return ResponseEntity.ok(phieuDoiTraService.nhanVienKiemTra(request, 2));
     }
 
     @PutMapping("/cap-nhat-trang-thai-phieu-doi-tra")
