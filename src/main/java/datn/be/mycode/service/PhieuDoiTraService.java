@@ -258,13 +258,13 @@ public class PhieuDoiTraService {
         thaoTacPhieuDoiTra.setPhieuDoiTra(phieuDoiTraGet);
         thaoTacPhieuDoiTraRepository.save(thaoTacPhieuDoiTra);
 
-        if (phieuDoiTra.getTrangThai() != 0){
-            sanPhamDoiTraList.forEach(sanPhamDoiTra -> {
-                var sanPhamChiTiet= sanPhamDoiTra.getSanPham();
-                sanPhamChiTiet.setSoLuong(sanPhamChiTiet.getSoLuong() + sanPhamDoiTra.getSoLuong());
-                sanPhamChiTietRepository.save(sanPhamChiTiet);
-            });
-        }
+//        if (phieuDoiTra.getTrangThai() != 0){
+//            sanPhamDoiTraList.forEach(sanPhamDoiTra -> {
+//                var sanPhamChiTiet= sanPhamDoiTra.getSanPham();
+//                sanPhamChiTiet.setSoLuong(sanPhamChiTiet.getSoLuong() + sanPhamDoiTra.getSoLuong());
+//                sanPhamChiTietRepository.save(sanPhamChiTiet);
+//            });
+//        }
 
         return ResponseEntity.ok();
     }
@@ -507,6 +507,7 @@ public class PhieuDoiTraService {
         if (request.getGhiChu().isBlank()) getErro("Chưa nhập gì");
 
         phieuDoiTra.setGhiChuNhanVien(request.getGhiChu());
+        phieuDoiTra.setThaoTac(0);
         phieuDoiTra.setTrangThai(0);
         phieuDoiTraRepository.save(phieuDoiTra);
 
