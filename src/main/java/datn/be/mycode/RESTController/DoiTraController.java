@@ -64,12 +64,13 @@ public class DoiTraController {
 
     @PutMapping("/cap-nhat-trang-thai-phieu-doi-tra")
     public ResponseEntity<?> nextStep(
-            @RequestParam(value = "idNhanVien",required = false) Long idNhanVien,
-            @RequestParam(value = "idPhieuDoiTra", required = false) Long idPhieuDoiTra,
-            @RequestParam(value = "idKhachHang",required = false) Long idKhachHang,
-            @RequestParam(value = "trangThai",required = false) Integer trangThai
+            @RequestBody NextStepDoiTraReq request
     ){
-        NextStepDoiTraReq request = new NextStepDoiTraReq(idNhanVien,idPhieuDoiTra,idKhachHang,trangThai);
         return ResponseEntity.ok(phieuDoiTraService.nextSetp(request));
     }
+
+//    @PutMapping("/them-dia-chi-vao-phieu-doi-tra")
+//    public ResponseEntity<?> addDiaChi(@RequestBody XacNhanReq request){
+//        return ResponseEntity.ok(phieuDoiTraService.xacNhanPhieuDoiTra(request, 0));
+//    }
 }
