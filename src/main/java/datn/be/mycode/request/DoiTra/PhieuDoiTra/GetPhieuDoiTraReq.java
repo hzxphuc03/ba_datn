@@ -19,5 +19,7 @@ public class GetPhieuDoiTraReq {
 
     private String keyWord;
 
+    private Integer theLoai;
+    
     private Integer status;
 }

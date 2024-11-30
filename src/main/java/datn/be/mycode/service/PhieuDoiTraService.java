@@ -63,11 +63,14 @@ public class PhieuDoiTraService {
         if (request.getStatus() == null) {
             request.setStatus(1);
         }
+        if (request.getTheLoai() == null) {
+            request.setTheLoai(1);
+        }
         if (request.getKeyWord() == null || request.getKeyWord().isBlank()){
             request.setKeyWord(null);
         }
         Pageable pageable = PageRequest.of(request.getPage() - 1,request.getPageSize());
-        var phieuGiamGiaPage = phieuDoiTraRepository.findAllByKhachHangAndStatus(request.getKeyWord(), request.getStatus(), pageable);
+        var phieuGiamGiaPage = phieuDoiTraRepository.findAllByKhachHangAndStatus(request.getKeyWord(), request.getStatus(), request.getTheLoai(), pageable);
 
 
         var phieuDoiTraNormalTableResponse = new NormalTableResponse<PhieuDoiTra>();
@@ -348,9 +351,21 @@ public class PhieuDoiTraService {
         phieuDoiTra.setTenChuTaiKhoan(request.getTenChuTaiKhoan());
         phieuDoiTra.setSoTaiKhoanNganHang(request.getSoTaiKhoanNganHang());
         phieuDoiTra.setTenNganHang(request.getTenNganHang());
-
+        TaoThaoTacPhieuDoiTra(null, phieuDoiTra.getKhachHang(),phieuDoiTra,"đã cập nhật thông tin chuyển khoản");
+        TaoThongBao(phieuDoiTra,"Khách hàng cập nhật thông tin chuyển khoản");
         return ResponseEntity.ok(phieuDoiTraRepository.save(phieuDoiTra));
 
+    }
+
+    private void TaoThaoTacPhieuDoiTra(NhanVien nhanVien, KhachHang khachHang, PhieuDoiTra phieuDoiTra,String conten) {
+        ThaoTacPhieuDoiTra thaoTacPhieuDoiTra = new ThaoTacPhieuDoiTra();
+        thaoTacPhieuDoiTra.setGhiChu("Khách hàng: "+ khachHang.getHoTen()+ " "+conten);
+        thaoTacPhieuDoiTra.setNgayTao(LocalDateTime.now());
+        thaoTacPhieuDoiTra.setTrangThai(1);
+        thaoTacPhieuDoiTra.setPhieuDoiTra(phieuDoiTra);
+        thaoTacPhieuDoiTra.setNhanVien(nhanVien);
+        thaoTacPhieuDoiTra.setKhachHang(khachHang);
+        thaoTacPhieuDoiTraRepository.save(thaoTacPhieuDoiTra);
     }
 
     private String validateAddChuyenKhoan(AddChuyenKhoanReq request) {
@@ -371,6 +386,7 @@ public class PhieuDoiTraService {
         phieuDoiTra.setHoaDonMoi(hoaDon);
         TaoThaoTacHoaDon(hoaDon);
         TaoThongBaoHoaDon(hoaDon);
+        TaoThaoTacPhieuDoiTra(null, phieuDoiTra.getKhachHang(),phieuDoiTra,"đã nhập thông tin địa chỉ và tạo thành công hóa đơn");
 
         return ResponseEntity.ok(phieuDoiTra);
     }

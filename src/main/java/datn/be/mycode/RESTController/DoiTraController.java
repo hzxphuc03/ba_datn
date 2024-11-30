@@ -19,9 +19,10 @@ public class DoiTraController {
             @RequestParam(name = "page",required = false) Integer page,
             @RequestParam(name = "pageSize",required = false) Integer pageSize,
             @RequestParam(name = "keyWord",required = false) String keyWord,
+            @RequestParam(name = "theLoai",required = false) Integer theLoai,
             @RequestParam(name = "status",required = false) Integer status
     ){
-        GetPhieuDoiTraReq getPhieuDoiTraReq = new GetPhieuDoiTraReq(page, pageSize, keyWord, status);
+        GetPhieuDoiTraReq getPhieuDoiTraReq = new GetPhieuDoiTraReq(page, pageSize, keyWord, theLoai, status);
         return ResponseEntity.ok(phieuDoiTraService.getPhieuDoiTra(getPhieuDoiTraReq));
     }
 
