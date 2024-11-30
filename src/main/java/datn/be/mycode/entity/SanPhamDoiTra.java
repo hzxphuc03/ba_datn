@@ -23,7 +23,7 @@ public class SanPhamDoiTra {
     private int soLuong;
 
     @Column(name = "gia_san_pham")
-    private BigDecimal gia_san_pham;
+    private BigDecimal giaSanPham;
 
     @Column(name = "trang_thai")
     private int trangThai;

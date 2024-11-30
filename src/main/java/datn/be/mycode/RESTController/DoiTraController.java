@@ -69,8 +69,15 @@ public class DoiTraController {
         return ResponseEntity.ok(phieuDoiTraService.nextSetp(request));
     }
 
-//    @PutMapping("/them-dia-chi-vao-phieu-doi-tra")
-//    public ResponseEntity<?> addDiaChi(@RequestBody XacNhanReq request){
-//        return ResponseEntity.ok(phieuDoiTraService.xacNhanPhieuDoiTra(request, 0));
-//    }
+    @PutMapping("/thong-tin-chuyen-khoan-phieu-doi-tra")
+    public ResponseEntity<?> thongTinChuyenKhoan(
+            @RequestBody AddChuyenKhoanReq request
+    ){
+        return ResponseEntity.ok(phieuDoiTraService.addChuyenKhoan(request));
+    }
+
+    @PutMapping("/them-dia-chi-vao-phieu-doi-tra")
+    public ResponseEntity<?> addDiaChi(@RequestBody AddDiaChiReq request){
+        return ResponseEntity.ok(phieuDoiTraService.taoHoaDon(request));
+    }
 }
