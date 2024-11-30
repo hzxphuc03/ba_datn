@@ -7,6 +7,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+import java.util.Optional;
+
 @Repository
 public interface PhieuDoiTraRepository extends JpaRepository<PhieuDoiTra, Long> {
 
@@ -19,4 +22,6 @@ public interface PhieuDoiTraRepository extends JpaRepository<PhieuDoiTra, Long> 
     Page<PhieuDoiTra> findAllByKhachHangAndStatus(String keyWord, Integer status, Integer theLoai, Pageable pageable);
 
     Page<PhieuDoiTra> findAllByKhachHangId(Long idKhachHang, Pageable pageable);
+
+    List<PhieuDoiTra> findByHoaDonCuId(Long idHoaDonCu);
 }

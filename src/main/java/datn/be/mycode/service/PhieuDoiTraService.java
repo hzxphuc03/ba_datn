@@ -4,8 +4,11 @@ import datn.be.mycode.entity.*;
 import datn.be.mycode.repository.*;
 import datn.be.mycode.request.DoiTra.PhieuDoiTra.*;
 import datn.be.mycode.response.DoiTra.DetailPhieuDoiTraRes;
+import datn.be.mycode.response.DoiTra.HoaDonChiTietDoiTraRes;
+import datn.be.mycode.response.DoiTra.KhachHangGetHoaDonChiTietRes;
 import datn.be.mycode.response.NormalTableResponse;
 import datn.be.mycode.response.erroResponse;
+import datn.be.mycode.response.hoaDon.HoaDonChiTietChoViewKhachHang;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -357,17 +360,6 @@ public class PhieuDoiTraService {
 
     }
 
-    private void TaoThaoTacPhieuDoiTra(NhanVien nhanVien, KhachHang khachHang, PhieuDoiTra phieuDoiTra,String conten) {
-        ThaoTacPhieuDoiTra thaoTacPhieuDoiTra = new ThaoTacPhieuDoiTra();
-        thaoTacPhieuDoiTra.setGhiChu("Khách hàng: "+ khachHang.getHoTen()+ " "+conten);
-        thaoTacPhieuDoiTra.setNgayTao(LocalDateTime.now());
-        thaoTacPhieuDoiTra.setTrangThai(1);
-        thaoTacPhieuDoiTra.setPhieuDoiTra(phieuDoiTra);
-        thaoTacPhieuDoiTra.setNhanVien(nhanVien);
-        thaoTacPhieuDoiTra.setKhachHang(khachHang);
-        thaoTacPhieuDoiTraRepository.save(thaoTacPhieuDoiTra);
-    }
-
     private String validateAddChuyenKhoan(AddChuyenKhoanReq request) {
         if (request.getSoTaiKhoanNganHang().isBlank()) return "Bạn chưa nhập số tài khoản";
         if (request.getTenChuTaiKhoan().isBlank()) return "Bạn chưa nhập tên chủ tài khoản";
@@ -462,6 +454,76 @@ public class PhieuDoiTraService {
         hoaDon.setMa("HDDT"+hoaDon.getId());
 
         return hoaDonRepository.save(hoaDon);
+    }
+
+    public Object getHoaDonChiTietChoViewKhachHang(Long idHoaDon) {
+        var hoaDon = hoaDonRepository.findById(idHoaDon).orElse(null);
+        if(hoaDon == null)return null;
+        var phieuDoiTraList = phieuDoiTraRepository.findByHoaDonCuId(hoaDon.getId());
+        List<SanPhamDoiTra> sanPhamDoiList = new ArrayList<>();
+        phieuDoiTraList.forEach(phieuDoiTra -> {
+            var sanPhamDoi = sanPhamDoiTraRepository.findAllByPhieuDoiTraId(phieuDoiTra.getId());
+            sanPhamDoiList.addAll(sanPhamDoi);
+        });
+
+        var hoaDonChiTietList = hoaDonChiTietRepository.findAllByHoaDon_Id(hoaDon.getId());
+
+        List<HoaDonChiTietDoiTraRes> hoaDonChiTietRes = new ArrayList<>();
+        hoaDonChiTietList.forEach(hoaDonChiTiet -> {
+            HoaDonChiTietDoiTraRes hoaDonChiTietDoiTraRes = new HoaDonChiTietDoiTraRes();
+            hoaDonChiTietDoiTraRes.HoaDonChiTietDoiTraRes(hoaDonChiTiet);
+            sanPhamDoiList.forEach(sanPhamDoiTra -> {
+                hoaDonChiTietDoiTraRes.setSoLuongDoi(0);
+                if (sanPhamDoiTra.getSanPham().equals(hoaDonChiTiet.getSanPhamChiTiet())) hoaDonChiTietDoiTraRes.setSoLuongDoi(sanPhamDoiTra.getSoLuong());
+            });
+            hoaDonChiTietRes.add(hoaDonChiTietDoiTraRes);
+        });
+
+        var thaoTacHoaDonList = thaoTacHoaDonRepository.findAllByHoaDonId(hoaDon.getId());
+
+        KhachHangGetHoaDonChiTietRes khachHangGetHoaDonChiTietRes = new KhachHangGetHoaDonChiTietRes();
+        khachHangGetHoaDonChiTietRes.setHoaDon(hoaDon);
+        khachHangGetHoaDonChiTietRes.setHoaDonChiTietList(hoaDonChiTietRes);
+        khachHangGetHoaDonChiTietRes.setThaoTacHoaDons(thaoTacHoaDonList);
+        return khachHangGetHoaDonChiTietRes;
+    }
+
+    public Object nhanVienNote(NhanVienNoteReq request) {
+        var nhanVien = nhanVienRepository.findById(request.getIdNhanVien()).orElse(null);
+        if (nhanVien == null) return getErro("Không tìm thấy nhân viên này");
+        var phieuDoiTra = phieuDoiTraRepository.findById(request.getIdPhieuDoiTra()).orElse(null);
+        if(phieuDoiTra == null) return getErro("Không tìm thấy phiếu đổi trả này");
+        if (request.getGhiChu().isBlank()) getErro("Chưa nhập gì");
+
+        TaoThaoTacPhieuDoiTra(nhanVien, null, phieuDoiTra, request.getGhiChu());
+        return ResponseEntity.ok(phieuDoiTra);
+    }
+
+    public Object huyPhieuDoiTra(HuyPhieuDoiTraReq request) {
+        var nhanVien = nhanVienRepository.findById(request.getIdNhanVien()).orElse(null);
+        if (nhanVien == null) return getErro("Không tìm thấy nhân viên này");
+        var phieuDoiTra = phieuDoiTraRepository.findById(request.getIdPhieuDoiTra()).orElse(null);
+        if(phieuDoiTra == null) return getErro("Không tìm thấy phiếu đổi trả này");
+        if (request.getGhiChu().isBlank()) getErro("Chưa nhập gì");
+
+        phieuDoiTra.setGhiChuNhanVien(request.getGhiChu());
+        phieuDoiTra.setTrangThai(0);
+        phieuDoiTraRepository.save(phieuDoiTra);
+
+        TaoThaoTacPhieuDoiTra(nhanVien, null, phieuDoiTra, request.getGhiChu());
+        return ResponseEntity.ok(phieuDoiTra);
+    }
+
+    private void TaoThaoTacPhieuDoiTra(NhanVien nhanVien, KhachHang khachHang, PhieuDoiTra phieuDoiTra,String conten) {
+        ThaoTacPhieuDoiTra thaoTacPhieuDoiTra = new ThaoTacPhieuDoiTra();
+        if (khachHang == null)thaoTacPhieuDoiTra.setGhiChu("Nhân viên: "+ nhanVien.getHoTen()+ " "+conten);
+        if (nhanVien == null)thaoTacPhieuDoiTra.setGhiChu("Khách hàng: "+ khachHang.getHoTen()+ " "+conten);
+        thaoTacPhieuDoiTra.setNgayTao(LocalDateTime.now());
+        thaoTacPhieuDoiTra.setTrangThai(1);
+        thaoTacPhieuDoiTra.setPhieuDoiTra(phieuDoiTra);
+        thaoTacPhieuDoiTra.setNhanVien(nhanVien);
+        thaoTacPhieuDoiTra.setKhachHang(khachHang);
+        thaoTacPhieuDoiTraRepository.save(thaoTacPhieuDoiTra);
     }
 
     private ResponseEntity<?> getErro(String s){
