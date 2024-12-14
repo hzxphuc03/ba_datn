@@ -8,10 +8,12 @@ import datn.be.mycode.request.LoaiCoRequest;
 import datn.be.mycode.request.NormalTableRequest;
 import datn.be.mycode.request.VatLieuRequest;
 import datn.be.mycode.response.NormalTableResponse;
+import datn.be.mycode.response.erroResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -56,32 +58,50 @@ public class VatLieuService {
         return vatLieuNormalTableResponse;
     }
 
-    public VatLieu add(String request) {
+    public ResponseEntity<?> add(String request) {
+        String erroMess = check(request);
+        if (!erroMess.isBlank()) return getErro(erroMess);
+        var checkName = repository.findByTen(request).orElse(null);
+        if (checkName != null) return getErro("Tên này đã tồn tại");
 
         VatLieu vatLieu = new VatLieu();
         vatLieu.setTen(request);
         vatLieu.setTrangThai(1);
         vatLieu.setNgayTao(LocalDateTime.now());
-        return repository.save(vatLieu);
+        return ResponseEntity.ok(repository.save(vatLieu));
     }
 
 
-    public VatLieu update(VatLieuRequest request) {
+    public ResponseEntity<?> update(VatLieuRequest request) {
+        String erroMess = check(request.getTen());
+        if (!erroMess.isBlank()) return getErro(erroMess);
+        var checkName = repository.findByTen(request.getTen()).orElse(null);
+        if (checkName != null) return getErro("Tên này đã tồn tại");
+
         VatLieu vatLieu = repository.findById(request.getId()).get();
         vatLieu.setTen(request.getTen());
         vatLieu.setTrangThai(request.getTrangThai());
         vatLieu.setNgaySua(LocalDateTime.now());
-        return repository.save(vatLieu);
+        return ResponseEntity.ok(repository.save(vatLieu));
     }
 
+    private String check(String request) {
+        if(request == null || request.isBlank() ) return "Bạn chưa nhập dữ liệu";
+        return "";
+    }
 
     public VatLieu udateTrangThai(Long id, Integer status){
         VatLieu vatLieu = repository.findById(id).get();
+        vatLieu.setNgaySua(LocalDateTime.now());
         vatLieu.setTrangThai(status);
         return repository.save(vatLieu);
     }
 
     public ResponseEntity<?> getAll() {
         return ResponseEntity.ok(repository.findAllByTrangThai(1));
+    }
+
+    private ResponseEntity<?> getErro(String s){
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new erroResponse(s));
     }
 }

@@ -6,10 +6,13 @@ import datn.be.mycode.request.NormalTableRequest;
 import datn.be.mycode.request.TheLoaiRequest;
 import datn.be.mycode.request.TrangThaiRequest;
 import datn.be.mycode.response.NormalTableResponse;
+import datn.be.mycode.response.erroResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -51,23 +54,37 @@ public class TheLoaiService {
     }
 
 
-    public TheLoai add(String request) {
+    public ResponseEntity<?> add(String request) {
+        String erroMess = check(request);
+        if (!erroMess.isBlank()) return getErro(erroMess);
+        var checkName = repo.findByTen(request).orElse(null);
+        if (checkName != null) return getErro("Tên này đã tồn tại");
+
         TheLoai theLoai = new TheLoai();
         theLoai.setTen(request);
         theLoai.setTrangThai(1);
         theLoai.setNgayTao(LocalDateTime.now());
-        return repo.save(theLoai);
+        return ResponseEntity.ok(repo.save(theLoai));
     }
 
 
-    public TheLoai update(TheLoaiRequest request) {
+    public ResponseEntity<?> update(TheLoaiRequest request) {
+        String erroMess = check(request.getTen());
+        if (!erroMess.isBlank()) return getErro(erroMess);
+        var checkName = repo.findByTen(request.getTen()).orElse(null);
+        if (checkName != null) return getErro("Tên này đã tồn tại");
+
         TheLoai theLoai = repo.findById(request.getId()).get();
         theLoai.setTen(request.getTen());
         theLoai.setTrangThai(request.getTrangThai());
         theLoai.setNgaySua(LocalDateTime.now());
-        return repo.save(theLoai);
+        return ResponseEntity.ok(repo.save(theLoai));
     }
 
+    private String check(String request) {
+        if(request==null ||request.isBlank()) return "Bạn chưa nhập dữ liệu";
+        return "";
+    }
 
     public void delete(TheLoai theLoai) {
         repo.delete(theLoai);
@@ -87,5 +104,9 @@ public class TheLoaiService {
     }
     public List<TheLoai> findAllTheLoai() {
         return repo.findAll();
+    }
+
+    private ResponseEntity<?> getErro(String s){
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new erroResponse(s));
     }
 }

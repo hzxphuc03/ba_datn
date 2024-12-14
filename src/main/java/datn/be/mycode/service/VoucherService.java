@@ -70,11 +70,11 @@ public class VoucherService {
 
 
 
-    public Voucher add(VoucherRequest request) {
-        System.out.println("addDC1");
-        System.out.println(request);
+    public ResponseEntity<?> add(VoucherRequest request) {
+        String erroMess = check(request);
+        if (!erroMess.isBlank()) return getErro(erroMess);
+
         Voucher voucher = new Voucher();
-        voucher.setMa(request.getMa());
         voucher.setTen(request.getTen());
         voucher.setTheLoai(request.getTheLoai());
         voucher.setNgayBatDau(request.getNgayBatDau());
@@ -87,13 +87,29 @@ public class VoucherService {
         voucher.setTrangThai(1);
 
         voucher = repository.save(voucher);
+        voucher.setMa("PGG"+voucher.getId());
+        voucher = repository.save(voucher);
         capNhatTrangThaiVoucher();
-        return voucher;
+        return ResponseEntity.ok(voucher);
     }
 
-    public Voucher update(VoucherRequest request) {
+    private String check(VoucherRequest request) {
+        var now = LocalDateTime.now();
+        if (request.getTen().isBlank()) return "Bạn chưa nhập tên";
+        if (request.getTen().isBlank()) return "Bạn chưa nhập tên";
+        if (request.getSoLuong()<=0) return "Số lượng phải lớn hơn 0";
+        if (request.getPhanTramGiam()<=0) return "Số lượng phải lớn hơn 0";
+        if (request.getNgayBatDau().isBefore(now)) return "Ngày bắt đầu phải sau hôm nay";
+        if (request.getNgayKetThuc().isAfter(now)) return "Ngày kết thúc phải sau hôm nay";
+        return "";
+
+    }
+
+    public ResponseEntity<?> update(VoucherRequest request) {
+        String erroMess = check(request);
+        if (!erroMess.isBlank()) return getErro(erroMess);
+
         Voucher voucher = repository.findById(request.getId()).get();
-        voucher.setMa(request.getMa());
         voucher.setTen(request.getTen());
         voucher.setTheLoai(request.getTheLoai());
         voucher.setNgayBatDau(request.getNgayBatDau());
@@ -107,7 +123,7 @@ public class VoucherService {
 
         voucher = repository.save(voucher);
         capNhatTrangThaiVoucher();
-        return voucher;
+        return ResponseEntity.ok(voucher);
     }
 
     public Voucher udateTrangThai(Long id, Integer status){

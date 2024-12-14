@@ -37,7 +37,7 @@ public class TheLoaiController {
     }
 
     @PostMapping("/add")
-    public ResponseEntity<?> add(@RequestBody String tenTheLoaiRequest){
+    public ResponseEntity<?> add(@RequestBody(required = false) String tenTheLoaiRequest){
 
         return ResponseEntity.ok(theLoaiService.add(tenTheLoaiRequest));
     }

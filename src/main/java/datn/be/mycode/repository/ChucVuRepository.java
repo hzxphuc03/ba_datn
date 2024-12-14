@@ -8,6 +8,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
 public interface ChucVuRepository extends JpaRepository<ChucVu, Long> {
 
@@ -15,4 +17,6 @@ public interface ChucVuRepository extends JpaRepository<ChucVu, Long> {
 
     @Query("SELECT u FROM ChucVu u WHERE u.ten LIKE %:name%")
     Page<ChucVu> searchByTen(String name, Pageable pageable);
+
+    Optional<ChucVu> findByTen(String ten);
 }

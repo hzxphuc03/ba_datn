@@ -28,7 +28,7 @@ public class KichCoController {
     }
 
     @PostMapping("/add")
-    public ResponseEntity add(@RequestBody String request){
+    public ResponseEntity add(@RequestBody(required = false) String request){
         return ResponseEntity.ok(kichCoService.add(request));
     }
 

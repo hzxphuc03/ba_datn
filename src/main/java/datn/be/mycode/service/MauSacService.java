@@ -2,17 +2,17 @@ package datn.be.mycode.service;
 
 
 import datn.be.mycode.entity.MauSac;
-import datn.be.mycode.entity.ThuongHieu;
 import datn.be.mycode.repository.MauSacRepository;
-import datn.be.mycode.repository.ThuongHieuRepository;
 import datn.be.mycode.request.MauSacRequest;
 import datn.be.mycode.request.NormalTableRequest;
-import datn.be.mycode.request.ThuongHieuRequest;
 import datn.be.mycode.response.NormalTableResponse;
+import datn.be.mycode.response.erroResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -55,25 +55,40 @@ public class MauSacService {
         return mauSacNormalTableResponse;
     }
 
-    public MauSac add(MauSacRequest request) {
+    public ResponseEntity<?> add(MauSacRequest request) {
+        String erroMess = check(request);
+        if (!erroMess.isBlank()) return getErro(erroMess);
+        var checkName = repository.findByTen(request.getTen()).orElse(null);
+        if (checkName != null) return getErro("Tên này đã tồn tại");
+
         MauSac mauSac = new MauSac();
         mauSac.setTen(request.getTen());
         mauSac.setMaMau(request.getMaMau());
         mauSac.setTrangThai(1);
         mauSac.setNgayTao(LocalDateTime.now());
-        return repository.save(mauSac);
+        return ResponseEntity.ok(repository.save(mauSac));
     }
 
 
-    public MauSac update(MauSacRequest request) {
+    public ResponseEntity<?> update(MauSacRequest request) {
+        String erroMess = check(request);
+        if (!erroMess.isBlank()) return getErro(erroMess);
+        var checkName = repository.findByTen(request.getTen()).orElse(null);
+        if (checkName != null) return getErro("Tên này đã tồn tại");
+
         MauSac mauSac = repository.findById(request.getId()).get();
         mauSac.setTen(request.getTen());
         mauSac.setMaMau(request.getMaMau());
         mauSac.setTrangThai(request.getTrangThai());
         mauSac.setNgaySua(LocalDateTime.now());
-        return repository.save(mauSac);
+        return ResponseEntity.ok(repository.save(mauSac));
     }
 
+    private String check(MauSacRequest request) {
+        if(request.getTen().isBlank()) return "Bạn chưa nhập dữ liệu";
+        if(request.getMaMau().isBlank()) return "Bạn chưa chọn mã màu";
+        return "";
+    }
 
 //    public void delete(MauSac mauSac) {
 //        repository.delete(mauSac);
@@ -88,7 +103,12 @@ public class MauSacService {
 
     public MauSac udateTrangThai(Long id, Integer status){
         MauSac mauSac = repository.findById(id).get();
+        mauSac.setNgaySua(LocalDateTime.now());
         mauSac.setTrangThai(status);
         return repository.save(mauSac);
+    }
+
+    private ResponseEntity<?> getErro(String s){
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new erroResponse(s));
     }
 }
