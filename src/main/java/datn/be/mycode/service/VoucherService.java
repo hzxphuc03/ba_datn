@@ -99,7 +99,7 @@ public class VoucherService {
         if (request.getTen().isBlank()) return "Bạn chưa nhập tên";
         if (request.getSoLuong()<=0) return "Số lượng phải lớn hơn 0";
         if (request.getPhanTramGiam()<=0) return "Số lượng phải lớn hơn 0";
-//        if (request.getNgayKetThuc().isAfter(now)) return "Ngày kết thúc phải sau hôm nay";
+        if (request.getNgayKetThuc().isBefore(request.getNgayBatDau())) return "Ngày kết thúc phải sau hôm nay";
         return "";
     }
 
