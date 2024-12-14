@@ -6,10 +6,13 @@ import datn.be.mycode.request.KichCoRequest;
 import datn.be.mycode.request.NormalTableRequest;
 import datn.be.mycode.request.VatLieuRequest;
 import datn.be.mycode.response.NormalTableResponse;
+import datn.be.mycode.response.erroResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -53,29 +56,47 @@ public class KichCoService {
         return kichCoNormalTableResponse;
     }
 
-    public KichCo add(String request) {
+    public ResponseEntity<?> add(String request) {
+        String erroMess = check(request);
+        if (!erroMess.isBlank()) return getErro(erroMess);
+        var checkName = repository.findByTen(request).orElse(null);
+        if (checkName != null) return getErro("Tên này đã tồn tại");
 
         KichCo kichCo = new KichCo();
         kichCo.setTen(request);
         kichCo.setTrangThai(1);
         kichCo.setNgayTao(LocalDateTime.now());
-        return repository.save(kichCo);
+        return ResponseEntity.ok(repository.save(kichCo));
     }
 
 
-    public KichCo update(KichCoRequest request) {
+    public ResponseEntity<?> update(KichCoRequest request) {
+        String erroMess = check(request.getTen());
+        if (!erroMess.isBlank()) return getErro(erroMess);
+        var checkName = repository.findByTen(request.getTen()).orElse(null);
+        if (checkName != null) return getErro("Tên này đã tồn tại");
+
         KichCo kichCo = repository.findById(request.getId()).get();
         kichCo.setTen(request.getTen());
         kichCo.setTrangThai(request.getTrangThai());
         kichCo.setNgaySua(LocalDateTime.now());
-        return repository.save(kichCo);
+        return ResponseEntity.ok(repository.save(kichCo));
     }
 
+    private String check(String request) {
+        if(request==null || request.isBlank()) return "Bạn chưa nhập dữ liệu";
+        return "";
+    }
 
     public KichCo udateTrangThai(Long id, Integer status){
         KichCo kichCo = repository.findById(id).get();
+        kichCo.setNgaySua(LocalDateTime.now());
         kichCo.setTrangThai(status);
         return repository.save(kichCo);
+    }
+
+    private ResponseEntity<?> getErro(String s){
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new erroResponse(s));
     }
 
 }

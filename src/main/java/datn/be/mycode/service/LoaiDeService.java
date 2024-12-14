@@ -8,10 +8,12 @@ import datn.be.mycode.request.LoaiCoRequest;
 import datn.be.mycode.request.LoaiDeRequest;
 import datn.be.mycode.request.NormalTableRequest;
 import datn.be.mycode.response.NormalTableResponse;
+import datn.be.mycode.response.erroResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -56,32 +58,51 @@ public class LoaiDeService {
         return loaiDeNormalTableResponse;
     }
 
-    public LoaiDe add(String request) {
+    public ResponseEntity<?> add(String request) {
+        String erroMess = check(request);
+        if (!erroMess.isBlank()) return getErro(erroMess);
+        var checkName = repository.findByTen(request).orElse(null);
+        if (checkName != null) return getErro("Tên này đã tồn tại");
+
 
         LoaiDe loaiDe = new LoaiDe();
         loaiDe.setTen(request);
         loaiDe.setTrangThai(1);
         loaiDe.setNgayTao(LocalDateTime.now());
-        return repository.save(loaiDe);
+        return ResponseEntity.ok(repository.save(loaiDe));
     }
 
 
-    public LoaiDe update(LoaiDeRequest request) {
+    public ResponseEntity<?> update(LoaiDeRequest request) {
+        String erroMess = check(request.getTen());
+        if (!erroMess.isBlank()) return getErro(erroMess);
+        var checkName = repository.findByTen(request.getTen()).orElse(null);
+        if (checkName != null) return getErro("Tên này đã tồn tại");
+
         LoaiDe loaiDe = repository.findById(request.getId()).get();
         loaiDe.setTen(request.getTen());
         loaiDe.setTrangThai(request.getTrangThai());
         loaiDe.setNgaySua(LocalDateTime.now());
-        return repository.save(loaiDe);
+        return ResponseEntity.ok(repository.save(loaiDe));
     }
 
+    private String check(String request) {
+        if(request==null ||request.isBlank()) return "Bạn chưa nhập dữ liệu";
+        return "";
+    }
 
     public LoaiDe udateTrangThai(Long id, Integer status){
         LoaiDe loaiDe = repository.findById(id).get();
+        loaiDe.setNgaySua(LocalDateTime.now());
         loaiDe.setTrangThai(status);
         return repository.save(loaiDe);
     }
 
     public ResponseEntity<?> getAll() {
         return ResponseEntity.ok(repository.findAllByTrangThai(1));
+    }
+
+    private ResponseEntity<?> getErro(String s){
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new erroResponse(s));
     }
 }

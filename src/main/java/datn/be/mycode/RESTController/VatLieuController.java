@@ -35,8 +35,8 @@ public class VatLieuController {
     }
 
     @PostMapping("/add")
-    public ResponseEntity<?> add(@RequestBody String tenThuongHieuRequest){
-        System.out.println(tenThuongHieuRequest);
+    public ResponseEntity<?> add(@RequestBody(required = false) String tenThuongHieuRequest){
+
         return ResponseEntity.ok(vatLieuService.add(tenThuongHieuRequest));
     }
 

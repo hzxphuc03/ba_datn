@@ -1,5 +1,6 @@
 package datn.be.mycode.repository;
 
+import datn.be.mycode.entity.KichCo;
 import datn.be.mycode.entity.VatLieu;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -8,6 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface VatLieuRepository extends JpaRepository<VatLieu,Long> {
@@ -21,4 +23,6 @@ public interface VatLieuRepository extends JpaRepository<VatLieu,Long> {
 
 
     List<VatLieu> findAllByTrangThai(int i);
+
+    Optional<KichCo> findByTen(String ten);
 }

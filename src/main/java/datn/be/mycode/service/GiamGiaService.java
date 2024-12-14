@@ -9,11 +9,13 @@ import datn.be.mycode.repository.KichcoRepository;
 import datn.be.mycode.repository.SanPhamRepository;
 import datn.be.mycode.request.*;
 import datn.be.mycode.response.NormalTableResponse;
+import datn.be.mycode.response.erroResponse;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -101,7 +103,11 @@ public class GiamGiaService {
         return repository.findById(id).get();
     }
 
-    public GiamGia add(GiamGiaRequest request){
+    public ResponseEntity<?> add(GiamGiaRequest request){
+        if (request.getNgayBatDau().isAfter(request.getNgayKetThuc())) return getErro("Ngày kết thúc phải sau ngày bắt đầu");
+        var checkName = repository.findByTen(request.getTen()).orElse(null);
+        if (checkName != null) return getErro("Tên này đã tồn tại");
+
         GiamGia giamGia= new GiamGia();
         giamGia.setTen(request.getTen());
         giamGia.setNgayBatDau(request.getNgayBatDau());
@@ -110,10 +116,14 @@ public class GiamGiaService {
         giamGia.setTrangThai(1);
         giamGia.setNgayTao(LocalDateTime.now());
 
-        return repository.save(giamGia);
+        return ResponseEntity.ok(repository.save(giamGia));
     }
 
-    public GiamGia update(GiamGiaRequest request) {
+    public ResponseEntity<?> update(GiamGiaRequest request) {
+        if (request.getNgayBatDau().isAfter(request.getNgayKetThuc())) return getErro("Ngày kết thúc phải sau ngày bắt đầu");
+        var checkName = repository.findByTen(request.getTen()).orElse(null);
+        if (checkName != null) return getErro("Tên này đã tồn tại");
+
         GiamGia giamGia = repository.findById(request.getId()).get();
         var trangThaiBefore = giamGia.getTrangThai();
         giamGia.setTen(request.getTen());
@@ -125,7 +135,7 @@ public class GiamGiaService {
         if(trangThaiBefore == 1 && trangThaiBefore != giamGia.getTrangThai()){
             loadSanPham(giamGia);
         }
-        return repository.save(giamGia);
+        return ResponseEntity.ok(repository.save(giamGia));
     }
 
     private void checkGiamGia(GiamGia giamGia) {
@@ -169,5 +179,9 @@ public class GiamGiaService {
 
     public void update(GiamGia giamGia) {
         repository.save(giamGia);
+    }
+
+    private ResponseEntity<?> getErro(String s){
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new erroResponse(s));
     }
 }

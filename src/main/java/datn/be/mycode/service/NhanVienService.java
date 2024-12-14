@@ -82,8 +82,10 @@ public class NhanVienService {
         return repo.findById(id).get();
     }
 
-    public NhanVien add(NhanVienRequest request) {
+    public ResponseEntity<?> add(NhanVienRequest request) {
 
+        String erroMess = check(request);
+        if (!erroMess.isBlank()) return getErro(erroMess);
 
         NhanVien nhanvien = NhanVien.builder()
                 .ma(request.getMa())
@@ -102,11 +104,25 @@ public class NhanVienService {
                 .build();
         nhanvien = repo.save(nhanvien);
         nhanvien.setMa("NV"+nhanvien.getId());
-        return repo.save(nhanvien);
+        return ResponseEntity.ok(repo.save(nhanvien));
+    }
+
+    private String check(NhanVienRequest request) {
+        if (request.getHoten()== null ||request.getHoten().isBlank()) return "Bạn chưa nhập tên";
+        if (request.getSoDienThoai()== null ||request.getSoDienThoai().isBlank()) return "Bạn chưa nhập số điện thoại";
+        if (request.getDiaChi()== null ||request.getDiaChi().isBlank()) return "Bạn chưa nhập địa chỉ";
+        if (request.getEmail()== null ||request.getEmail().isBlank()) return "Bạn chưa nhập email";
+        if (request.getTaiKhoan()== null ||request.getTaiKhoan().isBlank()) return "Bạn chưa nhập tai khoản";
+        if (request.getMatKhau()== null ||request.getMatKhau().isBlank()) return "Bạn chưa nhập mật khẩu";
+        return "";
     }
 
 
-    public NhanVien update(NhanVienRequest request) {
+    public ResponseEntity<?> update(NhanVienRequest request) {
+
+        String erroMess = check(request);
+        if (!erroMess.isBlank()) return getErro(erroMess);
+
         NhanVien nhanvien = repo.findById(request.getId()).get();
         nhanvien.setMa(request.getMa());
         nhanvien.setHoTen(request.getHoten());
@@ -121,7 +137,7 @@ public class NhanVienService {
         nhanvien.setChucVu(chucVuRepository.findById(request.getIdChucVu()).get());
         nhanvien.setTrangThai(request.getTrangThai());
 
-        return repo.save(nhanvien);
+        return ResponseEntity.ok(repo.save(nhanvien));
     }
 
 
@@ -171,7 +187,11 @@ public class NhanVienService {
             return ResponseEntity.ok(response);
         }
 
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new erroResponse("Tài khoản hoặc mật khẩu không chính xác"));
+        return ResponseEntity.ok(new erroResponse("Tài khoản hoặc mật khẩu không chính xác"));
 
+    }
+
+    private ResponseEntity<?> getErro(String s){
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new erroResponse(s));
     }
 }

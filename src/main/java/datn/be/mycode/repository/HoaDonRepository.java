@@ -44,4 +44,9 @@ public interface HoaDonRepository extends JpaRepository<HoaDon, Long> {
     Page<HoaDon> findAllByTrangThaiAndKhachHangIdOrderByNgayTaoDesc(int trangThai, Long idKhachHang, Pageable pageable);
 
     List<HoaDon> findByKhachHangId(@Param("idKhachHang") Long idKhachHang);
+
+    @Query("SELECT h FROM HoaDon h WHERE h.ngayThanhToan BETWEEN :dauThang AND :cuoiThang AND h.trangThai = 6")
+    List<HoaDon> findAllByNgayThanhToanAndTrangThai(
+            @Param("dauThang") LocalDateTime dauThang,
+            @Param("cuoiThang") LocalDateTime cuoiThang);
 }

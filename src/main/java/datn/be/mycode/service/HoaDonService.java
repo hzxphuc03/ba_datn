@@ -10,6 +10,9 @@ import datn.be.mycode.request.VoucherHoaDonRequest;
 import datn.be.mycode.request.customRequest.BanHang.*;
 import datn.be.mycode.request.customRequest.TableHoaDonRequest;
 import datn.be.mycode.request.thaoTacHoaDon.ThaoTacHoaDonAddRequest;
+import datn.be.mycode.response.ThongKe.DoanhSo;
+import datn.be.mycode.response.ThongKe.DoanhSoThang;
+import datn.be.mycode.response.ThongKe.Top5SanPham;
 import datn.be.mycode.response.hoaDon.HoaDonChiTietChoViewKhachHang;
 import datn.be.mycode.response.hoaDon.HoaDonResponse;
 import datn.be.mycode.response.NormalTableResponse;
@@ -29,8 +32,12 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 public class HoaDonService {
@@ -65,6 +72,8 @@ public class HoaDonService {
     private SimpMessagingTemplate messagingTemplate;
     @Autowired
     private EmailSender emailSender;
+    @Autowired
+    private SanPhamRepository sanPhamRepository;
 
     @Autowired
     private HoaDonChiTietService hoaDonChiTietService;
@@ -412,7 +421,7 @@ public class HoaDonService {
         }
 //        subtract quantity pruduct
         if(hoaDon.getTrangThai() == 6 || hoaDon.getThanhToan() == true){
-            setSoLuongSanPham(hoaDon);
+//            setSoLuongSanPham(hoaDon);
             setVoucher(hoaDon);
             hoaDonChiTietService.setTrangThaiByHoaDonDone(hoaDon);
         }
@@ -493,7 +502,7 @@ public class HoaDonService {
         hoaDon.setThanhToan(true);
         hoaDon.setTrangThai(2);
         hoaDon.setNgayThanhToan(LocalDateTime.now());
-        setSoLuongSanPham(hoaDon);
+//        setSoLuongSanPham(hoaDon);
         setVoucher(hoaDon);
         repo.save(hoaDon);
         thaoTacHoaDonService.add(thaoTacHoaDon);
@@ -517,7 +526,9 @@ public class HoaDonService {
 
                 hoaDon.setNgayThanhToan(LocalDateTime.now());
                 hoaDon.setThanhToan(true);
+                if (hoaDon.getNhanVien() == null){
                 setSoLuongSanPham(hoaDon);
+                }
                 hoaDonChiTietService.setTrangThaiByHoaDonDone(hoaDon);
             }
         }
@@ -584,6 +595,7 @@ public class HoaDonService {
         var trangThai = hoaDon.getTrangThai();
         if(trangThai == 6) return getErro("Hóa đơn này đã hoàn thành không để chỉnh sửa");
         if(trangThai == 0) return getErro("Hóa đơn này đã hủy");
+        if(trangThai != 2) return getErro("Hóa đơn này đã xác nhận không được hủy");
 
         var thaoTacHoaDon = new ThaoTacHoaDonAddRequest();
         switch (trangThai){
@@ -681,19 +693,111 @@ public class HoaDonService {
         return hoaDonChiTietChoViewKhachHang;
     }
 
-//
-//    public Object getTop5NhanVienXuatSacCuaThang() {
-//        var dauThang = LocalDateTime.now().with(TemporalAdjusters.firstDayOfMonth()).withHour(0).withMinute(0).withSecond(0).withNano(0);
-//        var cuoiThang = dauThang.with(TemporalAdjusters.lastDayOfMonth());
-//
-//        var nhanVienThang = repo.findDistinctNhanVienByNgayTaoInCurrentMonth(dauThang, cuoiThang);
-//        return nhanVienThang.stream().limit(5).collect(Collectors.toList());
-//    }
-//
-//    public Object getNhanVienXuatSacTungThang(LocalDateTime ngayBatDau) {
-//        var dauThang = ngayBatDau.with(TemporalAdjusters.firstDayOfMonth()).withHour(0).withMinute(0).withSecond(0).withNano(0);
-//        var cuoiThang = LocalDateTime.now().with(TemporalAdjusters.lastDayOfMonth());
-//
-//        return repo.findNhanVienByHoaDonPerMonth(dauThang, cuoiThang);
-//    }
+    public DoanhSo getDoanhSoThangNay(LocalDateTime dauThang, LocalDateTime cuoiThang) {
+//        var dauThang = LocalDateTime.now().with(TemporalAdjusters.firstDayOfMonth()).withHour(0).withMinute(0).withSecond(0).withNano(0).withMonth(11);
+//        var cuoiThang = dauThang.with(TemporalAdjusters.lastDayOfMonth()).withHour(23).withMinute(59).withSecond(59);
+
+        var hoaDonList = repo.findAllByNgayThanhToanAndTrangThai(dauThang,cuoiThang);
+
+        var soHoaDonHoanThanhTrongThang = hoaDonList.stream()
+                .filter(hoaDon -> hoaDon.getMa().startsWith("HD") && !hoaDon.getMa().startsWith("HDDT"))
+                .collect(Collectors.toList());
+        int soLuongHoaDonHoanThanhTrongThang = soHoaDonHoanThanhTrongThang.size();
+        var doanhSo = hoaDonList.stream()
+                .filter(hoaDon -> hoaDon.getMa().startsWith("HD") && !hoaDon.getMa().startsWith("HDDT"))
+                .mapToInt(value -> value.getTongTien().intValue())
+                .sum();
+        List<HoaDonChiTiet> hoaDonChiTietList = new ArrayList<>();
+        soHoaDonHoanThanhTrongThang.forEach(hoaDon -> {
+            var hoaDonChiTiet = hoaDonChiTietRepository.findByHoaDon(hoaDon);
+            hoaDonChiTietList.addAll(hoaDonChiTiet);
+        });
+
+        var sanPhamDaBan = hoaDonChiTietList.stream().mapToInt(value -> value.getSoLuong()).sum();
+        DoanhSo response = new DoanhSo();
+        response.setHoaDon(soLuongHoaDonHoanThanhTrongThang);
+        response.setDoanhSo(doanhSo);
+        response.setSoSanPhamBan(sanPhamDaBan);
+
+        return response;
+    }
+
+    public Object sanPhamBanChay() {
+        var dauThang = LocalDateTime.now().with(TemporalAdjusters.firstDayOfMonth()).withHour(0).withMinute(0).withSecond(0).withNano(0).withMonth(11);
+        var cuoiThang = dauThang.with(TemporalAdjusters.lastDayOfMonth()).withHour(23).withMinute(59).withSecond(59);
+
+        var hoaDonList = repo.findAllByNgayThanhToanAndTrangThai(dauThang,cuoiThang);
+
+        var soHoaDonHoanThanhTrongThang = hoaDonList.stream()
+                .filter(hoaDon -> hoaDon.getMa().startsWith("HD") && !hoaDon.getMa().startsWith("HDDT"))
+                .collect(Collectors.toList());
+        List<HoaDonChiTiet> hoaDonChiTietList = new ArrayList<>();
+        soHoaDonHoanThanhTrongThang.forEach(hoaDon -> {
+            var hoaDonChiTiet = hoaDonChiTietRepository.findByHoaDon(hoaDon);
+            hoaDonChiTietList.addAll(hoaDonChiTiet);
+        });
+
+        // Nhóm theo sản phẩm và tính tổng số lượng
+        Map<Long, Integer> productQuantityMap = hoaDonChiTietList.stream()
+                .collect(Collectors.groupingBy(
+                        hoaDonChiTiet -> hoaDonChiTiet.getSanPhamChiTiet().getSanPham().getId(), // Lấy ID sản phẩm từ SanPham
+                        Collectors.summingInt(HoaDonChiTiet::getSoLuong) // Tính tổng số lượng
+                ));
+
+        // Chuyển đổi Map sang List<Top5SanPham>
+        List<Top5SanPham> top5SanPhams = productQuantityMap.entrySet().stream()
+                .map(entry -> {
+                    Long productId = entry.getKey();
+                    int totalQuantity = entry.getValue();
+
+                    // Tìm tên sản phẩm từ ID
+                    String productName = sanPhamRepository.findById(productId).get().getTen(); // Tìm tên sản phẩm
+
+                    Top5SanPham top5 = new Top5SanPham();
+                    top5.setTenSanPham(productName);
+                    top5.setSoLuong(totalQuantity);
+                    return top5;
+                })
+                .sorted((p1, p2) -> Integer.compare(p2.getSoLuong(), p1.getSoLuong())) // Sắp xếp giảm dần
+                .limit(5) // Lấy 5 sản phẩm bán chạy nhất
+                .collect(Collectors.toList());
+
+
+        return top5SanPhams;
+    }
+
+    public Object getDoanhSo() {
+        List<DoanhSo> response = new ArrayList<>();
+        var dauThang = LocalDateTime.now().with(TemporalAdjusters.firstDayOfMonth()).withHour(0).withMinute(0).withSecond(0).withNano(0).withMonth(11);
+        var cuoiThang = dauThang.with(TemporalAdjusters.lastDayOfMonth()).withHour(23).withMinute(59).withSecond(59);
+        response.add(getDoanhSoThangNay(dauThang, cuoiThang));
+        var dauNgay = LocalDateTime.now().withHour(0).withMinute(0).withSecond(0).withNano(0);
+        var cuoiNgay = LocalDateTime.now().withHour(23).withMinute(59).withSecond(59);
+        response.add(getDoanhSoThangNay(dauNgay, cuoiNgay));
+
+        return response;
+    }
+
+    public Object getDoanhSoThang() {
+        var now = LocalDateTime.now();
+        List<DoanhSoThang> res = new ArrayList<>();
+        for (int i = 1; i <= now.getDayOfMonth(); i++) {
+            DoanhSoThang doanhSoThang = new DoanhSoThang();
+            var dauNgay = LocalDateTime.now().withDayOfMonth(i).withHour(0).withMinute(0).withSecond(0).withNano(0);
+            var cuoiNgay = LocalDateTime.now().withDayOfMonth(i).withHour(23).withMinute(59).withSecond(59);
+            var getDoanhSo = getDoanhSoThangNay(dauNgay, cuoiNgay);
+            doanhSoThang.setNgayThang(i);
+            doanhSoThang.setDoanhSo(getDoanhSo.getDoanhSo());
+            res.add(doanhSoThang);
+        }
+        return res;
+    }
+
+    public List<HoaDon> getHoaDonHomNay() {
+        var dauNgay = LocalDateTime.now().withHour(0).withMinute(0).withSecond(0).withNano(0);
+        var cuoiNgay = LocalDateTime.now().withHour(23).withMinute(59).withSecond(59);
+        var hoaDonList = repo.findAllByNgayThanhToanAndTrangThai(dauNgay,cuoiNgay);
+
+        return hoaDonList;
+    }
 }

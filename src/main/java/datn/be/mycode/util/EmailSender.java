@@ -2,7 +2,9 @@ package datn.be.mycode.util;
 
 import datn.be.mycode.entity.HoaDon;
 import datn.be.mycode.entity.HoaDonChiTiet;
+import datn.be.mycode.entity.PhieuDoiTra;
 import datn.be.mycode.request.thaoTacHoaDon.ThaoTacHoaDonAddRequest;
+import datn.be.mycode.response.DoiTra.EmailTrangThaiRes;
 import datn.be.mycode.response.erroResponse;
 import jakarta.mail.internet.MimeMessage;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -181,6 +183,35 @@ public class EmailSender {
 
             // Xóa OTP sau 3 phút
             scheduler.schedule(() -> otpStorage.remove(to), 3, TimeUnit.MINUTES);
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    @Async
+    public void sendEmailPhieuDoiTra(PhieuDoiTra email, String res) {
+        try {
+            MimeMessage message = javaMailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message,true);
+            message.setFrom(EMAIL_HOST);
+            message.setRecipients(MimeMessage.RecipientType.TO,email.getKhachHang().getEmail());
+            message.setSubject("Phiếu đổi trả "+ email.getMa());
+
+            // Đọc tệp HTML
+            String htmlTemplate = readFile("src/main/resources/view/trang-thai-doi-tra/status-doi-tra.html");
+
+
+            // Thay thế các biến trong HTML
+            String htmlContent = htmlTemplate
+                    .replace("${InvoiceStatus}", res);
+
+            // Thêm hình ảnh inline
+            helper.addInline("logo", new File("src/main/resources/view/otp/logo.png"));
+
+            // Thiết lập nội dung HTML
+            helper.setText(htmlContent, true);
+
+            javaMailSender.send(message);
         } catch (Exception e){
             e.printStackTrace();
         }

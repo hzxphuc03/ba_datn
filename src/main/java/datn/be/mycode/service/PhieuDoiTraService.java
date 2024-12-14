@@ -8,6 +8,7 @@ import datn.be.mycode.response.DoiTra.HoaDonChiTietDoiTraRes;
 import datn.be.mycode.response.DoiTra.KhachHangGetHoaDonChiTietRes;
 import datn.be.mycode.response.NormalTableResponse;
 import datn.be.mycode.response.erroResponse;
+import datn.be.mycode.util.EmailSender;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -25,6 +26,8 @@ import java.util.stream.Collectors;
 @Service
 public class PhieuDoiTraService {
 
+    @Autowired
+    private EmailSender emailSender;
     @Autowired
     private HoaDonRepository hoaDonRepository;
     @Autowired
@@ -91,7 +94,7 @@ public class PhieuDoiTraService {
         }
 
         Pageable pageable = PageRequest.of(request.getPage() - 1,request.getPageSize());
-        var phieuGiamGiaPage = phieuDoiTraRepository.findAllByKhachHangId(request.getIdKhachHang(), pageable);
+        var phieuGiamGiaPage = phieuDoiTraRepository.findAllByKhachHangIdOrderByNgayTaoDesc(request.getIdKhachHang(), pageable);
 
 
         var phieuDoiTraNormalTableResponse = new NormalTableResponse<PhieuDoiTra>();
@@ -258,7 +261,7 @@ public class PhieuDoiTraService {
         }
         thaoTacPhieuDoiTraRepository.save(thaoTacPhieuDoiTra);
         TaoThongBao(phieuDoiTra,"Phiếu đổi trả của bạn đã được xác nhận");
-
+        emailSender.sendEmailPhieuDoiTra(phieuDoiTra,"Đã được xác nhận");
         return ResponseEntity.ok(phieuDoiTraRepository.save(phieuDoiTra));
     }
 
@@ -544,6 +547,7 @@ public class PhieuDoiTraService {
 
         TaoThaoTacPhieuDoiTra(nhanVien, null, phieuDoiTra, request.getGhiChu());
         TaoThongBao(phieuDoiTra,"Phiếu đổi trả của bạn đã bị hủy");
+        emailSender.sendEmailPhieuDoiTra(phieuDoiTra,"Phiếu đổi trả của bạn đã bị hủy");
         return ResponseEntity.ok(phieuDoiTra);
 }
 

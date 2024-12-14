@@ -30,7 +30,7 @@ public class ChucVuController {
 
 
     @PostMapping("/add")
-    public ResponseEntity<?> add(@RequestBody String tenChuVuRequest){
+    public ResponseEntity<?> add(@RequestBody(required = false) String tenChuVuRequest){
 
         return ResponseEntity.ok(chucVuService.add(tenChuVuRequest));
     }
