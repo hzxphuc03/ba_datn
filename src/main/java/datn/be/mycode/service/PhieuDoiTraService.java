@@ -8,6 +8,7 @@ import datn.be.mycode.response.DoiTra.HoaDonChiTietDoiTraRes;
 import datn.be.mycode.response.DoiTra.KhachHangGetHoaDonChiTietRes;
 import datn.be.mycode.response.NormalTableResponse;
 import datn.be.mycode.response.erroResponse;
+import datn.be.mycode.util.EmailSender;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -25,6 +26,8 @@ import java.util.stream.Collectors;
 @Service
 public class PhieuDoiTraService {
 
+    @Autowired
+    private EmailSender emailSender;
     @Autowired
     private HoaDonRepository hoaDonRepository;
     @Autowired
@@ -91,7 +94,7 @@ public class PhieuDoiTraService {
         }
 
         Pageable pageable = PageRequest.of(request.getPage() - 1,request.getPageSize());
-        var phieuGiamGiaPage = phieuDoiTraRepository.findAllByKhachHangId(request.getIdKhachHang(), pageable);
+        var phieuGiamGiaPage = phieuDoiTraRepository.findAllByKhachHangIdOrderByNgayTaoDesc(request.getIdKhachHang(), pageable);
 
 
         var phieuDoiTraNormalTableResponse = new NormalTableResponse<PhieuDoiTra>();
@@ -108,7 +111,7 @@ public class PhieuDoiTraService {
         if (phieuDoiTra == null) return detailPhieuDoiTraRes;
 
         var sanPhamDoiTraList = sanPhamDoiTraRepository.findAllByPhieuDoiTraId(phieuDoiTra.getId());
-        var thaoTacPhieuDoiTraList = thaoTacPhieuDoiTraRepository.findAllByPhieuDoiTraId(phieuDoiTra.getId());
+        var thaoTacPhieuDoiTraList = thaoTacPhieuDoiTraRepository.findAllByPhieuDoiTraIdOrderByNgayTaoDesc(phieuDoiTra.getId());
         var khachHangDoiTraThongTinList = thongTinLyDoDoiTraRepository.findAllByPhieuDoiTraId(phieuDoiTra.getId());
         var getThongTinKiemTraList = thongTinKiemTraRepositpry.findAllByPhieuDoiTraId(phieuDoiTra.getId());
         var thongTinKiemTraList = getThongTinKiemTraList.stream().filter(thongTinKiemTra -> thongTinKiemTra.getTrangThai()==1).collect(Collectors.toList());
@@ -130,6 +133,9 @@ public class PhieuDoiTraService {
         if(!erroMess.isBlank()) return getErro(erroMess);
         HoaDon hoaDonCu = hoaDonRepository.findById(request.getIdHoaDon()).orElse(null);
         if(hoaDonCu == null) return getErro("Hóa đơn này không tồn tại");
+
+        String erroSoLuong = CheckSoLuong(hoaDonCu, request);
+        if (!erroSoLuong.isBlank()) return getErro(erroSoLuong);
 
 //        San Pham Doi Tra
         List<SanPhamDoiTra> sanPhamDoiTraList = new ArrayList<>();
@@ -190,6 +196,40 @@ public class PhieuDoiTraService {
         return ResponseEntity.ok(phieuDoiTraRepository.save(phieuDoiTraGet));
     }
 
+    private String CheckSoLuong(HoaDon hoaDonCu, AddPhieuDoiTraReq request) {
+        var phieuDoiTraList = phieuDoiTraRepository.findByHoaDonCuId(hoaDonCu.getId());
+        var hoaDonChiTietList = hoaDonChiTietRepository.findAllByHoaDon_Id(hoaDonCu.getId());
+
+        List<SanPhamDoiTra> sanPhamDoiList = new ArrayList<>();
+        phieuDoiTraList.forEach(phieuDoiTra -> {
+            var sanPhamDoi = sanPhamDoiTraRepository.findAllByPhieuDoiTraId(phieuDoiTra.getId());
+            sanPhamDoiList.addAll(sanPhamDoi);
+        });
+
+        var SanPhamAddList = request.getSanPhamDoiTraList();
+        boolean check = false;
+        for (HoaDonChiTiet hoaDonChiTiet : hoaDonChiTietList) {
+
+            // Khởi tạo biến để lưu trữ tổng số lượng
+            int totalSoLuongDoi = SanPhamAddList.stream()
+                    .filter(addSanPhamDoiTraReq -> addSanPhamDoiTraReq.getIdHoaDonChiTiet() == hoaDonChiTiet.getId())
+                    .mapToInt(addSanPhamDoiTraReq -> addSanPhamDoiTraReq.getSoLuong().intValue())
+                    .sum();
+
+            // Duyệt qua danh sách sanPhamDoiList để tính tổng số lượng
+            for (SanPhamDoiTra sanPhamDoiTra : sanPhamDoiList) {
+                if (sanPhamDoiTra.getSanPham().equals(hoaDonChiTiet.getSanPhamChiTiet())) {
+                    totalSoLuongDoi += sanPhamDoiTra.getSoLuong(); // Cộng dồn số lượng
+                }
+            }
+
+            // so so sánh
+            if (totalSoLuongDoi > hoaDonChiTiet.getSoLuong()) check = true;
+        }
+        if (check) return "Số lượng sản phẩm vượt quá số lượng được đổi";
+        return "";
+    }
+
     private String validateAddPhieuDoiTra(AddPhieuDoiTraReq request) {
 //        if(request.getSoTaiKhoanNganHang().isBlank()) return "Bạn chưa nhập số tài khoản ngân hàng";
 //        if(request.getTenChuTaiKhoan().isBlank()) return "Bạn chưa nhập tên chủ tài khoản ngân hàng";
@@ -221,7 +261,7 @@ public class PhieuDoiTraService {
         }
         thaoTacPhieuDoiTraRepository.save(thaoTacPhieuDoiTra);
         TaoThongBao(phieuDoiTra,"Phiếu đổi trả của bạn đã được xác nhận");
-
+        emailSender.sendEmailPhieuDoiTra(phieuDoiTra,"Đã được xác nhận");
         return ResponseEntity.ok(phieuDoiTraRepository.save(phieuDoiTra));
     }
 
@@ -250,7 +290,7 @@ public class PhieuDoiTraService {
         thaoTacPhieuDoiTra.setNhanVien(nhanVien);
         thaoTacPhieuDoiTra.setPhieuDoiTra(phieuDoiTra);
         thaoTacPhieuDoiTraRepository.save(thaoTacPhieuDoiTra);
-
+        TaoThongBao(phieuDoiTra, "Phiếu đổi trả đã được cập nhật");
 
         return ResponseEntity.ok(phieuDoiTra);
     }
@@ -458,10 +498,18 @@ public class PhieuDoiTraService {
         hoaDonChiTietList.forEach(hoaDonChiTiet -> {
             HoaDonChiTietDoiTraRes hoaDonChiTietDoiTraRes = new HoaDonChiTietDoiTraRes();
             hoaDonChiTietDoiTraRes.HoaDonChiTietDoiTraRes(hoaDonChiTiet);
-            sanPhamDoiList.forEach(sanPhamDoiTra -> {
-                hoaDonChiTietDoiTraRes.setSoLuongDoi(0);
-                if (sanPhamDoiTra.getSanPham().equals(hoaDonChiTiet.getSanPhamChiTiet())) hoaDonChiTietDoiTraRes.setSoLuongDoi(sanPhamDoiTra.getSoLuong());
-            });
+            // Khởi tạo biến để lưu trữ tổng số lượng
+            int totalSoLuongDoi = 0;
+
+            // Duyệt qua danh sách sanPhamDoiList để tính tổng số lượng
+            for (SanPhamDoiTra sanPhamDoiTra : sanPhamDoiList) {
+                if (sanPhamDoiTra.getSanPham().equals(hoaDonChiTiet.getSanPhamChiTiet())) {
+                    totalSoLuongDoi += sanPhamDoiTra.getSoLuong(); // Cộng dồn số lượng
+                }
+            }
+
+            // Cập nhật số lượng vào hoaDonChiTietDoiTraRes
+            hoaDonChiTietDoiTraRes.setSoLuongDoi(totalSoLuongDoi);
             hoaDonChiTietRes.add(hoaDonChiTietDoiTraRes);
         });
 
@@ -499,6 +547,7 @@ public class PhieuDoiTraService {
 
         TaoThaoTacPhieuDoiTra(nhanVien, null, phieuDoiTra, request.getGhiChu());
         TaoThongBao(phieuDoiTra,"Phiếu đổi trả của bạn đã bị hủy");
+        emailSender.sendEmailPhieuDoiTra(phieuDoiTra,"Phiếu đổi trả của bạn đã bị hủy");
         return ResponseEntity.ok(phieuDoiTra);
 }
 

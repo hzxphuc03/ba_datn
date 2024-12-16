@@ -6,10 +6,13 @@ import datn.be.mycode.request.ChucVuRequest;
 import datn.be.mycode.request.NormalTableRequest;
 import datn.be.mycode.request.TheLoaiRequest;
 import datn.be.mycode.response.NormalTableResponse;
+import datn.be.mycode.response.erroResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -50,21 +53,31 @@ public class ChucVuService {
     }
 
 
-    public ChucVu add(String request) {
+    public ResponseEntity<?> add(String request) {
+        String erroMess = check(request);
+        if (!erroMess.isBlank()) return getErro(erroMess);
+        var checkName = repo.findByTen(request).orElse(null);
+        if (checkName != null) return getErro("Tên này đã tồn tại");
+
         ChucVu chucVu = new ChucVu();
         chucVu.setTen(request);
         chucVu.setTrangThai(1);
         chucVu.setNgayTao(LocalDateTime.now());
-        return repo.save(chucVu);
+        return ResponseEntity.ok(repo.save(chucVu));
     }
 
 
-    public ChucVu update(ChucVuRequest request) {
+    public ResponseEntity<?> update(ChucVuRequest request) {
+        String erroMess = check(request.getTen());
+        if (!erroMess.isBlank()) return getErro(erroMess);
+        var checkName = repo.findByTen(request.getTen()).orElse(null);
+        if (checkName != null) return getErro("Tên này đã tồn tại");
+
         ChucVu chucVu = repo.findById(request.getId()).get();
         chucVu.setTen(request.getTen());
         chucVu.setTrangThai(request.getTrangThai());
         chucVu.setNgaySua(LocalDateTime.now());
-        return repo.save(chucVu);
+        return ResponseEntity.ok(repo.save(chucVu));
     }
 
 
@@ -72,5 +85,14 @@ public class ChucVuService {
         ChucVu chucVu = repo.findById(id).get();
         chucVu.setTrangThai(status);
         return repo.save(chucVu);
+    }
+
+    private String check(String request) {
+        if(request == null || request.isBlank() ) return "Bạn chưa nhập dữ liệu";
+        return "";
+    }
+
+    private ResponseEntity<?> getErro(String s){
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new erroResponse(s));
     }
 }

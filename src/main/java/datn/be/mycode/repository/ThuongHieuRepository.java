@@ -1,5 +1,6 @@
 package datn.be.mycode.repository;
 
+import datn.be.mycode.entity.ChucVu;
 import datn.be.mycode.entity.ThuongHieu;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -8,6 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface ThuongHieuRepository extends JpaRepository<ThuongHieu,Long> {
@@ -21,5 +23,7 @@ public interface ThuongHieuRepository extends JpaRepository<ThuongHieu,Long> {
     @Query("SELECT u FROM ThuongHieu u WHERE u.ten LIKE %:name%")
     Page<ThuongHieu> searchByTen(String name, Pageable pageable);
     List<ThuongHieu> findAll();
+
+    Optional<ThuongHieu> findByTen(String ten);
 
 }
