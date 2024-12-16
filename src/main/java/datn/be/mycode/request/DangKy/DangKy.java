@@ -30,6 +30,8 @@ public class DangKy {
     @Size(min = 6, message = "Mật khẩu phải có ít nhất 6 ký tự")
     @Schema(description = "Mật khẩu của người dùng", example = "123456", required = true)
 
+    private String tenNguoiDung;
+    private String SDT;
     private String matKhau;
     private String confirmPassword;
     private Date ngayTao;

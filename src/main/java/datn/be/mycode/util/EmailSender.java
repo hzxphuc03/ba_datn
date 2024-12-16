@@ -71,7 +71,7 @@ public class EmailSender {
             message.setSubject("OTP");
 
             // Đọc tệp HTML
-            String htmlTemplate = readFile("C:/Users/kienp/Downloads/ba_datn-main/ba_datn/src/main/resources/view/otp/otp.html");
+            String htmlTemplate = readFile("src/main/resources/view/otp/otp.html");
 
             // Thay thế OTP trong HTML
             String htmlContent = htmlTemplate.replace("${otp}", otp);
@@ -94,7 +94,7 @@ public class EmailSender {
 
     @Async
     public void sendEmailOtp(String to ) {
-        var optCode = 100000 + new Random().nextInt(999999);
+        var optCode = 100000 + new Random().nextInt(899999);
         String otp = String.valueOf(optCode);
 
         try {
@@ -105,7 +105,7 @@ public class EmailSender {
             message.setSubject("OTP");
 
             // Đọc tệp HTML
-            String htmlTemplate = readFile("C:/Users/kienp/Downloads/ba_datn-main/ba_datn/src/main/resources/view/otp/otp.html");
+            String htmlTemplate = readFile("src/main/resources/view/otp/otp.html");
 
             // Thay thế OTP trong HTML
             String htmlContent = htmlTemplate.replace("${otp}", otp);

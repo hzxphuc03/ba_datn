@@ -46,6 +46,16 @@
 
     <!-- Tài khoản -->
     <div class="mb-3">
+    <label for="taiKhoan" >Tên người dùng</label>
+    <input type="text" class="form-control" id="tenNguoiDung" name="tenNguoiDung" value="${user.tenNguoiDung}"required>
+        <span style="color: red"> ${erro4}</span>
+    </div>
+    <div class="mb-3">
+        <label for="taiKhoan" >Số điện thoại</label>
+        <input type="text" class="form-control" id="SDT" name="SDT" value="${user.SDT}"required>
+        <span style="color: red"> ${erro3}</span>
+    </div>
+    <div class="mb-3">
         <label for="taiKhoan" >Tài Khoản</label>
         <input type="text" class="form-control" id="taiKhoan" name="taiKhoan" placeholder="username123" value="${user.taiKhoan}"required>
         <div class="invalid-feedback">Tài khoản không được để trống.</div>

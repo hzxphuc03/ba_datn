@@ -58,14 +58,16 @@ public class DangkySevice {
 
         KhachHang khachHang = new KhachHang();
         khachHang.setMa("");
+        khachHang.setHoTen(request.getTenNguoiDung());
+        khachHang.setSoDienThoai(request.getSDT());
         khachHang.setNgayTao(LocalDateTime.now());
         khachHang.setEmail(request.getEmail());
-      khachHang.setTaiKhoan(request.getTaiKhoan());
-       khachHang.setMatKhau(request.getMatKhau());
-khachHang.setTrangThai(1);
+        khachHang.setTaiKhoan(request.getTaiKhoan());
+        khachHang.setMatKhau(request.getMatKhau());
+        khachHang.setTrangThai(1);
 
         khachHang = repository.save(khachHang);
-        khachHang.setMa("KH"+khachHang.getId());
+        khachHang.setMa("KH" + khachHang.getId());
         creatGioHang(khachHang);
 
         return repository.save(khachHang);

@@ -12,6 +12,8 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.util.regex.Pattern;
+
 @Controller
 @RequestMapping("/dang-ky")
 public class DangKyController {
@@ -86,7 +88,18 @@ public String checkEmail(
             Model model,
             RedirectAttributes redirectAttribute
             ) {
-
+        String VIETNAM_PHONE_PATTERN = "^(0[1-9][0-9]{8})$";
+        boolean checkSDT = Pattern.matches(VIETNAM_PHONE_PATTERN, dangKy.getSDT());
+        if (dangKy.getTenNguoiDung()==null || dangKy.getTenNguoiDung().isBlank()){
+            model.addAttribute("erro4", "Tên người dùng không được để trống!");
+            model.addAttribute("email", dangKy.getEmail());
+            return "dangky";
+        }if (checkSDT == false){
+            model.addAttribute("erro3", "Số điện thoại không đúng!");
+            model.addAttribute("email", dangKy.getEmail());
+            model.addAttribute("user", dangKy);
+            return "dangky";
+        }
         if (!dangKy.getMatKhau().equals(dangKy.getConfirmPassword())) {
             model.addAttribute("erro2", "Mat khau phai trung!");
             model.addAttribute("email", dangKy.getEmail());
