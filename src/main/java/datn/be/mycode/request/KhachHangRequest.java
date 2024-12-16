@@ -28,5 +28,6 @@ public class KhachHangRequest {
     private String taiKhoan;
     private String matKhau;
     private int trangThai;
+    private String confirmPassword;
 
 }

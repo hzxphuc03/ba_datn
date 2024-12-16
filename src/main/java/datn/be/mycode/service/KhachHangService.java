@@ -87,6 +87,9 @@ public class KhachHangService {
 
         return repository.findAll();
     }
+    public boolean existsByEmail(String email) {
+        return repository.existsByEmail(email);
+    }
 
     public KhachHang getById(Long id){
         return repository.findById(id).get();
@@ -165,6 +168,15 @@ public class KhachHangService {
         khachHang.setMatKhau(request.getMatKhau());
         return repository.save(khachHang);
     }
+    public KhachHang updateByEmail(String email, String matKhau) {
+        KhachHang khachHang = repository.findByEmail(email);
+
+        khachHang.setMatKhau(matKhau);  khachHang.setEmail(email);
+        return repository.save(khachHang);
+    }
+    public KhachHang findByEmail(String email) {
+        return repository.findByEmail(email);
+    }
     public KhachHang updateKhachHang(UpdateKhachHangRequest request) {
         KhachHang khachHang = repository.findById(request.getId()).get();
         khachHang.setMa(request.getMa());
@@ -191,6 +203,11 @@ public class KhachHangService {
         khachHang.setTrangThai(status);
         return repository.save(khachHang);
     }
+//    public KhachHang udateMatKhau(String email, String matKhau){
+//        KhachHang khachHang = repository.findByEmail().get();
+//        khachHang.setMatKhau(matKhau);
+//        return repository.save(khachHang);
+//    }
 
     public ResponseEntity<?> getAccount(loginTest loginRequest) {
         KhachHang khachHang = repository.findByTaiKhoanAndMatKhauAndTrangThai(loginRequest.getUsername(), loginRequest.getPass(), 1).orElse(null);
