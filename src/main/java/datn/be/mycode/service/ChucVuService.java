@@ -71,9 +71,9 @@ public class ChucVuService {
         String erroMess = check(request.getTen());
         if (!erroMess.isBlank()) return getErro(erroMess);
         var checkName = repo.findByTen(request.getTen()).orElse(null);
-        if (checkName != null) return getErro("Tên này đã tồn tại");
 
         ChucVu chucVu = repo.findById(request.getId()).get();
+        if (checkName != null && checkName.getId() != chucVu.getId()) return getErro("Tên này đã tồn tại");
         chucVu.setTen(request.getTen());
         chucVu.setTrangThai(request.getTrangThai());
         chucVu.setNgaySua(LocalDateTime.now());

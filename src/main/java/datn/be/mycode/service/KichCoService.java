@@ -74,9 +74,9 @@ public class KichCoService {
         String erroMess = check(request.getTen());
         if (!erroMess.isBlank()) return getErro(erroMess);
         var checkName = repository.findByTen(request.getTen()).orElse(null);
-        if (checkName != null) return getErro("Tên này đã tồn tại");
 
         KichCo kichCo = repository.findById(request.getId()).get();
+        if (checkName != null && checkName.getId()!= kichCo.getId()) return getErro("Tên này đã tồn tại");
         kichCo.setTen(request.getTen());
         kichCo.setTrangThai(request.getTrangThai());
         kichCo.setNgaySua(LocalDateTime.now());

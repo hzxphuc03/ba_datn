@@ -24,5 +24,5 @@ public interface VatLieuRepository extends JpaRepository<VatLieu,Long> {
 
     List<VatLieu> findAllByTrangThai(int i);
 
-    Optional<KichCo> findByTen(String ten);
+    Optional<VatLieu> findByTen(String ten);
 }

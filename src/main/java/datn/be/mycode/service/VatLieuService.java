@@ -76,9 +76,9 @@ public class VatLieuService {
         String erroMess = check(request.getTen());
         if (!erroMess.isBlank()) return getErro(erroMess);
         var checkName = repository.findByTen(request.getTen()).orElse(null);
-        if (checkName != null) return getErro("Tên này đã tồn tại");
 
         VatLieu vatLieu = repository.findById(request.getId()).get();
+        if (checkName != null && checkName.getId() != vatLieu.getId()) return getErro("Tên này đã tồn tại");
         vatLieu.setTen(request.getTen());
         vatLieu.setTrangThai(request.getTrangThai());
         vatLieu.setNgaySua(LocalDateTime.now());

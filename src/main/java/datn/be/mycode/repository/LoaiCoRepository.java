@@ -1,6 +1,5 @@
 package datn.be.mycode.repository;
 
-import datn.be.mycode.entity.KichCo;
 import datn.be.mycode.entity.LoaiCo;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -22,5 +21,5 @@ public interface LoaiCoRepository extends JpaRepository<LoaiCo,Long> {
 
     List<LoaiCo> findAllByTrangThai(int i);
 
-    Optional<KichCo> findByTen(String ten);
+    Optional<LoaiCo> findByTen(String ten);
 }

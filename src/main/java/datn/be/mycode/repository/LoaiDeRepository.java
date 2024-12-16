@@ -23,5 +23,5 @@ public interface LoaiDeRepository extends JpaRepository<LoaiDe,Long> {
 
     List<LoaiDe> findAllByTrangThai(int i);
 
-    Optional<KichCo> findByTen(String ten);
+    Optional<LoaiDe> findByTen(String ten);
 }

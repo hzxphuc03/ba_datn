@@ -21,5 +21,5 @@ public interface MauSacRepository extends JpaRepository<MauSac, Long> {
     @Query("SELECT u FROM MauSac u WHERE u.ten LIKE %:name%")
     Page<MauSac> searchByTen(String name, Pageable pageable);
 
-    Optional<KichCo> findByTen(String ten);
+    Optional<MauSac> findByTen(String ten);
 }

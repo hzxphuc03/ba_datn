@@ -73,9 +73,9 @@ public class LoaiCoService {
         String erroMess = check(request.getTen());
         if (!erroMess.isBlank()) return getErro(erroMess);
         var checkName = repository.findByTen(request.getTen()).orElse(null);
-        if (checkName != null) return getErro("Tên này đã tồn tại");
 
         LoaiCo loaiCo = repository.findById(request.getId()).get();
+        if (checkName != null && checkName.getId() != loaiCo.getId()) return getErro("Tên này đã tồn tại");
         loaiCo.setTen(request.getTen());
         loaiCo.setTrangThai(request.getTrangThai());
         loaiCo.setNgaySua(LocalDateTime.now());

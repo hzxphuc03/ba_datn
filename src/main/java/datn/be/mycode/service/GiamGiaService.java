@@ -104,6 +104,11 @@ public class GiamGiaService {
     }
 
     public ResponseEntity<?> add(GiamGiaRequest request){
+        if (request.getTen()== null || request.getTen().isBlank()) return getErro("không bỏ trống tên");
+        if (request.getMucGiam() <=0 ) return getErro("Mức giảm phải lớn hơn 0");
+        if (request.getMucGiam() > 100 ) return getErro("Mức giảm phải nhỏ hơn 100%");
+        if (request.getNgayBatDau() == null) return getErro("không bỏ trống ngày bắt đầu");
+        if (request.getNgayKetThuc() == null) return getErro("không bỏ trống ngày kết thúc");
         if (request.getNgayBatDau().isAfter(request.getNgayKetThuc())) return getErro("Ngày kết thúc phải sau ngày bắt đầu");
         var checkName = repository.findByTen(request.getTen()).orElse(null);
         if (checkName != null) return getErro("Tên này đã tồn tại");
@@ -122,9 +127,9 @@ public class GiamGiaService {
     public ResponseEntity<?> update(GiamGiaRequest request) {
         if (request.getNgayBatDau().isAfter(request.getNgayKetThuc())) return getErro("Ngày kết thúc phải sau ngày bắt đầu");
         var checkName = repository.findByTen(request.getTen()).orElse(null);
-        if (checkName != null) return getErro("Tên này đã tồn tại");
 
         GiamGia giamGia = repository.findById(request.getId()).get();
+        if (checkName != null && checkName.getId()!=giamGia.getId()) return getErro("Tên này đã tồn tại");
         var trangThaiBefore = giamGia.getTrangThai();
         giamGia.setTen(request.getTen());
         giamGia.setNgayBatDau(request.getNgayBatDau());

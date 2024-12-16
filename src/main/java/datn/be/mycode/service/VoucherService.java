@@ -96,7 +96,7 @@ public class VoucherService {
     private String check(VoucherRequest request) {
         var now = LocalDateTime.now();
         if (request.getTen().isBlank()) return "Bạn chưa nhập tên";
-        if (request.getTen().isBlank()) return "Bạn chưa nhập tên";
+        if (request.getPhanTramGiam()>100) return "Phần trăm giảm phải dưới 100";
         if (request.getSoLuong()<=0) return "Số lượng phải lớn hơn 0";
         if (request.getPhanTramGiam()<=0) return "Số lượng phải lớn hơn 0";
         if (request.getNgayKetThuc().isBefore(request.getNgayBatDau())) return "Ngày kết thúc phải sau hôm nay";

@@ -78,9 +78,9 @@ public class ThuongHieuService {
         String erroMess = check(request.getTen());
         if (!erroMess.isBlank()) return getErro(erroMess);
         var checkName = repository.findByTen(request.getTen()).orElse(null);
-        if (checkName != null) return getErro("Tên này đã tồn tại");
 
         ThuongHieu thuongHieu = repository.findById(request.getId()).get();
+        if (checkName != null && checkName.getId() != thuongHieu.getId()) return getErro("Tên này đã tồn tại");
         thuongHieu.setTen(request.getTen());
         thuongHieu.setTrangThai(request.getTrangThai());
         thuongHieu.setNgaySua(LocalDateTime.now());

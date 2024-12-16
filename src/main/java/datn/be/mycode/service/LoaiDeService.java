@@ -77,9 +77,9 @@ public class LoaiDeService {
         String erroMess = check(request.getTen());
         if (!erroMess.isBlank()) return getErro(erroMess);
         var checkName = repository.findByTen(request.getTen()).orElse(null);
-        if (checkName != null) return getErro("Tên này đã tồn tại");
 
         LoaiDe loaiDe = repository.findById(request.getId()).get();
+        if (checkName != null && checkName.getId() != loaiDe.getId()) return getErro("Tên này đã tồn tại");
         loaiDe.setTen(request.getTen());
         loaiDe.setTrangThai(request.getTrangThai());
         loaiDe.setNgaySua(LocalDateTime.now());

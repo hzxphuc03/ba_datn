@@ -74,9 +74,9 @@ public class MauSacService {
         String erroMess = check(request);
         if (!erroMess.isBlank()) return getErro(erroMess);
         var checkName = repository.findByTen(request.getTen()).orElse(null);
-        if (checkName != null) return getErro("Tên này đã tồn tại");
-
         MauSac mauSac = repository.findById(request.getId()).get();
+        if (checkName != null && checkName.getId() != mauSac.getId()) return getErro("Tên này đã tồn tại");
+
         mauSac.setTen(request.getTen());
         mauSac.setMaMau(request.getMaMau());
         mauSac.setTrangThai(request.getTrangThai());
@@ -85,7 +85,7 @@ public class MauSacService {
     }
 
     private String check(MauSacRequest request) {
-        if(request.getTen().isBlank()) return "Bạn chưa nhập dữ liệu";
+        if(request.getTen().isBlank()) return "Bạn chưa nhập tên";
         if(request.getMaMau().isBlank()) return "Bạn chưa chọn mã màu";
         return "";
     }

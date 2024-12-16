@@ -72,9 +72,9 @@ public class TheLoaiService {
         String erroMess = check(request.getTen());
         if (!erroMess.isBlank()) return getErro(erroMess);
         var checkName = repo.findByTen(request.getTen()).orElse(null);
-        if (checkName != null) return getErro("Tên này đã tồn tại");
 
         TheLoai theLoai = repo.findById(request.getId()).get();
+        if (checkName != null && checkName.getId() != theLoai.getId()) return getErro("Tên này đã tồn tại");
         theLoai.setTen(request.getTen());
         theLoai.setTrangThai(request.getTrangThai());
         theLoai.setNgaySua(LocalDateTime.now());
