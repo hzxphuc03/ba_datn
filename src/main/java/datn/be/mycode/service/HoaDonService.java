@@ -723,7 +723,7 @@ public class HoaDonService {
     }
 
     public Object sanPhamBanChay() {
-        var dauThang = LocalDateTime.now().with(TemporalAdjusters.firstDayOfMonth()).withHour(0).withMinute(0).withSecond(0).withNano(0).withMonth(11);
+        var dauThang = LocalDateTime.now().with(TemporalAdjusters.firstDayOfMonth()).withHour(0).withMinute(0).withSecond(0).withNano(0);
         var cuoiThang = dauThang.with(TemporalAdjusters.lastDayOfMonth()).withHour(23).withMinute(59).withSecond(59);
 
         var hoaDonList = repo.findAllByNgayThanhToanAndTrangThai(dauThang,cuoiThang);
@@ -768,7 +768,7 @@ public class HoaDonService {
 
     public Object getDoanhSo() {
         List<DoanhSo> response = new ArrayList<>();
-        var dauThang = LocalDateTime.now().with(TemporalAdjusters.firstDayOfMonth()).withHour(0).withMinute(0).withSecond(0).withNano(0).withMonth(11);
+        var dauThang = LocalDateTime.now().with(TemporalAdjusters.firstDayOfMonth()).withHour(0).withMinute(0).withSecond(0).withNano(0);
         var cuoiThang = dauThang.with(TemporalAdjusters.lastDayOfMonth()).withHour(23).withMinute(59).withSecond(59);
         response.add(getDoanhSoThangNay(dauThang, cuoiThang));
         var dauNgay = LocalDateTime.now().withHour(0).withMinute(0).withSecond(0).withNano(0);
