@@ -446,8 +446,11 @@ public class HoaDonService {
         }
     }
 
-    private void setSoLuongSanPham(HoaDon hoaDon) {
-        hoaDonChiTietService.setSoLuongAfterPayment(hoaDon.getId());
+    private String setSoLuongSanPham(HoaDon hoaDon) {
+        String erroMess = hoaDonChiTietService.setSoLuongAfterPayment(hoaDon.getId());
+        if (erroMess.isBlank() == false) return erroMess;
+
+        return "";
     }
 
     private void setHoaDon(HoaDon hoaDon, ThanhToanRequest request) {
@@ -526,12 +529,17 @@ public class HoaDonService {
 
                 hoaDon.setNgayThanhToan(LocalDateTime.now());
                 hoaDon.setThanhToan(true);
-                if (hoaDon.getNhanVien() == null){
-                setSoLuongSanPham(hoaDon);
-                }
+//                if (hoaDon.getNhanVien() == null){
+//                    var erroMess = setSoLuongSanPham(hoaDon);
+//                    if (erroMess.isBlank() ==false) return getErro(erroMess);
+//                }
                 hoaDonChiTietService.setTrangThaiByHoaDonDone(hoaDon);
             }
         }
+        if(hoaDon.getTrangThai() ==2 && hoaDon.getNhanVien() == null){
+            var erroMess = setSoLuongSanPham(hoaDon);
+            if (erroMess.isBlank() ==false) return getErro(erroMess);
+        };
         var thaoTacHoaDon = new ThaoTacHoaDonAddRequest();
 
         thaoTacHoaDon.setThaoTac(getStringThaoTac(hoaDon.getTrangThai()));

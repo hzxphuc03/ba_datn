@@ -38,6 +38,7 @@ public class HoaDonChiTietService {
     @Autowired
     private SanPhamService sanPhamService;
 
+
     public NormalTableResponse<HoaDonChiTiet> getAllByIdHoaDon(NormalTableRequest request) {
 
         CheckRequest(request);
@@ -70,22 +71,23 @@ public class HoaDonChiTietService {
         return sanPhamChiTiet;
     }
 
-    public void setSoLuongAfterPayment(Long idHoaDon){
+    public String setSoLuongAfterPayment(Long idHoaDon){
         var hoaDonChiTiets = getListByHoaDonId(idHoaDon);
         for (HoaDonChiTiet hoaDonChiTiet:hoaDonChiTiets) {
             var sanPhamChiTiet = hoaDonChiTiet.getSanPhamChiTiet();
             var sanPham = sanPhamChiTiet.getSanPham();
             sanPhamChiTiet.setSoLuong(sanPhamChiTiet.getSoLuong()-hoaDonChiTiet.getSoLuong());
-            if(sanPhamChiTiet.getSoLuong() == 0) sanPhamChiTiet.setTrangThai(0);
+            if(sanPhamChiTiet.getSoLuong() < 0) return "Sản phảm còn lại không đủ cho hóa đơn này";
 
             sanPhamChiTietRepository.save(sanPhamChiTiet);
             sanPhamService.updateSoLuong(sanPham);
-            var sanPhamChiTiets = sanPhamChiTietRepository.findAllBySanPham_IdAndTrangThai(sanPham.getId(), 1);
-            if(sanPhamChiTiets.isEmpty() ){
-                sanPham.setTrangThai(0);
-                sanPhamService.update(sanPham);
-            }
+//            var sanPhamChiTiets = sanPhamChiTietRepository.findAllBySanPham_IdAndTrangThai(sanPham.getId(), 1);
+//            if(sanPhamChiTiets.isEmpty() ){
+//                sanPham.setTrangThai(0);
+//                sanPhamService.update(sanPham);
+//            }
         }
+        return "";
     }
     public void setSoLuongAfterAdd(Long idHoaDonChiTiet, int soLuongCu) {
         var hoaDonChiTiet = repo.findById(idHoaDonChiTiet).orElse(null);
@@ -94,15 +96,15 @@ public class HoaDonChiTietService {
         var sanPhamChiTiet = hoaDonChiTiet.getSanPhamChiTiet();
         var sanPham = sanPhamChiTiet.getSanPham();
         sanPhamChiTiet.setSoLuong(sanPhamChiTiet.getSoLuong() - hoaDonChiTiet.getSoLuong() + soLuongCu);
-        if (sanPhamChiTiet.getSoLuong() == 0) sanPhamChiTiet.setTrangThai(0);
+//        if (sanPhamChiTiet.getSoLuong() == 0) sanPhamChiTiet.setTrangThai(0);
 
         sanPhamChiTietRepository.save(sanPhamChiTiet);
         sanPhamService.updateSoLuong(sanPham);
-        var sanPhamChiTiets = sanPhamChiTietRepository.findAllBySanPham_IdAndTrangThai(sanPham.getId(), 1);
-        if (sanPhamChiTiets.isEmpty()) {
-            sanPham.setTrangThai(0);
-            sanPhamService.update(sanPham);
-        }
+//        var sanPhamChiTiets = sanPhamChiTietRepository.findAllBySanPham_IdAndTrangThai(sanPham.getId(), 1);
+//        if (sanPhamChiTiets.isEmpty()) {
+//            sanPham.setTrangThai(0);
+//            sanPhamService.update(sanPham);
+//        }
 
     }
 
@@ -125,6 +127,9 @@ public class HoaDonChiTietService {
 
         }
     }
+//    private Integer soLuong(Long id){
+//       return repo.soLuongSanPham( id);
+//    }
 
     private void CheckRequest(NormalTableRequest request) {
         if (request.getPage() == null) {
@@ -218,10 +223,11 @@ public class HoaDonChiTietService {
 
         if (hoaDonChiTiet == null) return getErro("Không tìm thấy hóa đơn chi tiết");
         var spct = hoaDonChiTiet.getSanPhamChiTiet();
+        var soLuongTong = spct.getSoLuong() + hoaDonChiTiet.getSoLuong();
         if (request.getSoLuong() <= 0) return getErro("Số lượng phải lớn hơn 0");
         int soLuongSauThem = request.getSoLuong();
         int soLuongCu = hoaDonChiTiet.getSoLuong();
-        if (soLuongSauThem > spct.getSoLuong()) return getErro("Số lượng vượt quá số lượng đang có");
+        if (soLuongSauThem > soLuongTong) return getErro("Số lượng vượt quá số lượng đang có");
         hoaDonChiTiet.setSoLuong(soLuongSauThem);
         setSoLuongAfterAdd(hoaDonChiTiet.getId(), soLuongCu);
         return ResponseEntity.ok(repo.save(hoaDonChiTiet));

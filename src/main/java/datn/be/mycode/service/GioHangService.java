@@ -383,12 +383,12 @@ public class GioHangService {
 
             var sanPhamChiTiet = gioHangChiTiet.getSanPhamChiTiet();
             var sanPham = sanPhamChiTiet.getSanPham();
-            if(hoaDon.getPhuongThucThanhToan().getId() != 3) {
-                sanPhamChiTiet.setSoLuong(sanPhamChiTiet.getSoLuong() - gioHangChiTiet.getSoLuong());
-                if (sanPhamChiTiet.getSoLuong() == 0) sanPhamChiTiet.setTrangThai(0);
-
-                sanPhamChiTietRepository.save(sanPhamChiTiet);
-            }
+//            if(hoaDon.getPhuongThucThanhToan().getId() != 3) {
+//                sanPhamChiTiet.setSoLuong(sanPhamChiTiet.getSoLuong() - gioHangChiTiet.getSoLuong());
+//                if (sanPhamChiTiet.getSoLuong() == 0) sanPhamChiTiet.setTrangThai(0);
+//
+//                sanPhamChiTietRepository.save(sanPhamChiTiet);
+//            }
             gioHangChiTietRepository.delete(gioHangChiTiet);
 //            tinh lai so luong cua san pham
         int soLuongTong = sanPhamChiTietRepository.sumSoLuongByTrangThai(sanPham.getId());

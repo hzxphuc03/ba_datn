@@ -3,6 +3,7 @@ package datn.be.mycode.repository;
 import datn.be.mycode.entity.HoaDon;
 import datn.be.mycode.entity.HoaDonChiTiet;
 import datn.be.mycode.entity.SanPham;
+import org.eclipse.tags.shaded.org.apache.bcel.generic.Select;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -40,6 +41,14 @@ public interface HoaDonChiTietRepository extends JpaRepository<HoaDonChiTiet, Lo
     List<SanPham> timSanPhamChuaCmtTrong7NgayThanhToan(
             @Param("startDate") LocalDateTime startDate,
             @Param("endDate") LocalDateTime endDate);
+
+//    @Query("select sum(b.soLuong)" +
+//            "from HoaDon a JOIN HoaDonChiTiet b ON a.id = b.hoaDon.id" +
+//            " join SanPhamChiTiet c on b.sanPhamChiTiet.id = c.id" +
+//            " Where b.sanPhamChiTiet.id = :idSanPham" +
+//            " And a.trangThai>3  a.trangThai< 6"
+//    )
+//    Integer soLuongSanPham(  @Param("idSanPham") Long id);
 
     @Query("SELECT DISTINCT hdc.sanPhamChiTiet.sanPham " +
             "FROM HoaDonChiTiet hdc " +
