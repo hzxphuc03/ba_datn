@@ -25,7 +25,7 @@ public class PhieuDoiTra {
     @Column(name = "so_tai_khoan_ngan_hang")
     private String soTaiKhoanNganHang;
 
-    @Column(name = "ten_ngan_hang")
+    @Column(name = "ten_ngan_hang", columnDefinition = "nvarchar(max)")
     private String tenNganHang;
 
     @Column(name = "ten_chu_tai_khoan")

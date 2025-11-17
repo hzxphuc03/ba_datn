@@ -24,7 +24,7 @@ public class Voucher implements Serializable {
     @Column(name = "ma_voucher")
     private String ma;
 
-    @Column(name = "ten_voucher")
+    @Column(name = "ten_voucher", columnDefinition = "nvarchar(max)")
     private String ten;
 
     @Column(name = "the_loai")

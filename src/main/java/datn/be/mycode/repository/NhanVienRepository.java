@@ -12,6 +12,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 @Repository
 public interface NhanVienRepository extends JpaRepository<NhanVien,Long> {
@@ -64,4 +65,6 @@ public interface NhanVienRepository extends JpaRepository<NhanVien,Long> {
             "(nv.trangThai = 1)"
     )
     NhanVien getAccount(loginTest request);
+    
+    Optional<NhanVien> findByTaiKhoanAndTrangThai(String taiKhoan, int trangThai);
 }

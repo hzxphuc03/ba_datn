@@ -28,7 +28,7 @@ public class SanPhamChiTiet implements Serializable {
     @Column(name = "ngay_sua")
     private LocalDateTime ngaySua;
 
-    @Column(name = "hinh_anh")
+    @Column(name = "hinh_anh", columnDefinition = "nvarchar(max)")
     private String hinhAnh;
 
     @Column(name = "gia_nhap")

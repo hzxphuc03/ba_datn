@@ -603,7 +603,7 @@ public class HoaDonService {
         var trangThai = hoaDon.getTrangThai();
         if(trangThai == 6) return getErro("Hóa đơn này đã hoàn thành không để chỉnh sửa");
         if(trangThai == 0) return getErro("Hóa đơn này đã hủy");
-        if(trangThai != 2) return getErro("Hóa đơn này đã xác nhận không được hủy");
+//        if(trangThai != 2) return getErro("Hóa đơn này đã xác nhận không được hủy");
 
         var thaoTacHoaDon = new ThaoTacHoaDonAddRequest();
         switch (trangThai){
@@ -631,6 +631,16 @@ public class HoaDonService {
 
         List<HoaDonChiTiet> hoaDonChiTiets = hoaDonChiTietService.getListByHoaDonId(hoaDon.getId());
         if(trangThai > 2){
+            for (HoaDonChiTiet hoaDonChiTiet: hoaDonChiTiets) {
+                var soLuongBan = hoaDonChiTiet.getSoLuong();
+                var sanPhamChiTiet = hoaDonChiTiet.getSanPhamChiTiet();
+                var soLuongSauHuy = sanPhamChiTiet.getSoLuong() + soLuongBan;
+                sanPhamChiTiet.setSoLuong(soLuongSauHuy);
+
+                sanPhamChiTietRepository.save(sanPhamChiTiet);
+            }
+        }
+        if(trangThai == 2 && hoaDon.getNhanVien() != null){
             for (HoaDonChiTiet hoaDonChiTiet: hoaDonChiTiets) {
                 var soLuongBan = hoaDonChiTiet.getSoLuong();
                 var sanPhamChiTiet = hoaDonChiTiet.getSanPhamChiTiet();

@@ -36,7 +36,7 @@ import java.util.concurrent.TimeUnit;
 @Component
 public class EmailSender {
 
-    private static String EMAIL_HOST= "toannhph23989@fpt.edu.vn";
+    private static String EMAIL_HOST= "phucpanda2003@gmail.com";
     private final Map<String, String> otpStorage = new HashMap<>(); // Lưu OTP trong bộ nhớ tạm
     private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
 

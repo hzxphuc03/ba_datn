@@ -71,16 +71,18 @@ public interface SanPhamRepository extends JpaRepository<SanPham, Long> {
 
     @Query("SELECT sp.id FROM SanPham sp JOIN SanPhamChiTiet spct ON spct.sanPham.id = sp.id " +
             "JOIN HoaDonChiTiet hdct ON hdct.sanPhamChiTiet.id = spct.id " +
+            "where sp.trangThai = 1 " +
             "GROUP BY sp.id ORDER BY SUM(hdct.soLuong) DESC")
     List<Long> top5SanPhamBanChay();
 
     @Query("SELECT sp.id FROM SanPham sp " +
             "JOIN sp.giamGia gg " +
             "WHERE gg.trangThai = 1 AND gg.ngayBatDau <= CURRENT_DATE AND gg.ngayKetThuc >= CURRENT_DATE " +
+            "and sp.trangThai = 1 " +
             "ORDER BY gg.mucGiam DESC")
     List<Long> topSanPhamGiamGia();
 
-    @Query(value = "SELECT s FROM SanPham s ORDER BY s.ngayTao DESC")
+    @Query(value = "SELECT s FROM SanPham s where s.trangThai = 1  ORDER BY s.ngayTao DESC")
     List<SanPham> top5SanPhamMoi(Pageable pageable);
 
 
@@ -90,6 +92,7 @@ public interface SanPhamRepository extends JpaRepository<SanPham, Long> {
             "JOIN sp.giamGia gg " +
             "JOIN SanPhamChiTiet spct ON spct.sanPham = sp " +
             "WHERE gg.trangThai = 1 AND gg.ngayBatDau <= CURRENT_DATE AND gg.ngayKetThuc >= CURRENT_DATE " +
+            "and sp.trangThai = 1" +
             "ORDER BY gg.mucGiam DESC, spct.giaBan ASC")
     List<SanPham> findSanPhamGiamGiaSauNhat(Pageable pageable);
 

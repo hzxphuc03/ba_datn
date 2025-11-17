@@ -11,13 +11,21 @@ import datn.be.mycode.response.khachHang.OtpResponse;
 import datn.be.mycode.response.khachHang.ThongTinKhachHangResponse;
 import datn.be.mycode.service.KhachHangService;
 import datn.be.mycode.util.EmailSender;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/khach_hang")
+@Tag(name = "Khách Hàng", description = "API quản lý khách hàng - Yêu cầu xác thực")
+@SecurityRequirement(name = "bearer-key")
 public class KhachHangController {
     @Autowired
     private KhachHangService khachHangService;
@@ -25,6 +33,14 @@ public class KhachHangController {
     EmailSender emailSender;
 
     @GetMapping("")
+    @Operation(summary = "Lấy danh sách khách hàng", 
+               description = "Chỉ admin/nhân viên mới có thể xem danh sách khách hàng")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('NHAN_VIEN')")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Lấy danh sách thành công"),
+        @ApiResponse(responseCode = "401", description = "Chưa xác thực"),
+        @ApiResponse(responseCode = "403", description = "Không có quyền truy cập")
+    })
     public ResponseEntity<?> getAll(
             @RequestParam(name = "page",required = false) Integer page,
             @RequestParam(name = "pageSize",required = false) Integer pageSize,
@@ -45,6 +61,9 @@ public class KhachHangController {
 
 
     @GetMapping("/{id}")
+    @Operation(summary = "Lấy thông tin chi tiết khách hàng", 
+               description = "Tạm thời public để test - sau này sẽ cần authentication")
+    // @PreAuthorize("hasRole('ADMIN') or hasRole('NHAN_VIEN') or (hasRole('KHACH_HANG') and #id == authentication.principal.id)")
     public ThongTinKhachHangResponse getThongTinById(@PathVariable Long id) {
         return khachHangService.getThongTinById(id);
     }

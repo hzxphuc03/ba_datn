@@ -1,0 +1,33 @@
+spring.application.name=mycode
+spring.mvc.view.prefix: /WEB-INF/view/
+spring.mvc.view.suffix: .jsp
+
+# Database Configuration
+spring.datasource.url=jdbc:sqlserver://localhost:1433;databaseName=DATN_SD40;encrypt=true;trustServerCertificate=true
+spring.datasource.username=your_username
+spring.datasource.password=your_password
+spring.datasource.driver-class-name=com.microsoft.sqlserver.jdbc.SQLServerDriver
+
+# JPA/Hibernate Configuration
+logging.level.org.hibernate.SQL=DEBUG
+logging.level.org.hibernate.type.descriptor.sql.BasicBinder=TRACE
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.show-sql=true
+spring.jpa.properties.hibernate.format_sql=true
+
+# Email Configuration
+spring.mail.host=smtp.gmail.com
+spring.mail.port=587
+spring.mail.username=your_email@gmail.com
+spring.mail.password=your_app_password
+spring.mail.properties.mail.smtp.auth=true
+spring.mail.properties.mail.smtp.starttls.enable=true
+
+# Swagger Configuration
+app.swagger.enabled=true
+springdoc.swagger-ui.enabled=true
+springdoc.api-docs.enabled=true
+
+# Active Profile
+spring.profiles.active=dev
+

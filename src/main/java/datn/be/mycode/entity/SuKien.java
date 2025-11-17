@@ -14,19 +14,19 @@ import java.util.List;
 @ToString
 
 @Entity
-@Table(name = "su-kien")
+@Table(name = "su_kien")
 public class SuKien implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "ten_su_kien")
+    @Column(name = "ten_su_kien", columnDefinition = "nvarchar(max)")
     private String tenSuKien;
 
     @Column(name = "ma_su_kien")
     private String maSuKien;
 
-    @Column(name = "hinh_anh")
+    @Column(name = "hinh_anh", columnDefinition = "nvarchar(max)")
     private String hinhAnh;
 
     @Column(name = "thang_hoat_dong")
@@ -41,7 +41,7 @@ public class SuKien implements Serializable {
     @Column(name = "key_su_kien")
     private String keySuKien;
 
-    @Column(name = "mo_ta")
+    @Column(name = "mo_ta", columnDefinition = "nvarchar(max)")
     private String moTa;
 
     @Column(name = "trang_thai")

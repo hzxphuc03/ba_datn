@@ -34,28 +34,28 @@ public class GioHang implements Serializable {
     @Column(name = "ngay_thanh_toan")
     private LocalDateTime ngayThanhToan;
 
-    @Column(name = "ghi_chu")
+    @Column(name = "ghi_chu", columnDefinition = "nvarchar(max)")
     private String ghiChu;
 
-    @Column(name = "ten_nguoi_nhan")
+    @Column(name = "ten_nguoi_nhan", columnDefinition = "nvarchar(max)")
     private String tenNguoiNhan;
 
     @Column(name = "sdt_nguoi_nhan")
     private String sdtNguoiNhan;
 
-    @Column(name = "id_tinh_thanh")
+    @Column(name = "id_tinh_thanh", columnDefinition = "nvarchar(max)")
     private String idTinhThanh;
-    @Column(name = "tinh_thanh")
+    @Column(name = "tinh_thanh", columnDefinition = "nvarchar(max)")
     private String tinhThanh;
 
-    @Column(name = "id_quan_huyen")
+    @Column(name = "id_quan_huyen", columnDefinition = "nvarchar(max)")
     private String idQuanHuyen;
-    @Column(name = "quan_huyen")
+    @Column(name = "quan_huyen", columnDefinition = "nvarchar(max)")
     private String quanHuyen;
 
-    @Column(name = "id_phuong_xa")
+    @Column(name = "id_phuong_xa", columnDefinition = "nvarchar(max)")
     private String idPhuongXa;
-    @Column(name = "phuong_xa")
+    @Column(name = "phuong_xa", columnDefinition = "nvarchar(max)")
     private String phuongXa;
 
     @Column(name = "phi_ship")

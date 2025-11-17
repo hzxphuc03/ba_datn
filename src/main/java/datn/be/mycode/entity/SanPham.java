@@ -25,25 +25,25 @@ public class SanPham implements Serializable {
     @Column(name = "ma")
     private String ma;
 
-    @Column(name = "ten")
+    @Column(name = "ten", columnDefinition = "nvarchar(max)")
     private String ten;
 
-    @Column(name = "mo_ta")
+    @Column(name = "mo_ta", columnDefinition = "nvarchar(max)")
     private String moTa;
 
-    @Column(name = "hinh_anh")
+    @Column(name = "hinh_anh", columnDefinition = "nvarchar(max)")
     private String hinhAnh;
 
     @Column(name = "trong_luong")
     private int trongLuong;
 
-    @Column(name = "be_mat_su_dung")
+    @Column(name = "be_mat_su_dung", columnDefinition = "nvarchar(max)")
     private String beMatSuDung;
 
-    @Column(name = "cong_nghe")
+    @Column(name = "cong_nghe", columnDefinition = "nvarchar(max)")
     private String congNghe;
 
-    @Column(name = "kieu_dang")
+    @Column(name = "kieu_dang", columnDefinition = "nvarchar(max)")
     private String kieuDang;
 
     @Column(name = "gia_thap_nhat")

@@ -18,7 +18,7 @@ public class HinhAnhBinhLuan {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "anh")
+    @Column(name = "anh", columnDefinition = "nvarchar(max)")
     private String anh;
 
     @Column(name = "trang_thai")

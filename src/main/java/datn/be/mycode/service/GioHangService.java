@@ -185,8 +185,15 @@ public class GioHangService {
 //        hoaDon = hoaDonRepository.save(hoaDon);
 ////            toa hoa don chi tiet
 //        List<HoaDonChiTiet> hoaDonChiTietList = taoHoaDonChiTiet(hoaDon,request.getIdGioHangChiTietList());
-//        if(hoaDonChiTietList == null) return getErro("Chưa có sản phẩm trong giỏ hàng");
+//        if(hoaDonChiTietList == null) return getErro("Chưa có sản phẩm trong giỏ hàng");89
 //        setGiohang(gioHang);
+
+        for (Long idGioHangChiTiet : request.getIdGioHangChiTietList()) {
+            var gioHangChiTietCheck = gioHangChiTietRepository.findById(idGioHangChiTiet).get();
+            var sanPhamCheck = gioHangChiTietCheck.getSanPhamChiTiet();
+            if (sanPhamCheck.getSanPham().getTrangThai() != 1) return getErro("Sản phẩm hiện tại không hoạt đông");
+//            if(sanPhamCheck.getSoLuong()<gioHangChiTietCheck.getSoLuong()) return getErro("Cửa hàng không còn đủ số lượng của sản phẩm "+gioHangChiTietCheck.getId());
+        }
 
         return ResponseEntity.ok(taoURLThanhToan(request.getTongTien().intValue(),request.getIdKhachHang()+""));
 
@@ -197,6 +204,14 @@ public class GioHangService {
         var pttt = phuongThucThanhToanRepository.findById(Long.valueOf(3)).orElse(null);
         var gioHang = gioHangRepository.findByKhachHangId(request.getIdKhachHang()).orElse(null);
         if(gioHang == null) return getErro("Khách hàng này đã dừng");
+
+//        List<GioHangChiTiet> gioHangChiTietCheck = new ArrayList<>();
+        for (Long idGioHangChiTiet : request.getIdGioHangChiTietList()) {
+            var gioHangChiTietCheck = gioHangChiTietRepository.findById(idGioHangChiTiet).get();
+            var sanPhamCheck = gioHangChiTietCheck.getSanPhamChiTiet();
+            if (sanPhamCheck.getSanPham().getTrangThai() != 1) return getErro("Sản phẩm hiện tại không hoạt đông");
+//            if(sanPhamCheck.getSoLuong()<gioHangChiTietCheck.getSoLuong()) return getErro("Cửa hàng không còn đủ số lượng của sản phẩm "+gioHangChiTietCheck.getId());
+        }
 
 //        tao hoa don
         HoaDon hoaDon = taoHoaDonThanhToan(request);
@@ -249,7 +264,6 @@ public class GioHangService {
         var gioHang = gioHangRepository.findByKhachHangId(request.getIdKhachHang()).orElse(null);
         if(gioHang == null) return getErro("Khách hàng này không hoạt động hoặc chưa tạo tài khoản");
         if(request.getIdTinhThanh() == null) return getErro("");
-
 //        tao hoa don
         HoaDon hoaDon = taoHoaDonThanhToan(request);
         hoaDon.setPhuongThucThanhToan(pttt);

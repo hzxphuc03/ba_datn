@@ -1,0 +1,124 @@
+spring:
+  application:
+    name: mycode
+  
+  # Database Configuration
+  datasource:
+    url: jdbc:sqlserver://localhost:1433;databaseName=DATN_SD40;encrypt=true;trustServerCertificate=true
+    username: ${DB_USERNAME:sa}
+    password: ${DB_PASSWORD:Password.1}
+    driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
+    hikari:
+      maximum-pool-size: 20
+      minimum-idle: 5
+      connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000
+  
+  # JPA Configuration
+  jpa:
+    hibernate:
+      ddl-auto: validate # Không tự động tạo/sửa schema trong production
+    show-sql: false # Tắt trong production
+    properties:
+      hibernate:
+        format_sql: false
+        dialect: org.hibernate.dialect.SQLServerDialect
+  
+  # Mail Configuration
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${MAIL_USERNAME:phucpanda2003@gmail.com}
+    password: ${MAIL_PASSWORD:mnpq ppdi pvls omcg}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+          ssl:
+            trust: smtp.gmail.com
+  
+  # MVC Configuration
+  mvc:
+    view:
+      prefix: /WEB-INF/view/
+      suffix: .jsp
+  
+  # Security Configuration
+  security:
+    require-ssl: false # Bật true trong production với HTTPS
+
+# Application Security Configuration
+app:
+  jwt:
+    secret: ${JWT_SECRET:myVerySecretKeyThatIsAtLeast256BitsLongForHS256Algorithm}
+    expiration: ${JWT_EXPIRATION:86400000} # 24 hours
+    refresh-expiration: ${JWT_REFRESH_EXPIRATION:604800000} # 7 days
+  
+  cors:
+    allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:4200,https://yourdomain.com}
+    allowed-methods: GET,POST,PUT,DELETE,OPTIONS
+    allowed-headers: "*"
+    allow-credentials: true
+  
+  security:
+    password:
+      min-length: 8
+      require-uppercase: true
+      require-lowercase: true
+      require-digits: true
+      require-special-chars: true
+    
+    rate-limiting:
+      enabled: true
+      max-requests-per-minute: 60
+      max-login-attempts: 5
+      lockout-duration-minutes: 15
+    
+    otp:
+      length: 6
+      expiry-minutes: 5
+      max-attempts: 3
+
+# Logging Configuration
+logging:
+  level:
+    datn.be.mycode: INFO
+    org.springframework.security: WARN
+    org.hibernate.SQL: WARN
+    org.hibernate.type.descriptor.sql.BasicBinder: WARN
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+  file:
+    name: logs/application.log
+    max-size: 10MB
+    max-history: 30
+
+# Management endpoints
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: when-authorized
+  security:
+    enabled: true
+
+# Server Configuration
+server:
+  port: ${SERVER_PORT:8080}
+  servlet:
+    session:
+      timeout: 30m
+      cookie:
+        secure: false # Bật true trong production với HTTPS
+        http-only: true
+        same-site: strict
+  error:
+    include-stacktrace: never # Không hiển thị stacktrace cho client

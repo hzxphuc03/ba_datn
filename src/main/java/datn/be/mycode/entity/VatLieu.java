@@ -20,7 +20,7 @@ public class VatLieu implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "ten")
+    @Column(name = "ten", columnDefinition = "nvarchar(max)")
     private String ten;
 
     @Column(name = "ngay_tao")

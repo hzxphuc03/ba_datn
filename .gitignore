@@ -31,3 +31,13 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### Sensitive Configuration Files ###
+src/main/resources/application.properties
+src/main/resources/application-prod.properties
+*.xlsx
+*.xls
+
+### OS Files ###
+.DS_Store
+Thumbs.db
