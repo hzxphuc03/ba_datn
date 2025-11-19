@@ -1,5 +1,6 @@
 package datn.be.mycode.config;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
@@ -11,15 +12,41 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @Configuration
 @EnableAsync
 public class WebConfig {
+    
+    // Đọc CORS allowed origins từ environment variable hoặc application.properties
+    // Format: "http://localhost:4200,https://yourdomain.com"
+    @Value("${app.cors.allowed-origins:http://localhost:4200}")
+    private String allowedOrigins;
+    
     @Bean
     public WebMvcConfigurer WebMvcConfigurer(){
         return new WebMvcConfigurer(){
             @Override
             public void addCorsMappings(CorsRegistry registry){
+                // Split comma-separated origins
+                String[] origins = allowedOrigins.split(",");
+                for (int i = 0; i < origins.length; i++) {
+                    origins[i] = origins[i].trim();
+                }
+                
                 registry.addMapping("/**")
-                        .allowedOrigins("http://localhost:4200")
-                        .allowedMethods(HttpMethod.GET.name(),HttpMethod.POST.name(),HttpMethod.PUT.name(),HttpMethod.DELETE.name())
-                        .allowedHeaders(HttpHeaders.CONTENT_TYPE,HttpHeaders.AUTHORIZATION);
+                        .allowedOrigins(origins)
+                        .allowedMethods(
+                            HttpMethod.GET.name(),
+                            HttpMethod.POST.name(),
+                            HttpMethod.PUT.name(),
+                            HttpMethod.DELETE.name(),
+                            HttpMethod.OPTIONS.name(),
+                            HttpMethod.PATCH.name()
+                        )
+                        .allowedHeaders(
+                            HttpHeaders.CONTENT_TYPE,
+                            HttpHeaders.AUTHORIZATION,
+                            HttpHeaders.ACCEPT,
+                            HttpHeaders.ORIGIN
+                        )
+                        .allowCredentials(true)
+                        .maxAge(3600); // Cache preflight for 1 hour
             }
         };
     }

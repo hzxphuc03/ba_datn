@@ -1,0 +1,7 @@
+# Ensure Maven wrapper scripts are executable
+mvnw text eol=lf
+mvnw.cmd text eol=crlf
+
+# Make mvnw executable
+* text=auto
+
