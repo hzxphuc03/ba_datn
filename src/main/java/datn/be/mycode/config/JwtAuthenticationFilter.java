@@ -31,7 +31,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         
         // Skip JWT filter cho các public endpoints
         if (isPublicEndpoint(path)) {
-            logger.debug("Skipping JWT filter for public endpoint: {} {}", method, path);
+            logger.debug("Skipping JWT filter for public endpoint: " + method + " " + path);
             filterChain.doFilter(request, response);
             return;
         }
@@ -44,16 +44,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 Authentication authentication = jwtTokenProvider.getAuthentication(token);
                 if (authentication != null) {
                     SecurityContextHolder.getContext().setAuthentication(authentication);
-                    logger.debug("JWT authentication successful for: {}", path);
+                    logger.debug("JWT authentication successful for: " + path);
                 }
             } else {
                 // Không có token hoặc token không hợp lệ - để Spring Security xử lý
-                logger.debug("No valid JWT token for: {} {}", method, path);
+                logger.debug("No valid JWT token for: " + method + " " + path);
             }
         } catch (Exception ex) {
             // Log lỗi nhưng vẫn tiếp tục filter chain để Spring Security xử lý
-            logger.error("Could not set user authentication in security context for {} {}: {}", 
-                    method, path, ex.getMessage());
+            logger.error("Could not set user authentication in security context for " + method + " " + path + ": " + ex.getMessage(), ex);
         }
         
         // Luôn tiếp tục filter chain - để Spring Security quyết định có cho phép không
