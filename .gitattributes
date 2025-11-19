@@ -2,6 +2,6 @@
 mvnw text eol=lf
 mvnw.cmd text eol=crlf
 
-# Make mvnw executable
+# Ensure all text files use auto line endings
 * text=auto
 
