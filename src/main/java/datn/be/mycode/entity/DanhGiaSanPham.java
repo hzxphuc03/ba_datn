@@ -25,7 +25,7 @@ public class DanhGiaSanPham {
     @Column(name = "sao")
     private Integer sao;
 
-    @Column(name = "binh_luan", columnDefinition = "nvarchar(max)")
+    @Column(name = "binh_luan")
     private String binhLuan;
 
     @Column(name = "ngay_tao")
