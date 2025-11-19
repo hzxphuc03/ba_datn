@@ -7,9 +7,7 @@ import datn.be.mycode.repository.ChucVuRepository;
 import datn.be.mycode.repository.NhanVienRepository;
 
 import datn.be.mycode.request.NhanVienRequest;
-import datn.be.mycode.request.NormalTableRequest;
 import datn.be.mycode.request.customRequest.TableNhanVienRequest;
-import datn.be.mycode.response.LoginResponse;
 import datn.be.mycode.response.NormalTableResponse;
 import datn.be.mycode.response.UserLoginResponse;
 import datn.be.mycode.response.erroResponse;
