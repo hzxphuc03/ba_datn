@@ -198,66 +198,104 @@ Render cung cấp free tier với PostgreSQL, nhưng service sẽ sleep sau 15 p
 
 ### 3.4. Cấu Hình Build & Deploy
 
-**Cách 1: Sử dụng file `render.yaml` (Khuyến nghị)**
+**Cách 1: Sử dụng Docker (Khuyến nghị nhất) 🐳**
 
-File `render.yaml` đã được tạo trong project để Render tự động detect Java runtime:
+Project đã có sẵn `Dockerfile`, nên cách này đơn giản và ổn định nhất:
 
 1. Đảm bảo file `render.yaml` đã có trong repo (đã commit và push)
 2. Khi tạo Web Service, Render sẽ tự động đọc file này
-3. **Runtime** sẽ tự động được set thành `Java`
+3. **Runtime**: Chọn `Docker` trong dropdown
+4. **Build Command**: Để trống (Render tự động build từ Dockerfile)
+5. **Start Command**: Để trống (Render tự động chạy từ Dockerfile)
+
+✅ **Ưu điểm của Docker**:
+- Không cần lo về JAVA_HOME
+- Môi trường build và runtime nhất quán
+- Dễ dàng test local: `docker build -t app . && docker run -p 8080:8080 app`
+- Tránh các lỗi về permission với mvnw
+
+**Cách 2: Sử dụng file `render.yaml` với Java Runtime**
+
+File `render.yaml` đã được tạo trong project:
+
+1. Đảm bảo file `render.yaml` đã có trong repo (đã commit và push)
+2. Khi tạo Web Service, Render sẽ tự động đọc file này
+3. **Runtime** sẽ tự động được set thành `Java` hoặc `Docker` (tùy cấu hình)
 4. **Build Command** và **Start Command** sẽ được tự động cấu hình
 
-**Cách 2: Cấu hình thủ công trong Dashboard**
+**Cách 3: Cấu hình thủ công trong Dashboard**
 
-Nếu không dùng `render.yaml`, cấu hình như sau:
+Nếu không dùng `render.yaml` hoặc Render chưa đọc file, cấu hình thủ công:
 
-**Basic Settings:**
-- **Name**: `ba-datn-backend` (hoặc tên bạn muốn)
-- **Region**: Singapore
-- **Branch**: `main`
-- **Root Directory**: `/` (mặc định)
+**Option A: Dùng Docker (Khuyến nghị)**
+- **Runtime**: `Docker`
+- **Build Command**: Để trống
+- **Start Command**: Để trống
+
+**Option B: Dùng Java Runtime**
 - **Runtime**: `Java` ⚠️ **QUAN TRỌNG**: Phải chọn Java, không phải Node.js!
-- **Build Command**: `chmod +x mvnw && ./mvnw clean package -DskipTests`
-- **Start Command**: `java -jar target/mycode-0.0.1-SNAPSHOT.jar`
+- **Build Command**: 
+  ```bash
+  chmod +x mvnw && ./mvnw clean package -DskipTests
+  ```
+- **Start Command**: 
+  ```bash
+  java -jar target/mycode-0.0.1-SNAPSHOT.jar
+  ```
 
-**Lưu ý**: 
-- Nếu gặp lỗi "Permission denied", build command đã có `chmod +x mvnw`
-- Nếu gặp lỗi "JAVA_HOME is not defined", đảm bảo **Runtime** được set thành `Java` (không phải Node.js)
+⚠️ **Lưu ý quan trọng**: 
+- Nếu bạn thấy Build Command là `yarn` hoặc `npm install`, đó là vì Render đang dùng Node.js runtime
+- Phải đổi **Runtime** sang `Docker` hoặc `Java` trước
+- Với Docker: Không cần Build/Start Command, Render tự động xử lý
+- Nếu gặp lỗi "JAVA_HOME is not defined" → Dùng Docker thay vì Java runtime
 
 **Advanced Settings:**
 - **Auto-Deploy**: `Yes` (tự động deploy khi push code)
 
 ### 3.5. Cấu Hình Environment Variables
 
-Trong tab **"Environment"**, thêm:
+**Cách thêm Environment Variables trên Render:**
+
+1. Vào Web Service của bạn trên Render Dashboard
+2. Click vào tab **"Environment"**
+3. Click **"Add Environment Variable"**
+4. Thêm từng biến một theo danh sách dưới đây
+
+**Danh sách Environment Variables cần thêm:**
 
 ```bash
-# Database (sử dụng Internal Database URL từ PostgreSQL service)
-SPRING_DATASOURCE_URL=jdbc:postgresql://host:port/dbname
+# ===== DATABASE (Bắt buộc) =====
+# Lấy từ PostgreSQL service → tab "Connections" → "Internal Database URL"
+SPRING_DATASOURCE_URL=jdbc:postgresql://dpg-xxxxx-a.singapore-postgres.render.com:5432/dbname
 SPRING_DATASOURCE_USERNAME=render
-SPRING_DATASOURCE_PASSWORD=password
+SPRING_DATASOURCE_PASSWORD=your_password_here
 
-# Hoặc sử dụng DATABASE_URL nếu Render tự động inject
-# SPRING_DATASOURCE_URL=${DATABASE_URL}
-
-# JWT
-JWT_SECRET=your-generated-secret-key-here
+# ===== JWT (Bắt buộc) =====
+# Tạo secret key: openssl rand -base64 32
+JWT_SECRET=your-generated-secret-key-here-minimum-32-characters
 JWT_EXPIRATION=86400000
 JWT_REFRESH_EXPIRATION=604800000
 
-# Email
+# ===== EMAIL (Nếu có chức năng gửi email) =====
+MAIL_HOST=smtp.gmail.com
+MAIL_PORT=587
 MAIL_USERNAME=your_email@gmail.com
-MAIL_PASSWORD=your_app_password
+MAIL_PASSWORD=your_gmail_app_password
 
-# Profile
+# ===== SPRING PROFILE =====
 SPRING_PROFILES_ACTIVE=prod
 
-# Port (Render tự động set PORT)
+# ===== PORT (Render tự động set, nhưng có thể set thủ công) =====
 PORT=8080
 
-# CORS
-CORS_ALLOWED_ORIGINS=https://your-frontend.com
+# ===== CORS (Nếu có frontend) =====
+CORS_ALLOWED_ORIGINS=https://your-frontend-domain.com
 ```
+
+**Lưu ý:**
+- ⚠️ **KHÔNG** commit các giá trị thực của environment variables vào code
+- Chỉ set trong Render Dashboard
+- Sau khi thêm xong, click **"Save Changes"** và deploy lại
 
 ### 3.6. Deploy
 
@@ -467,14 +505,21 @@ spring.datasource.password=password
 
 2. **JAVA_HOME is not defined (Render)**:
    - ⚠️ **Nguyên nhân chính**: Render đang sử dụng **Node.js runtime** thay vì **Java runtime**
-   - **Giải pháp 1 (Khuyến nghị)**: Sử dụng file `render.yaml`
+   - **Giải pháp 1 (Khuyến nghị nhất)**: Sử dụng **Docker runtime**
+     - Vào **Settings** của Web Service
+     - Đổi **Runtime** từ `Node` sang `Docker`
+     - Xóa **Build Command** và **Start Command** (để trống)
+     - Render sẽ tự động build và chạy từ Dockerfile
+     - ✅ Không cần lo về JAVA_HOME, mọi thứ đã được cấu hình trong Dockerfile
+   - **Giải pháp 2**: Sử dụng file `render.yaml` với Docker
      - Đảm bảo file `render.yaml` đã có trong repo và đã được commit/push
-     - Khi tạo Web Service mới, Render sẽ tự động detect Java runtime từ file này
-   - **Giải pháp 2**: Cấu hình thủ công trong Render Dashboard
+     - File đã được cấu hình với `runtime: docker`
+     - Khi tạo Web Service mới, Render sẽ tự động detect Docker runtime
+   - **Giải pháp 3**: Cấu hình thủ công với Java runtime
      - Vào **Settings** của Web Service
      - Tìm phần **Runtime** và đổi từ `Node` sang `Java`
      - Lưu và deploy lại
-   - **Giải pháp 3**: Xóa service cũ và tạo lại với Runtime = Java ngay từ đầu
+   - **Giải pháp 4**: Xóa service cũ và tạo lại với Runtime = Docker hoặc Java ngay từ đầu
 
 3. **Railway/Render**: Đảm bảo có `mvnw` hoặc `mvnw.cmd` trong project
 
