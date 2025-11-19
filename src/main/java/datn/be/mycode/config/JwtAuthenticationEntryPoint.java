@@ -22,12 +22,21 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
                         AuthenticationException authException) throws IOException, ServletException {
         
         String path = request.getServletPath();
+        String requestURI = request.getRequestURI();
+        
+        System.out.println("=== JWT Entry Point Debug ===");
+        System.out.println("Path: " + path);
+        System.out.println("RequestURI: " + requestURI);
+        System.out.println("Exception: " + authException.getMessage());
         
         // Không chặn các public endpoints
         if (isPublicEndpoint(path)) {
+            System.out.println("✅ Entry Point: Path is public, allowing request");
             // Cho phép request tiếp tục (không nên xảy ra nhưng để an toàn)
             return;
         }
+        
+        System.out.println("❌ Entry Point: Returning 401 for path: " + path);
         
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);

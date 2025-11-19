@@ -28,13 +28,24 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         
         String path = request.getServletPath();
         String method = request.getMethod();
+        String requestURI = request.getRequestURI();
+        
+        // Log tất cả request để debug
+        System.out.println("=== JWT Filter Debug ===");
+        System.out.println("Method: " + method);
+        System.out.println("Path: " + path);
+        System.out.println("RequestURI: " + requestURI);
+        System.out.println("Is Public: " + isPublicEndpoint(path));
         
         // Skip JWT filter cho các public endpoints
         if (isPublicEndpoint(path)) {
+            System.out.println("✅ Skipping JWT filter for public endpoint: " + method + " " + path);
             logger.debug("Skipping JWT filter for public endpoint: " + method + " " + path);
             filterChain.doFilter(request, response);
             return;
         }
+        
+        System.out.println("⚠️ Processing JWT filter for: " + method + " " + path);
         
         // Chỉ xử lý JWT cho các request cần authentication
         try {
@@ -64,36 +75,45 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
      */
     private boolean isPublicEndpoint(String path) {
         if (path == null) {
+            System.out.println("❌ Path is null!");
             return false;
         }
         
+        System.out.println("Checking if path is public: " + path);
+        
         // Public auth endpoints - không cần token (quan trọng nhất!)
         if (path.startsWith("/api/auth/")) {
+            System.out.println("✅ Path starts with /api/auth/ - PUBLIC");
             return true;
         }
         
         // Public registration/forgot password endpoints
         if (path.startsWith("/dang-ky") || path.startsWith("/quen-mat-khau")) {
+            System.out.println("✅ Path is registration/forgot password - PUBLIC");
             return true;
         }
         
         // Swagger/OpenAPI endpoints
         if (path.startsWith("/swagger-ui") || path.startsWith("/v3/api-docs") 
             || path.startsWith("/swagger-resources") || path.startsWith("/webjars")) {
+            System.out.println("✅ Path is Swagger - PUBLIC");
             return true;
         }
         
         // Actuator health check
         if (path.startsWith("/actuator/health")) {
+            System.out.println("✅ Path is Actuator health - PUBLIC");
             return true;
         }
         
         // WebSocket endpoints
         if (path.startsWith("/ws/") || path.startsWith("/app/") 
             || path.startsWith("/topic/") || path.startsWith("/user/")) {
+            System.out.println("✅ Path is WebSocket - PUBLIC");
             return true;
         }
         
+        System.out.println("❌ Path is NOT public - requires authentication");
         return false;
     }
 
