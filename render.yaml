@@ -1,0 +1,21 @@
+services:
+  - type: web
+    name: ba-datn-backend
+    runtime: java
+    plan: free
+    buildCommand: chmod +x mvnw && ./mvnw clean package -DskipTests
+    startCommand: java -jar target/mycode-0.0.1-SNAPSHOT.jar
+    envVars:
+      - key: SPRING_PROFILES_ACTIVE
+        value: prod
+      - key: PORT
+        value: 8080
+      # Thêm các environment variables khác trong Render dashboard
+      # SPRING_DATASOURCE_URL
+      # SPRING_DATASOURCE_USERNAME
+      # SPRING_DATASOURCE_PASSWORD
+      # JWT_SECRET
+      # MAIL_USERNAME
+      # MAIL_PASSWORD
+      # CORS_ALLOWED_ORIGINS
+
