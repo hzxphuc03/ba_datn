@@ -203,14 +203,27 @@ Render cung cấp free tier với PostgreSQL, nhưng service sẽ sleep sau 15 p
 - **Region**: Singapore
 - **Branch**: `main`
 - **Root Directory**: `/` (mặc định)
-- **Runtime**: `Java`
-- **Build Command**: `chmod +x mvnw && ./mvnw clean package -DskipTests`
-- **Start Command**: `java -jar target/mycode-0.0.1-SNAPSHOT.jar`
+- **Runtime**: `Java` ⚠️ **QUAN TRỌNG**: Phải chọn **Java**, không phải Node.js!
+- **Java Version**: `17` (hoặc để mặc định nếu có option)
+- **Build Command**: 
+  ```bash
+  chmod +x mvnw && ./mvnw clean package -DskipTests
+  ```
+- **Start Command**: 
+  ```bash
+  java -jar target/mycode-0.0.1-SNAPSHOT.jar
+  ```
 
-**Lưu ý**: Nếu vẫn gặp lỗi "Permission denied", thử build command sau:
-```bash
-chmod +x mvnw && ./mvnw clean package -DskipTests
-```
+**⚠️ Lưu ý quan trọng:**
+- Nếu Render tự động detect **Node.js**, bạn phải **thay đổi Runtime thành Java** trong Settings
+- Nếu gặp lỗi `JAVA_HOME is not defined`, thêm vào **Environment Variables**:
+  ```bash
+  JAVA_HOME=/usr/lib/jvm/java-17-openjdk
+  ```
+  Hoặc thử build command với JAVA_HOME:
+  ```bash
+  export JAVA_HOME=/usr/lib/jvm/java-17-openjdk && chmod +x mvnw && ./mvnw clean package -DskipTests
+  ```
 
 **Advanced Settings:**
 - **Auto-Deploy**: `Yes` (tự động deploy khi push code)
@@ -437,20 +450,43 @@ spring.datasource.password=password
 
 ### 6.1. Build Failed
 
-**Lỗi**: `Maven not found` hoặc `Java not found` hoặc `Permission denied`
+**Lỗi**: `Maven not found` hoặc `Java not found` hoặc `Permission denied` hoặc `JAVA_HOME is not defined`
 
 **Giải pháp**:
-- **Permission denied với mvnw**: Thêm `chmod +x mvnw &&` vào đầu build command:
-  ```bash
-  chmod +x mvnw && ./mvnw clean package -DskipTests
-  ```
-- Railway/Render: Đảm bảo có `mvnw` hoặc `mvnw.cmd` trong project
-- Fly.io: Kiểm tra Dockerfile có cài đặt Maven đúng chưa
-- **Git không giữ quyền thực thi**: Chạy lệnh sau và commit:
-  ```bash
-  git update-index --chmod=+x mvnw
-  git commit -m "Add executable permission to mvnw"
-  ```
+
+1. **JAVA_HOME is not defined** (Render):
+   - **Kiểm tra Runtime**: Vào Settings → đảm bảo **Runtime = Java** (không phải Node.js)
+   - **Thêm Environment Variable**:
+     ```bash
+     JAVA_HOME=/usr/lib/jvm/java-17-openjdk
+     ```
+   - **Hoặc cập nhật Build Command**:
+     ```bash
+     export JAVA_HOME=/usr/lib/jvm/java-17-openjdk && chmod +x mvnw && ./mvnw clean package -DskipTests
+     ```
+   - **Hoặc thử**:
+     ```bash
+     export JAVA_HOME=$(readlink -f /usr/bin/java | sed "s:bin/java::") && chmod +x mvnw && ./mvnw clean package -DskipTests
+     ```
+
+2. **Permission denied với mvnw**: Thêm `chmod +x mvnw &&` vào đầu build command:
+   ```bash
+   chmod +x mvnw && ./mvnw clean package -DskipTests
+   ```
+
+3. **Runtime sai (Node.js thay vì Java)**:
+   - Vào Settings → Runtime → Chọn **Java**
+   - Render có thể tự động detect Node.js nếu có file `package.json`
+
+4. Railway/Render: Đảm bảo có `mvnw` hoặc `mvnw.cmd` trong project
+
+5. Fly.io: Kiểm tra Dockerfile có cài đặt Maven đúng chưa
+
+6. **Git không giữ quyền thực thi**: Chạy lệnh sau và commit:
+   ```bash
+   git update-index --chmod=+x mvnw
+   git commit -m "Add executable permission to mvnw"
+   ```
 
 ### 6.2. Application Không Start
 
