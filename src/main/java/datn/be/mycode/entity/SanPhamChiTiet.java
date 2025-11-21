@@ -1,6 +1,5 @@
 package datn.be.mycode.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -28,7 +27,7 @@ public class SanPhamChiTiet implements Serializable {
     @Column(name = "ngay_sua")
     private LocalDateTime ngaySua;
 
-    @Column(name = "hinh_anh", columnDefinition = "nvarchar(max)")
+    @Column(name = "hinh_anh")
     private String hinhAnh;
 
     @Column(name = "gia_nhap")

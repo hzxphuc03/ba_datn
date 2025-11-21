@@ -23,7 +23,7 @@ public class NhanVien implements Serializable {
     @Column(name = "ma")
     private String ma;
 
-    @Column(name = "ho_ten", columnDefinition = "nvarchar(max)")
+    @Column(name = "ho_ten")
     private String hoTen;
 
     @Column(name = "ngay_sinh")
@@ -35,13 +35,13 @@ public class NhanVien implements Serializable {
     @Column(name = "sdt")
     private String soDienThoai;
 
-    @Column(name = "gioi_tinh", columnDefinition = "nvarchar(10)")
+    @Column(name = "gioi_tinh")
     private int gioiTinh;
 
-    @Column(name = "dia_chi", columnDefinition = "nvarchar(max)")
+    @Column(name = "dia_chi")
     private String diaChi;
 
-    @Column(name = "hinh_anh", columnDefinition = "nvarchar(max)")
+    @Column(name = "hinh_anh")
     private String hinhAnh;
 
     @Column(name = "email")

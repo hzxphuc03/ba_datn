@@ -1,55 +1,53 @@
-# Git files
-.git
-.gitignore
-.gitattributes
+# Maven
+target/
+.mvn/
+mvnw
+mvnw.cmd
 
-# IDE files
-.idea
-.vscode
+# IDE
+.idea/
+.vscode/
 *.iml
 *.iws
 *.ipr
-.project
 .classpath
+.project
 .settings/
 
-# Maven
-target/
-!target/*.jar
-.mvn/wrapper/maven-wrapper.jar
-
-# Build files
-*.class
-*.jar
-*.war
-*.ear
-*.log
-
-# OS files
-.DS_Store
-Thumbs.db
-*.swp
-*.swo
-*~
+# Git
+.git/
+.gitignore
+.gitattributes
 
 # Documentation
 *.md
 !README.md
 
-# Scripts không cần thiết cho build
-*.sh
+# Logs
+logs/
+*.log
 
-# Migration scripts (có thể cần, nhưng tạm thời ignore)
-migration-scripts/
+# OS
+.DS_Store
+Thumbs.db
 
-# Security improvement examples (không cần cho production)
-security-improvements/
-frontend-examples/
+# Environment
+.env
+.env.local
+*.properties
+!application.properties.example
 
-# Test files
+# Test
 src/test/
 
-# Application properties với thông tin nhạy cảm
-# Chú ý: Cần copy file properties phù hợp với môi trường
-# application.properties.example
+# Build artifacts
+*.jar
+*.war
+*.ear
+
+# Temporary files
+*.tmp
+*.bak
+*.swp
+*~
 

@@ -21,6 +21,23 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
                         HttpServletResponse response,
                         AuthenticationException authException) throws IOException, ServletException {
         
+        String path = request.getServletPath();
+        String requestURI = request.getRequestURI();
+        
+        System.out.println("=== JWT Entry Point Debug ===");
+        System.out.println("Path: " + path);
+        System.out.println("RequestURI: " + requestURI);
+        System.out.println("Exception: " + authException.getMessage());
+        
+        // Không chặn các public endpoints
+        if (isPublicEndpoint(path)) {
+            System.out.println("✅ Entry Point: Path is public, allowing request");
+            // Cho phép request tiếp tục (không nên xảy ra nhưng để an toàn)
+            return;
+        }
+        
+        System.out.println("❌ Entry Point: Returning 401 for path: " + path);
+        
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 
@@ -28,10 +45,23 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
         body.put("status", HttpServletResponse.SC_UNAUTHORIZED);
         body.put("error", "Unauthorized");
         body.put("message", "Bạn cần đăng nhập để truy cập tài nguyên này");
-        body.put("path", request.getServletPath());
+        body.put("path", path);
 
         ObjectMapper mapper = new ObjectMapper();
         mapper.writeValue(response.getOutputStream(), body);
+    }
+    
+    private boolean isPublicEndpoint(String path) {
+        if (path == null) {
+            return false;
+        }
+        // Public auth endpoints
+        return path.startsWith("/api/auth/") 
+            || path.startsWith("/dang-ky") 
+            || path.startsWith("/quen-mat-khau")
+            || path.startsWith("/swagger-ui")
+            || path.startsWith("/v3/api-docs")
+            || path.startsWith("/actuator/health");
     }
 }
 
