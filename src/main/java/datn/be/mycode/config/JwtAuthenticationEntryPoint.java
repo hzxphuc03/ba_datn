@@ -21,6 +21,24 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
                         HttpServletResponse response,
                         AuthenticationException authException) throws IOException, ServletException {
         
+        String requestPath = request.getRequestURI();
+        String method = request.getMethod();
+        
+        // Log when entry point is called (should NOT happen for public endpoints)
+        System.err.println("❌ [JWT EntryPoint] 401 Unauthorized - Path: " + method + " " + requestPath);
+        System.err.println("❌ [JWT EntryPoint] Exception: " + (authException != null ? authException.getMessage() : "null"));
+        
+        // If this is called for /api/auth/** endpoints, it means SecurityConfig permitAll() is not working
+        if (requestPath != null && requestPath.startsWith("/api/auth/")) {
+            System.err.println("⚠️ [JWT EntryPoint] WARNING: EntryPoint called for auth endpoint! This should not happen!");
+            System.err.println("⚠️ [JWT EntryPoint] Check SecurityConfig - /api/auth/** should be permitAll()");
+            System.err.println("⚠️ [JWT EntryPoint] Request method: " + request.getMethod());
+            System.err.println("⚠️ [JWT EntryPoint] Request URI: " + request.getRequestURI());
+            System.err.println("⚠️ [JWT EntryPoint] Request URL: " + request.getRequestURL());
+            System.err.println("⚠️ [JWT EntryPoint] Servlet path: " + request.getServletPath());
+            System.err.println("⚠️ [JWT EntryPoint] Context path: " + request.getContextPath());
+        }
+        
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 
@@ -28,7 +46,7 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
         body.put("status", HttpServletResponse.SC_UNAUTHORIZED);
         body.put("error", "Unauthorized");
         body.put("message", "Bạn cần đăng nhập để truy cập tài nguyên này");
-        body.put("path", request.getServletPath());
+        body.put("path", requestPath);
 
         ObjectMapper mapper = new ObjectMapper();
         mapper.writeValue(response.getOutputStream(), body);

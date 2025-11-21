@@ -129,7 +129,8 @@ public class AuthenticationService {
     
     public ResponseEntity<?> authenticateNhanVien(loginTest loginRequest, String clientIp) {
         try {
-            System.out.println("🔍 Authenticating NhanVien: " + loginRequest.getUsername());
+            System.out.println("🔍 [AUTH SERVICE] Authenticating NhanVien: " + loginRequest.getUsername());
+            System.out.println("🔍 [AUTH SERVICE] Client IP: " + clientIp);
             
             // Tìm nhân viên theo tài khoản
             Optional<NhanVien> nhanVienOpt = nhanVienRepository

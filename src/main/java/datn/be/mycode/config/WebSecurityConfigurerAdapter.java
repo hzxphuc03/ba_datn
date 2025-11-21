@@ -10,7 +10,11 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.core.annotation.Order;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import java.util.Arrays;
 
 @Configuration
 @EnableWebSecurity
@@ -32,18 +36,77 @@ public class WebSecurityConfigurerAdapter {
     }
 
     @Bean
-    @Order(2)
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        
+        // CRITICAL: When allowCredentials is true, cannot use "*" in allowedOrigins
+        // Must use allowedOriginPatterns instead, or list specific origins
+        // For development: allow all origins with pattern
+        // For production: list specific origins
+        configuration.setAllowedOriginPatterns(Arrays.asList("*"));
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
+        configuration.setAllowedHeaders(Arrays.asList("*"));
+        configuration.setExposedHeaders(Arrays.asList("Authorization", "Content-Type"));
+        
+        // CRITICAL: allowCredentials = true with allowedOriginPatterns("*") should work
+        // But if you get error, you can either:
+        // 1. Set allowCredentials = false (no credentials needed for JWT in Authorization header)
+        // 2. List specific origins instead of "*"
+        // For JWT authentication, credentials are not required (token is in Authorization header, not cookie)
+        configuration.setAllowCredentials(false);
+        configuration.setMaxAge(3600L);
+        
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
+    }
+
+    /**
+     * Single SecurityFilterChain - Simplified approach
+     * Public endpoints are configured with permitAll() and processed first
+     */
+    @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        System.out.println("🔧 [SecurityConfig] ========================================");
+        System.out.println("🔧 [SecurityConfig] Building SecurityFilterChain...");
+        
+        // CRITICAL: Disable default security for public endpoints
         http
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> 
                     session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authorizeHttpRequests((authorize) -> authorize
-                        // Public endpoints - không cần authentication
+                // CRITICAL: Disable form login and http basic auth
+                .httpBasic(httpBasic -> httpBasic.disable())
+                .formLogin(formLogin -> formLogin.disable())
+                .authorizeHttpRequests((authorize) -> {
+                    System.out.println("🔧 [SecurityConfig] Configuring authorization rules...");
+                    // ========================================
+                    // CRITICAL: PUBLIC ENDPOINTS - MUST BE FIRST
+                    // ========================================
+                    // ALL /api/auth/** endpoints are PUBLIC (no JWT required)
+                    // This includes:
+                    // - /api/auth/login
+                    // - /api/auth/login/nhan-vien
+                    // - /api/auth/login/khach-hang
+                    // - /api/auth/register
+                    // - /api/auth/refresh-token
+                    // - /api/auth/** (any other auth endpoints)
+                    authorize
+                        // ========================================
+                        // CRITICAL: PUBLIC ENDPOINTS - MUST BE FIRST
+                        // ========================================
+                        .requestMatchers("/api/auth/**").permitAll()
+                        
+                        // Other public endpoints
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", 
                                        "/swagger-resources/**", "/webjars/**").permitAll()
-                        .requestMatchers("/api/auth/**", "/dang-ky/**", 
-                                       "/quen-mat-khau/**").permitAll()
+                        .requestMatchers("/dang-ky/**", "/quen-mat-khau/**").permitAll()
+                        .requestMatchers("/actuator/health").permitAll()
+                        // CRITICAL: Allow /error endpoint (Spring Boot error handler)
+                        .requestMatchers("/error").permitAll()
+                        // CRITICAL: Allow /error endpoint (Spring Boot error handler)
+                        .requestMatchers("/error").permitAll()
                         
                         // WebSocket endpoints - public
                         .requestMatchers("/ws/**").permitAll()
@@ -116,13 +179,51 @@ public class WebSecurityConfigurerAdapter {
                         .requestMatchers("DELETE", "/api/su_kien/**").hasAnyRole("ADMIN", "NHAN_VIEN")
                         
                         // Tất cả các request còn lại cần authentication
-                        .anyRequest().authenticated()
-                )
-                .exceptionHandling(ex -> 
-                    ex.authenticationEntryPoint(jwtAuthenticationEntryPoint))
+                        .anyRequest().authenticated();
+                    System.out.println("✅ [SecurityConfig] /api/auth/** -> permitAll()");
+                    System.out.println("✅ [SecurityConfig] Authorization rules configured");
+                    System.out.println("✅ [SecurityConfig] /api/auth/** is PUBLIC (permitAll)");
+                })
+                .exceptionHandling(ex -> {
+                    System.out.println("🔧 [SecurityConfig] Configuring exception handling...");
+                    ex.authenticationEntryPoint((request, response, authException) -> {
+                        String path = request.getRequestURI();
+                        String originalPath = (String) request.getAttribute("jakarta.servlet.error.request_uri");
+                        String method = request.getMethod();
+                        
+                        System.err.println("========================================");
+                        System.err.println("❌ [SecurityConfig] AuthenticationEntryPoint called!");
+                        System.err.println("❌ [SecurityConfig] Method: " + method);
+                        System.err.println("❌ [SecurityConfig] Path: " + path);
+                        System.err.println("❌ [SecurityConfig] Original Path: " + (originalPath != null ? originalPath : "null"));
+                        System.err.println("❌ [SecurityConfig] Exception: " + (authException != null ? authException.getMessage() : "null"));
+                        System.err.println("❌ [SecurityConfig] Request URL: " + request.getRequestURL());
+                        System.err.println("❌ [SecurityConfig] Servlet Path: " + request.getServletPath());
+                        System.err.println("❌ [SecurityConfig] Context Path: " + request.getContextPath());
+                        
+                        // If this is called for /api/auth/**, it's a problem!
+                        if (path != null && path.startsWith("/api/auth/")) {
+                            System.err.println("⚠️⚠️⚠️ [SecurityConfig] CRITICAL: EntryPoint called for /api/auth/** endpoint!");
+                            System.err.println("⚠️⚠️⚠️ [SecurityConfig] This means permitAll() is NOT working!");
+                        }
+                        
+                        // If path is /error, the original request was blocked
+                        if (path != null && path.equals("/error")) {
+                            System.err.println("⚠️⚠️⚠️ [SecurityConfig] WARNING: EntryPoint called for /error endpoint!");
+                            System.err.println("⚠️⚠️⚠️ [SecurityConfig] This means the ORIGINAL request was blocked!");
+                            System.err.println("⚠️⚠️⚠️ [SecurityConfig] Check if the original endpoint is in permitAll()");
+                        }
+                        System.err.println("========================================");
+                        
+                        jwtAuthenticationEntryPoint.commence(request, response, authException);
+                    });
+                })
                 .addFilterBefore(jwtAuthenticationFilter, 
                     UsernamePasswordAuthenticationFilter.class);
         
+        System.out.println("✅ [SecurityConfig] SecurityFilterChain built successfully");
+        System.out.println("✅ [SecurityConfig] JWT Filter added BEFORE UsernamePasswordAuthenticationFilter");
+        System.out.println("🔧 [SecurityConfig] ========================================");
         return http.build();
     }
 }
