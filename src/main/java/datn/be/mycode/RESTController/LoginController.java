@@ -27,13 +27,19 @@ public class LoginController {
 
     @PostMapping("/nhan_vien_login")
     public ResponseEntity<?> login(@RequestBody loginTest loginRequest) {
-
+        System.out.println("=== LoginController: nhan_vien_login called ===");
+        System.out.println("Username: " + loginRequest.getUsername());
+        System.out.println("Request received successfully!");
+        
         return nhanVienService.getAccount(loginRequest);
     }
 
     @PostMapping("/khach_hang_login")
     public ResponseEntity<?> loginKhachHang(@RequestBody loginTest loginRequest) {
-
+        System.out.println("=== LoginController: khach_hang_login called ===");
+        System.out.println("Username: " + loginRequest.getUsername());
+        System.out.println("Request received successfully!");
+        
         return khachHangService.getAccount(loginRequest);
     }
 

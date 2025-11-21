@@ -23,10 +23,10 @@ public class KhachHang implements Serializable {
     @Column(name = "ma")
     private String ma;
 
-    @Column(name = "ho_ten", columnDefinition = "nvarchar(max)")
+    @Column(name = "ho_ten")
     private String hoTen;
 
-    @Column(name = "hinh_anh", columnDefinition = "nvarchar(max)")
+    @Column(name = "hinh_anh")
     private String hinhAnh;
 
     @Column(name = "ngay_sinh")

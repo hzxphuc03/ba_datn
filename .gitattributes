@@ -1,0 +1,7 @@
+# Ensure Maven wrapper scripts are executable
+mvnw text eol=lf
+mvnw.cmd text eol=crlf
+
+# Ensure all text files use auto line endings
+* text=auto
+

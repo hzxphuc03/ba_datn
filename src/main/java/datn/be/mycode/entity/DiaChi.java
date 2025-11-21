@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.io.Serializable;
-import java.time.LocalDateTime;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -20,22 +19,22 @@ public class DiaChi implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "id_tinh_thanh", columnDefinition = "nvarchar(max)")
+    @Column(name = "id_tinh_thanh")
     private String idTinhThanh;
-    @Column(name = "tinh_thanh", columnDefinition = "nvarchar(max)")
+    @Column(name = "tinh_thanh")
     private String tinhThanh;
 
-    @Column(name = "id_quan_huyen", columnDefinition = "nvarchar(max)")
+    @Column(name = "id_quan_huyen")
     private String idQuanHuyen;
-    @Column(name = "quan_huyen", columnDefinition = "nvarchar(max)")
+    @Column(name = "quan_huyen")
     private String quanHuyen;
 
-    @Column(name = "id_phuong_xa", columnDefinition = "nvarchar(max)")
+    @Column(name = "id_phuong_xa")
     private String idPhuongXa;
-    @Column(name = "phuong_xa", columnDefinition = "nvarchar(max)")
+    @Column(name = "phuong_xa")
     private String phuongXa;
 
-    @Column(name = "ghi_chu", columnDefinition = "nvarchar(max)")
+    @Column(name = "ghi_chu")
     private String ghiChu;
 
     @Column(name = "trang_thai")

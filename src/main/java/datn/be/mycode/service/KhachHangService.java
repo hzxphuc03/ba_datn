@@ -3,12 +3,10 @@ package datn.be.mycode.service;
 import datn.be.mycode.config.JwtTokenProvider;
 import datn.be.mycode.entity.GioHang;
 import datn.be.mycode.entity.KhachHang;
-import datn.be.mycode.entity.NhanVien;
 import datn.be.mycode.entity.loginTest;
 import datn.be.mycode.repository.GioHangRepository;
 import datn.be.mycode.repository.KhachHangRepository;
 import datn.be.mycode.request.KhachHangRequest;
-import datn.be.mycode.request.NormalTableRequest;
 import datn.be.mycode.request.NormalTableRequestKhachHang;
 import datn.be.mycode.request.khachHang.CapNhatEmailKhachHangRequest;
 import datn.be.mycode.request.khachHang.CapNhatSoDienThoaiKhachHangRequest;
@@ -30,7 +28,6 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 @Service
 public class KhachHangService {
@@ -40,6 +37,8 @@ public class KhachHangService {
     private JwtTokenProvider jwtTokenProvider;
     @Autowired
     private GioHangRepository gioHangRepository;
+    @Autowired
+    private PasswordService passwordService;
 
     public NormalTableResponse<KhachHang> getAll(NormalTableRequestKhachHang request) {
 
@@ -210,18 +209,50 @@ public class KhachHangService {
 //    }
 
     public ResponseEntity<?> getAccount(loginTest loginRequest) {
-        KhachHang khachHang = repository.findByTaiKhoanAndMatKhauAndTrangThai(loginRequest.getUsername(), loginRequest.getPass(), 1).orElse(null);
-        Map<String, String> response = new HashMap<>();
+        try {
+            // Tìm khách hàng theo username (không so sánh password trong SQL)
+            KhachHang khachHang = repository.findByTaiKhoanAndTrangThai(loginRequest.getUsername(), 1)
+                    .orElse(null);
+            
+            Map<String, String> response = new HashMap<>();
 
-        if (khachHang == null) return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new erroResponse("Tài khoản hoặc mật khẩu không chính xác"));
+            if (khachHang == null) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body(new erroResponse("Tài khoản hoặc mật khẩu không chính xác"));
+            }
 
+            // Kiểm tra password - hỗ trợ cả BCrypt và plain text
+            String dbPassword = khachHang.getMatKhau();
+            boolean passwordMatches = false;
+            
+            if (dbPassword != null && loginRequest.getPass() != null) {
+                // Nếu password là BCrypt hash (bắt đầu bằng $2a$ hoặc $2b$)
+                if (dbPassword.startsWith("$2a$") || dbPassword.startsWith("$2b$")) {
+                    // Dùng BCrypt matching
+                    if (passwordService != null) {
+                        passwordMatches = passwordService.matches(loginRequest.getPass(), dbPassword);
+                    } else {
+                        // Fallback nếu passwordService null
+                        passwordMatches = false;
+                    }
+                } else {
+                    // Nếu password là plain text (hỗ trợ legacy)
+                    passwordMatches = dbPassword.equals(loginRequest.getPass());
+                }
+            }
 
-        UserLoginResponse user = UserLoginResponse.builder()
+            if (!passwordMatches) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body(new erroResponse("Tài khoản hoặc mật khẩu không chính xác"));
+            }
+
+            // Password đúng, tạo token
+            UserLoginResponse user = UserLoginResponse.builder()
                     .id(khachHang.getId())
                     .hoTen(khachHang.getHoTen())
                     .hinhAnh(khachHang.getHinhAnh())
-                    .ngaySinh(khachHang.getNgaySinh()+"")
-                    .ngayTao(khachHang.getNgayTao()+"")
+                    .ngaySinh(khachHang.getNgaySinh() != null ? khachHang.getNgaySinh().toString() : null)
+                    .ngayTao(khachHang.getNgayTao() != null ? khachHang.getNgayTao().toString() : null)
                     .soDienThoai(khachHang.getSoDienThoai())
                     .gioiTinh(khachHang.getGioiTinh())
                     .email(khachHang.getEmail())
@@ -231,10 +262,14 @@ public class KhachHangService {
                     .build();
 
             String token = jwtTokenProvider.generateToken(khachHang.getTaiKhoan(), "KhachHang", user);
-            response.clear();
             response.put("token", token);
             return ResponseEntity.ok(response);
-
+        } catch (Exception e) {
+            System.err.println("Error in getAccount: " + e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new erroResponse("Lỗi hệ thống, vui lòng thử lại sau"));
+        }
     }
 
     public KhachHang updateSoDienThoaiKhachHang(CapNhatSoDienThoaiKhachHangRequest request) {

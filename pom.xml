@@ -72,7 +72,7 @@
             <artifactId>mssql-jdbc</artifactId>
             <version>9.4.1.jre16</version>
         </dependency>
-        <!-- PostgreSQL Driver for Render -->
+        <!-- PostgreSQL Driver -->
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
@@ -85,6 +85,11 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-mail</artifactId>
+        </dependency>
+        <!-- Spring Boot Actuator for health checks -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
 <!--        <dependency>-->
 <!--            <groupId>io.socket</groupId>-->
