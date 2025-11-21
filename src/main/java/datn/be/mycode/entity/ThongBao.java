@@ -18,7 +18,7 @@ public class ThongBao {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "noi_dung", columnDefinition = "nvarchar(max)")
+    @Column(name = "noi_dung")
     private String noiDung;
 
     @Column(name = "url")

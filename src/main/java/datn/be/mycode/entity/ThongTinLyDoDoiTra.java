@@ -17,7 +17,7 @@ public class ThongTinLyDoDoiTra {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "url", columnDefinition = "varchar(max)")
+    @Column(name = "url")
     private String video;
 
     @Column(name = "trang_thai")

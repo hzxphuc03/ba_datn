@@ -17,6 +17,18 @@ buildNumber.properties
 *.iws
 *.ipr
 .vscode/
+.mvn/
+mvnw
+mvnw.cmd
+
+# IDE
+.idea/
+.vscode/
+*.iml
+*.iws
+*.ipr
+.classpath
+.project
 .settings/
 .classpath
 .project
@@ -54,6 +66,33 @@ Dockerfile
 # Database exports
 *.sql
 *.bak
+# Logs
+logs/
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Environment
+.env
+.env.local
+*.properties
+!application.properties.example
+
+# Test
+src/test/
+
+# Build artifacts
+*.jar
+*.war
+*.ear
+
+# Temporary files
+*.tmp
+*.bak
+*.swp
+*~
 
 # Temporary files
 *.tmp

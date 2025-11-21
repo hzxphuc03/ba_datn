@@ -17,7 +17,7 @@ public class ThongTinKiemTra {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "video", columnDefinition = "varchar(max)")
+    @Column(name = "video")
     private String video;
 
     @Column(name = "trang_thai")

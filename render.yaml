@@ -1,0 +1,36 @@
+services:
+  - type: web
+    name: ba-datn-backend
+    runtime: docker
+    plan: free
+    # Với Docker, không cần buildCommand và startCommand
+    # Render sẽ tự động build và chạy từ Dockerfile
+    envVars:
+      - key: SPRING_PROFILES_ACTIVE
+        value: prod
+      - key: PORT
+        value: 8080
+      # ⚠️ QUAN TRỌNG: Các environment variables nhạy cảm nên set trong Render Dashboard
+      # thay vì commit vào file này. Thêm các biến sau trong tab "Environment":
+      #
+      # Database (PostgreSQL trên Render)
+      # SPRING_DATASOURCE_URL=jdbc:postgresql://dpg-d4emvkshg0os738ftv4g-a.oregon-postgres.render.com:5432/ba_datn_db
+      # SPRING_DATASOURCE_USERNAME=ba_datn_db_user
+      # SPRING_DATASOURCE_PASSWORD=lNxER7uBbNYw60imnHx6coVCKyiUvSDH
+      # SPRING_DATASOURCE_DRIVER=org.postgresql.Driver
+      # HIBERNATE_DIALECT=org.hibernate.dialect.PostgreSQLDialect
+      #
+      # JWT (Tạo secret key: openssl rand -base64 32)
+      # JWT_SECRET=your-generated-secret-key-here-minimum-32-characters
+      # JWT_EXPIRATION=86400000
+      # JWT_REFRESH_EXPIRATION=604800000
+      #
+      # Email (Gmail App Password)
+      # MAIL_HOST=smtp.gmail.com
+      # MAIL_PORT=587
+      # MAIL_USERNAME=your_email@gmail.com
+      # MAIL_PASSWORD=your_gmail_app_password
+      #
+      # CORS (Nếu có frontend)
+      # CORS_ALLOWED_ORIGINS=https://your-frontend-domain.com
+

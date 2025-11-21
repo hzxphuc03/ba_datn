@@ -25,7 +25,7 @@ public class PhieuDoiTra {
     @Column(name = "so_tai_khoan_ngan_hang")
     private String soTaiKhoanNganHang;
 
-    @Column(name = "ten_ngan_hang", columnDefinition = "nvarchar(max)")
+    @Column(name = "ten_ngan_hang")
     private String tenNganHang;
 
     @Column(name = "ten_chu_tai_khoan")
@@ -34,10 +34,10 @@ public class PhieuDoiTra {
     @Column(name = "ngay_tao")
     private LocalDateTime ngayTao;
 
-    @Column(name = "ly_do_doi_tra", columnDefinition = "nvarchar(max)")
+    @Column(name = "ly_do_doi_tra")
     private String lyDoDoiTra;
 
-    @Column(name = "ghi_chu_nhan_vien", columnDefinition = "nvarchar(max)")
+    @Column(name = "ghi_chu_nhan_vien")
     private String ghiChuNhanVien;
 
     @Column(name = "thao_tac")
