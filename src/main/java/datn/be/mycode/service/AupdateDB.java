@@ -10,9 +10,16 @@ public class AupdateDB {
     @PersistenceContext
     private EntityManager entityManager;
 
+    // ⚠️ DISABLED: Service này chỉ dùng cho SQL Server migration
+    // Không tương thích với PostgreSQL - đã xóa columnDefinition trong entities
+    // Nếu cần migrate database, sử dụng Hibernate ddl-auto=update hoặc migration scripts
     @Transactional
     public void updateColumnTypes() {
+        // Method này đã được disable vì chỉ dùng cho SQL Server
+        // Với PostgreSQL, Hibernate sẽ tự động tạo schema từ entities
+        return;
 
+        /* SQL Server migration code - DISABLED for PostgreSQL
         entityManager.createNativeQuery("ALTER TABLE doan_chat_nhan_vien ALTER COLUMN hinh_anh NVARCHAR(max)").executeUpdate();
 //        dia chi
         entityManager.createNativeQuery("ALTER TABLE dia_chi ALTER COLUMN tinh_thanh NVARCHAR(50)").executeUpdate();
@@ -95,6 +102,6 @@ public class AupdateDB {
 
 //        voucher
         entityManager.createNativeQuery("ALTER TABLE voucher ALTER COLUMN ten_voucher NVARCHAR(50)").executeUpdate();
-
+        */
     }
 }

@@ -107,6 +107,10 @@ public class WebSecurityConfigurerAdapter {
                         .requestMatchers("/error").permitAll()
                         // CRITICAL: Allow /error endpoint (Spring Boot error handler)
                         .requestMatchers("/error").permitAll()
+                        .requestMatchers("/api/auth/**", "/dang-ky/**", 
+                                       "/quen-mat-khau/**").permitAll()
+                        // Actuator health check endpoint - public for monitoring
+                        .requestMatchers("/actuator/health", "/actuator/health/**").permitAll()
                         
                         // WebSocket endpoints - public
                         .requestMatchers("/ws/**").permitAll()
