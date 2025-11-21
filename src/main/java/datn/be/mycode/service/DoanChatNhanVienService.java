@@ -92,7 +92,7 @@ public class DoanChatNhanVienService {
             doanChatGet.setTinNhan(doanChatNhanVien.getTinNhan());
             doanChatGet.setNguoiGui(doanChatNhanVien.getNguoiGui());
             doanChatGet.setNguoiNhan(doanChatNhanVien.getNguoiNhan());
-            doanChatGet.setHopThoaiNhanVien(doanChatGet.getHopThoaiNhanVien());
+            doanChatGet.setHopThoaiNhanVien(doanChatNhanVien.getHopThoaiNhanVien());
             doanChatGets.add(doanChatGet);
 
         });
