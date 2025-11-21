@@ -17,9 +17,9 @@ buildNumber.properties
 *.iws
 *.ipr
 .vscode/
-.mvn/
-mvnw
-mvnw.cmd
+# Note: .mvn/ and mvnw are needed by Dockerfile, so don't ignore them
+# mvnw and mvnw.cmd are needed for Maven wrapper
+# .mvn/ is needed for Maven wrapper configuration
 
 # IDE
 .idea/
