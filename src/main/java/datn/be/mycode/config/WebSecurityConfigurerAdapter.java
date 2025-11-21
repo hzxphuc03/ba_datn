@@ -13,8 +13,10 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.beans.factory.annotation.Value;
 
 import java.util.Arrays;
+import java.util.List;
 
 @Configuration
 @EnableWebSecurity
@@ -23,6 +25,11 @@ public class WebSecurityConfigurerAdapter {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
+    
+    // Đọc CORS allowed origins từ environment variable hoặc application.properties
+    // Format: "http://localhost:4200,https://yourdomain.com"
+    @Value("${app.cors.allowed-origins:*}")
+    private String allowedOrigins;
 
     public WebSecurityConfigurerAdapter(JwtAuthenticationFilter jwtAuthenticationFilter,
                                        JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint) {
@@ -39,11 +46,21 @@ public class WebSecurityConfigurerAdapter {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         
-        // CRITICAL: When allowCredentials is true, cannot use "*" in allowedOrigins
-        // Must use allowedOriginPatterns instead, or list specific origins
-        // For development: allow all origins with pattern
-        // For production: list specific origins
-        configuration.setAllowedOriginPatterns(Arrays.asList("*"));
+        // Đọc allowed origins từ config
+        // Nếu là "*" thì dùng allowedOriginPatterns, nếu không thì dùng allowedOrigins
+        if ("*".equals(allowedOrigins) || allowedOrigins == null || allowedOrigins.isEmpty()) {
+            // Development: allow all origins with pattern
+            configuration.setAllowedOriginPatterns(Arrays.asList("*"));
+        } else {
+            // Production: list specific origins
+            String[] originsArray = allowedOrigins.split(",");
+            List<String> origins = new java.util.ArrayList<>();
+            for (String origin : originsArray) {
+                origins.add(origin.trim());
+            }
+            configuration.setAllowedOrigins(origins);
+        }
+        
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         configuration.setAllowedHeaders(Arrays.asList("*"));
         configuration.setExposedHeaders(Arrays.asList("Authorization", "Content-Type"));

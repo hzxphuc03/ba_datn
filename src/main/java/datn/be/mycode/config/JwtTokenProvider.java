@@ -9,6 +9,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
+import org.springframework.beans.factory.annotation.Value;
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
@@ -19,18 +20,29 @@ import java.util.Map;
 
 @Component
 public class JwtTokenProvider {
-    // Sử dụng secret key mạnh hơn (ít nhất 256 bits)
-    private static final String SECRET_KEY = "myVerySecretKeyThatIsAtLeast256BitsLongForHS256AlgorithmSecurity2024";
-    private static final long TOKEN_VALIDITY = 24 * 60 * 60 * 1000;  // 24 hours in milliseconds
+    // Đọc từ environment variable hoặc application.properties
+    // Đọc từ app.jwt.secret trong application.properties
+    @Value("${app.jwt.secret:myVerySecretKeyThatIsAtLeast256BitsLongForHS256AlgorithmSecurity2024}")
+    private String jwtSecret;
+    
+    @Value("${app.jwt.expiration:86400000}") // 24 hours in milliseconds
+    private long jwtExpirationMs;
+    
+    @Value("${app.jwt.refresh-expiration:604800000}") // 7 days in milliseconds
+    private long refreshExpirationMs;
 
     private SecretKey getSigningKey() {
-        byte[] keyBytes = SECRET_KEY.getBytes(StandardCharsets.UTF_8);
+        // Đảm bảo key đủ mạnh (ít nhất 256 bits)
+        if (jwtSecret == null || jwtSecret.length() < 32) {
+            throw new IllegalArgumentException("JWT secret must be at least 256 bits (32 characters)");
+        }
+        byte[] keyBytes = jwtSecret.getBytes(StandardCharsets.UTF_8);
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
     public String generateToken(String username, String role, UserLoginResponse user) {
         Date now = new Date();
-        Date expiryDate = new Date(now.getTime() + TOKEN_VALIDITY);
+        Date expiryDate = new Date(now.getTime() + jwtExpirationMs);
 
         // Map role từ database sang format chuẩn
         String normalizedRole = mapDbRoleToTokenRole(role);
@@ -57,7 +69,7 @@ public class JwtTokenProvider {
      */
     public String generateRefreshToken(String username) {
         Date now = new Date();
-        Date expiryDate = new Date(now.getTime() + (7 * 24 * 60 * 60 * 1000)); // 7 days
+        Date expiryDate = new Date(now.getTime() + refreshExpirationMs);
 
         return Jwts.builder()
                 .subject(username)
