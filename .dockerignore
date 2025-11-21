@@ -7,8 +7,9 @@ pom.xml.next
 release.properties
 dependency-reduced-pom.xml
 buildNumber.properties
+# Note: .mvn/ and mvnw are needed by Dockerfile, so don't ignore them
+# Only ignore specific files inside .mvn/ that are not needed
 .mvn/timing.properties
-.mvn/wrapper/maven-wrapper.jar
 
 # IDE
 .idea/
