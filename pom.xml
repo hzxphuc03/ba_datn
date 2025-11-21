@@ -159,7 +159,16 @@
                             <artifactId>lombok</artifactId>
                         </exclude>
                     </excludes>
+                    <!-- Đảm bảo chỉ tạo executable JAR (không tạo plain JAR) -->
+                    <classifier></classifier>
                 </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>repackage</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>

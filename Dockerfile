@@ -15,8 +15,22 @@ RUN ./mvnw dependency:go-offline -B
 # Copy source code
 COPY src src
 
-# Build application
+# Build application và đảm bảo JAR được tạo ra
 RUN ./mvnw clean package -DskipTests
+
+# Verify JAR files được tạo và tìm executable JAR
+RUN echo "=== Listing all JAR files ===" && \
+    ls -lh /app/target/*.jar 2>/dev/null || echo "No JAR files found!" && \
+    echo "=== Finding executable JAR (largest file, excluding *-plain.jar) ===" && \
+    JAR_FILE=$(find /app/target -name "*.jar" ! -name "*-plain.jar" -type f | head -1) && \
+    if [ -z "$JAR_FILE" ]; then \
+        echo "ERROR: No executable JAR found!" && \
+        ls -la /app/target/ && \
+        exit 1; \
+    fi && \
+    echo "Found JAR: $JAR_FILE" && \
+    cp "$JAR_FILE" /app/target/app.jar && \
+    ls -lh /app/target/app.jar
 
 # Giai đoạn 2: Tạo hình ảnh Docker cuối cùng
 FROM eclipse-temurin:17-jre-jammy
@@ -25,11 +39,20 @@ WORKDIR /app
 # Tạo user non-root để chạy ứng dụng (bảo mật hơn)
 RUN groupadd -r spring && useradd -r -g spring spring
 
-# Copy JAR từ build stage
-COPY --from=build /app/target/*.jar app.jar
+# Copy JAR từ build stage (đã được đổi tên thành app.jar)
+COPY --from=build /app/target/app.jar app.jar
 
-# Change ownership
-RUN chown spring:spring app.jar
+# Verify JAR file exists và có quyền đọc
+RUN if [ ! -f app.jar ]; then \
+        echo "ERROR: app.jar not found!" && \
+        ls -la /app/ && \
+        exit 1; \
+    fi && \
+    echo "=== JAR file info ===" && \
+    ls -lh app.jar && \
+    file app.jar && \
+    chown spring:spring app.jar && \
+    chmod 755 app.jar
 
 # Switch to non-root user
 USER spring:spring
@@ -47,5 +70,5 @@ ENTRYPOINT ["java", \
   "-XX:MaxRAMPercentage=75.0", \
   "-Djava.security.egd=file:/dev/./urandom", \
   "-jar", \
-  "/app.jar"]
+  "app.jar"]
 
