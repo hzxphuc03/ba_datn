@@ -219,22 +219,104 @@ public class AuthenticationService {
     
     public ResponseEntity<?> refreshToken(String refreshToken) {
         try {
+            System.out.println("🔄 [AUTH SERVICE] Refreshing token...");
+            
+            // Validate refresh token
             if (!jwtTokenProvider.validateToken(refreshToken)) {
+                System.out.println("❌ [AUTH SERVICE] Invalid refresh token");
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(new erroResponse("Refresh token không hợp lệ"));
             }
             
+            // Check if token is expired
+            if (jwtTokenProvider.isTokenExpired(refreshToken)) {
+                System.out.println("❌ [AUTH SERVICE] Refresh token expired");
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new erroResponse("Refresh token đã hết hạn"));
+            }
+            
+            // Get username from refresh token
             String username = jwtTokenProvider.getUsernameFromToken(refreshToken);
             if (username == null) {
+                System.out.println("❌ [AUTH SERVICE] Cannot extract username from refresh token");
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(new erroResponse("Refresh token không hợp lệ"));
             }
             
-            // TODO: Tìm user và tạo token mới (cần implement đầy đủ)
-            // Tạm thời trả về success
+            System.out.println("✅ [AUTH SERVICE] Username from token: " + username);
+            
+            // Tìm user - thử tìm trong KhachHang trước
+            Optional<KhachHang> khachHangOpt = khachHangRepository
+                .findByTaiKhoanAndTrangThai(username, 1);
+            
+            UserLoginResponse user;
+            String role;
+            String newAccessToken;
+            
+            if (khachHangOpt.isPresent()) {
+                // User là Khách hàng
+                KhachHang khachHang = khachHangOpt.get();
+                System.out.println("✅ [AUTH SERVICE] Found KhachHang: " + khachHang.getTaiKhoan());
+                
+                user = UserLoginResponse.builder()
+                    .id(khachHang.getId())
+                    .hoTen(khachHang.getHoTen())
+                    .hinhAnh(khachHang.getHinhAnh())
+                    .ngaySinh(khachHang.getNgaySinh() != null ? khachHang.getNgaySinh().toString() : null)
+                    .ngayTao(khachHang.getNgayTao() != null ? khachHang.getNgayTao().toString() : null)
+                    .soDienThoai(khachHang.getSoDienThoai())
+                    .gioiTinh(khachHang.getGioiTinh())
+                    .email(khachHang.getEmail())
+                    .taiKhoan(khachHang.getTaiKhoan())
+                    .trangThai(khachHang.getTrangThai())
+                    .build();
+                
+                role = "KHACH_HANG";
+                newAccessToken = jwtTokenProvider.generateToken(khachHang.getTaiKhoan(), role, user);
+                
+            } else {
+                // Thử tìm trong NhanVien
+                Optional<NhanVien> nhanVienOpt = nhanVienRepository
+                    .findByTaiKhoanAndTrangThai(username, 1);
+                
+                if (nhanVienOpt.isPresent()) {
+                    // User là Nhân viên
+                    NhanVien nhanVien = nhanVienOpt.get();
+                    System.out.println("✅ [AUTH SERVICE] Found NhanVien: " + nhanVien.getTaiKhoan());
+                    
+                    user = UserLoginResponse.builder()
+                        .id(nhanVien.getId())
+                        .hoTen(nhanVien.getHoTen())
+                        .hinhAnh(nhanVien.getHinhAnh())
+                        .ngaySinh(nhanVien.getNgaySinh() != null ? nhanVien.getNgaySinh().toString() : null)
+                        .ngayTao(nhanVien.getNgayTao() != null ? nhanVien.getNgayTao().toString() : null)
+                        .soDienThoai(nhanVien.getSoDienThoai())
+                        .gioiTinh(nhanVien.getGioiTinh())
+                        .email(nhanVien.getEmail())
+                        .taiKhoan(nhanVien.getTaiKhoan())
+                        .chucVu(nhanVien.getChucVu() != null ? nhanVien.getChucVu().toMap() : null)
+                        .trangThai(nhanVien.getTrangThai())
+                        .build();
+                    
+                    role = nhanVien.getChucVu() != null ? nhanVien.getChucVu().getTen() : "NHAN_VIEN";
+                    newAccessToken = jwtTokenProvider.generateToken(nhanVien.getTaiKhoan(), role, user);
+                    
+                } else {
+                    // Không tìm thấy user
+                    System.out.println("❌ [AUTH SERVICE] User not found: " + username);
+                    return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body(new erroResponse("Người dùng không tồn tại"));
+                }
+            }
+            
+            // Tạo response giống format login
             Map<String, Object> response = new HashMap<>();
-            response.put("message", "Token refreshed successfully");
-            response.put("accessToken", refreshToken); // Tạm thời dùng refreshToken làm accessToken
+            response.put("accessToken", newAccessToken);
+            response.put("refreshToken", refreshToken); // Giữ nguyên refreshToken
+            response.put("tokenType", "Bearer");
+            response.put("user", user);
+            
+            System.out.println("✅ [AUTH SERVICE] Token refreshed successfully for: " + username);
             
             return ResponseEntity.ok(response);
             
