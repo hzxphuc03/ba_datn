@@ -4,6 +4,8 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.lang.NonNull;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -16,6 +18,7 @@ import java.io.IOException;
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
+    private static final Logger logger = LoggerFactory.getLogger(JwtAuthenticationFilter.class);
     private final JwtTokenProvider jwtTokenProvider;
 
     public JwtAuthenticationFilter(JwtTokenProvider jwtTokenProvider) {
@@ -65,25 +68,40 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             String token = getTokenFromRequest(request);
             
             if (StringUtils.hasText(token)) {
+                System.out.println("🔑 [JWT Filter] Token found, validating...");
                 logger.info("🔑 [JWT Filter] Token found, validating...");
-                if (jwtTokenProvider.validateToken(token)) {
+                
+                // Validate token first
+                boolean isValid = jwtTokenProvider.validateToken(token);
+                System.out.println("🔑 [JWT Filter] Token validation result: " + isValid);
+                
+                if (isValid) {
+                    // Get authentication from token
                     Authentication authentication = jwtTokenProvider.getAuthentication(token);
+                    
                     if (authentication != null) {
-                        // Only set authentication if token is valid
+                        // Set authentication in SecurityContext
                         SecurityContextHolder.getContext().setAuthentication(authentication);
-                        logger.info("✅ [JWT Filter] Authentication set for user: " + authentication.getName());
+                        System.out.println("✅ [JWT Filter] Authentication set successfully");
+                        System.out.println("✅ [JWT Filter] User: " + authentication.getName());
+                        System.out.println("✅ [JWT Filter] Authorities: " + authentication.getAuthorities());
+                        logger.info("✅ [JWT Filter] Authentication set for user: " + authentication.getName() + 
+                                   " with authorities: " + authentication.getAuthorities());
                     } else {
+                        System.err.println("⚠️ [JWT Filter] Token valid but authentication is null");
                         logger.warn("⚠️ [JWT Filter] Token valid but authentication is null");
                         // Clear SecurityContext if authentication is null
                         SecurityContextHolder.clearContext();
                     }
                 } else {
+                    System.err.println("⚠️ [JWT Filter] Invalid token for path: " + requestPath);
                     logger.warn("⚠️ [JWT Filter] Invalid token for path: " + requestPath);
                     // Clear SecurityContext for invalid token
                     SecurityContextHolder.clearContext();
                 }
             } else {
                 // No token found - let Spring Security handle it (will check permitAll)
+                System.out.println("ℹ️ [JWT Filter] No token found for protected endpoint: " + requestPath);
                 logger.info("ℹ️ [JWT Filter] No token found for protected endpoint: " + requestPath);
                 // DO NOT set SecurityContext - let Spring Security authorization check handle it
                 // If endpoint requires auth, Spring Security will call AuthenticationEntryPoint
@@ -91,11 +109,16 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         } catch (Exception ex) {
             // Log error but continue filter chain
             // DO NOT block request - let Spring Security handle authorization
+            System.err.println("❌ [JWT Filter] Error processing token for path: " + requestPath);
+            System.err.println("❌ [JWT Filter] Exception: " + ex.getMessage());
+            ex.printStackTrace();
             logger.error("❌ [JWT Filter] Error processing token for path: " + requestPath, ex);
             SecurityContextHolder.clearContext();
         }
         
         // Continue filter chain - Spring Security will check authorization
+        System.out.println("➡️ [JWT Filter] Continuing filter chain...");
+        System.out.println("========================================");
         filterChain.doFilter(request, response);
     }
 
@@ -143,19 +166,39 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private String getTokenFromRequest(HttpServletRequest request) {
         String bearerToken = request.getHeader("Authorization");
-        if (bearerToken != null) {
-            System.out.println("🔍 [JWT Filter] Authorization header: " + (bearerToken.length() > 20 ? bearerToken.substring(0, 20) + "..." : bearerToken));
+        
+        if (bearerToken == null) {
+            // Also check for lowercase 'authorization' header (some clients send it lowercase)
+            bearerToken = request.getHeader("authorization");
+            if (bearerToken != null) {
+                System.out.println("🔍 [JWT Filter] Found lowercase 'authorization' header");
+            } else {
+                System.out.println("🔍 [JWT Filter] Authorization header: null");
+            }
         } else {
-            System.out.println("🔍 [JWT Filter] Authorization header: null");
+            System.out.println("🔍 [JWT Filter] Authorization header present (length: " + bearerToken.length() + ")");
+            System.out.println("🔍 [JWT Filter] Authorization header preview: " + 
+                (bearerToken.length() > 30 ? bearerToken.substring(0, 30) + "..." : bearerToken));
         }
         
-        if (StringUtils.hasText(bearerToken) && bearerToken != null && bearerToken.startsWith("Bearer ")) {
-            String token = bearerToken.substring(7);
-            System.out.println("🔍 [JWT Filter] Token extracted (length: " + token.length() + ")");
-            return token;
+        if (bearerToken != null && StringUtils.hasText(bearerToken)) {
+            // Remove "Bearer " prefix (case-insensitive)
+            String token = bearerToken.trim();
+            if (token.length() > 7 && token.substring(0, 7).equalsIgnoreCase("Bearer ")) {
+                token = token.substring(7).trim();
+                if (StringUtils.hasText(token)) {
+                    System.out.println("✅ [JWT Filter] Token extracted successfully (length: " + token.length() + ")");
+                    return token;
+                } else {
+                    System.err.println("⚠️ [JWT Filter] Token is empty after removing 'Bearer ' prefix");
+                }
+            } else {
+                System.err.println("⚠️ [JWT Filter] Authorization header does not start with 'Bearer '");
+                System.err.println("⚠️ [JWT Filter] Header value: " + (bearerToken.length() > 50 ? bearerToken.substring(0, 50) + "..." : bearerToken));
+            }
         }
         
-        System.out.println("🔍 [JWT Filter] No valid Bearer token found");
+        System.out.println("ℹ️ [JWT Filter] No valid Bearer token found in request");
         return null;
     }
 }
