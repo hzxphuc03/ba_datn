@@ -4,6 +4,7 @@ import com.corundumstudio.socketio.Configuration;
 import com.corundumstudio.socketio.SocketIOServer;
 import com.corundumstudio.socketio.annotation.SpringAnnotationScanner;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 
@@ -17,14 +18,36 @@ public class SocketIOConfig {
     @Value("${socketio.port:9092}")
     private Integer port;
 
+    @Value("${socketio.enabled:true}")
+    private Boolean socketioEnabled;
+
     @Bean
+    @ConditionalOnProperty(name = "socketio.enabled", havingValue = "true", matchIfMissing = true)
     public SocketIOServer socketIOServer(JwtTokenProvider jwtTokenProvider) {
+        if (!socketioEnabled) {
+            System.out.println("⚠️ [Socket.IO] Server is disabled (socketio.enabled=false)");
+            return null;
+        }
+        
         Configuration config = new Configuration();
         config.setHostname(host);
         config.setPort(port);
         
-        // Cho phép CORS - cho phép tất cả origins
-        config.setOrigin("*");
+        // CORS Configuration - an toàn cho production
+        String allowedOrigins = System.getenv("CORS_ALLOWED_ORIGINS");
+        if (allowedOrigins != null && !allowedOrigins.trim().isEmpty()) {
+            // Production: chỉ cho phép origins được cấu hình
+            String[] origins = allowedOrigins.split(",");
+            for (int i = 0; i < origins.length; i++) {
+                origins[i] = origins[i].trim();
+            }
+            config.setOrigin(origins);
+            System.out.println("✅ [Socket.IO] CORS configured for production origins: " + allowedOrigins);
+        } else {
+            // Development: cho phép tất cả (chỉ dùng khi không có CORS_ALLOWED_ORIGINS)
+            config.setOrigin("*");
+            System.out.println("⚠️ [Socket.IO] CORS set to * (development mode - not recommended for production)");
+        }
         
         // Cho phép custom headers (để gửi JWT token)
         config.setAllowCustomRequests(true);
@@ -78,7 +101,11 @@ public class SocketIOConfig {
     }
 
     @Bean
+    @ConditionalOnProperty(name = "socketio.enabled", havingValue = "true", matchIfMissing = true)
     public SpringAnnotationScanner springAnnotationScanner(SocketIOServer socketServer) {
+        if (socketServer == null) {
+            return null;
+        }
         return new SpringAnnotationScanner(socketServer);
     }
 }

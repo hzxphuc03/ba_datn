@@ -49,6 +49,12 @@ services:
       # Port (Render tự động inject, nhưng có thể set default)
       - key: PORT
         value: 8080
+      
+      # Socket.IO Configuration (DISABLED for production - Render only exposes 1 port)
+      # Socket.IO sẽ không hoạt động trên Render vì chỉ có 1 port (8080)
+      # Nếu cần real-time, dùng STOMP WebSocket trên cùng port HTTP
+      - key: SOCKETIO_ENABLED
+        value: "false"
 
 databases:
   # PostgreSQL Database (uncomment nếu muốn tạo database tự động)
