@@ -10,17 +10,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.ControllerAdvice;
-import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Service
 @Validated
-
-@ControllerAdvice
-@RestControllerAdvice
 public class DangkySevice {
     @Autowired
     private KhachHangRepository repository;

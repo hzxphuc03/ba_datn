@@ -122,8 +122,6 @@ public class WebSecurityConfigurerAdapter {
                         .requestMatchers("/actuator/health").permitAll()
                         // CRITICAL: Allow /error endpoint (Spring Boot error handler)
                         .requestMatchers("/error").permitAll()
-                        // CRITICAL: Allow /error endpoint (Spring Boot error handler)
-                        .requestMatchers("/error").permitAll()
                         
                         // WebSocket endpoints - yêu cầu authentication
                         // Authentication sẽ được xử lý trong WebSocketAuthInterceptor
