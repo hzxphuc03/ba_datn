@@ -125,11 +125,14 @@ public class WebSecurityConfigurerAdapter {
                         // CRITICAL: Allow /error endpoint (Spring Boot error handler)
                         .requestMatchers("/error").permitAll()
                         
-                        // WebSocket endpoints - public
-                        .requestMatchers("/ws/**").permitAll()
-                        .requestMatchers("/app/**").permitAll()
-                        .requestMatchers("/topic/**").permitAll()
-                        .requestMatchers("/user/**").permitAll()
+                        // WebSocket endpoints - yêu cầu authentication
+                        // Authentication sẽ được xử lý trong WebSocketAuthInterceptor
+                        // Cho phép handshake nhưng sẽ validate token trong interceptor
+                        .requestMatchers("/ws/**").permitAll() // Cho phép handshake, nhưng validate trong interceptor
+                        // Các endpoint này sẽ được bảo vệ bởi WebSocketAuthInterceptor
+                        // .requestMatchers("/app/**").authenticated()
+                        // .requestMatchers("/topic/**").authenticated()
+                        // .requestMatchers("/user/**").authenticated()
                         
                         // Public product/category endpoints - chỉ GET
                         .requestMatchers("GET", "/api/the_loai/**").permitAll()
