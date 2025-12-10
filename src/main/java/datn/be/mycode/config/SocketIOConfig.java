@@ -37,12 +37,16 @@ public class SocketIOConfig {
         String allowedOrigins = System.getenv("CORS_ALLOWED_ORIGINS");
         if (allowedOrigins != null && !allowedOrigins.trim().isEmpty()) {
             // Production: chỉ cho phép origins được cấu hình
+            // Socket.IO setOrigin() chỉ nhận String, không nhận String[]
+            // Lấy origin đầu tiên từ danh sách (hoặc có thể dùng origin chính)
             String[] origins = allowedOrigins.split(",");
-            for (int i = 0; i < origins.length; i++) {
-                origins[i] = origins[i].trim();
+            String firstOrigin = origins[0].trim();
+            config.setOrigin(firstOrigin);
+            System.out.println("✅ [Socket.IO] CORS configured for production origin: " + firstOrigin);
+            if (origins.length > 1) {
+                System.out.println("⚠️ [Socket.IO] Multiple origins provided, using first one: " + firstOrigin);
+                System.out.println("⚠️ [Socket.IO] Other origins: " + String.join(", ", java.util.Arrays.copyOfRange(origins, 1, origins.length)));
             }
-            config.setOrigin(origins);
-            System.out.println("✅ [Socket.IO] CORS configured for production origins: " + allowedOrigins);
         } else {
             // Development: cho phép tất cả (chỉ dùng khi không có CORS_ALLOWED_ORIGINS)
             config.setOrigin("*");
