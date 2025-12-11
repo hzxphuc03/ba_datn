@@ -179,6 +179,8 @@ public class WebSecurityConfigurerAdapter {
                         
                         // Image upload endpoints - require authentication
                         .requestMatchers("/api/upload/**").hasAnyRole("KHACH_HANG", "ADMIN", "NHAN_VIEN")
+                        // Storage gateway proxy endpoints - require authentication
+                        .requestMatchers("/api/storage-gateway/**").hasAnyRole("KHACH_HANG", "ADMIN", "NHAN_VIEN")
                         
                         // Quản lý sản phẩm - Admin và Nhân viên (POST, PUT, DELETE)
                         .requestMatchers("POST", "/api/the_loai/**").hasAnyRole("ADMIN", "NHAN_VIEN")

@@ -41,30 +41,27 @@ public class SocketIOInfoController {
         
         Map<String, Object> response = new HashMap<>();
         
+        // Socket.IO is disabled on production (Render only exposes 1 port)
+        // Return 200 with info message instead of error to avoid frontend retry
+        response.put("code", socketioEnabled ? 400 : 503);
+        response.put("message", socketioEnabled 
+            ? "Socket.IO server runs on separate port " + socketioPort + ", not on HTTP port 8080. Please use STOMP WebSocket at /ws instead."
+            : "Socket.IO server is disabled on production. Please use STOMP WebSocket at /ws instead.");
+        response.put("socketioEnabled", socketioEnabled);
+        response.put("alternative", Map.of(
+            "type", "STOMP WebSocket",
+            "endpoint", "/ws",
+            "documentation", "See WEBSOCKET_AUTH_GUIDE.md for connection details"
+        ));
+        
         if (!socketioEnabled) {
-            response.put("status", 503);
-            response.put("error", "Service Unavailable");
-            response.put("message", "Socket.IO server is disabled on production. Please use STOMP WebSocket instead.");
-            response.put("socketioEnabled", false);
-            response.put("alternative", Map.of(
-                "type", "STOMP WebSocket",
-                "endpoint", "/ws",
-                "documentation", "See WEBSOCKET_AUTH_GUIDE.md for connection details"
-            ));
-            
             System.err.println("❌ [SocketIOInfoController] Socket.IO is disabled. Frontend should use STOMP WebSocket at /ws");
-            return ResponseEntity.status(503).body(response);
+            // Return 200 to stop frontend from retrying
+            return ResponseEntity.ok(response);
         } else {
-            // Socket.IO enabled nhưng request đến port 8080 thay vì 9092
-            response.put("status", 400);
-            response.put("error", "Bad Request");
-            response.put("message", "Socket.IO server runs on separate port " + socketioPort + ", not on HTTP port 8080");
-            response.put("socketioEnabled", true);
-            response.put("socketioPort", socketioPort);
-            response.put("hint", "Connect to: ws://your-backend:" + socketioPort + " with token in query parameter or Authorization header");
-            
             System.err.println("⚠️ [SocketIOInfoController] Socket.IO enabled but request came to HTTP port. Should connect to port " + socketioPort);
-            return ResponseEntity.status(400).body(response);
+            // Return 200 to stop frontend from retrying
+            return ResponseEntity.ok(response);
         }
     }
 }
