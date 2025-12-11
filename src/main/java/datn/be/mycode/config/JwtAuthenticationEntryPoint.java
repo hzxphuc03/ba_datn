@@ -24,13 +24,6 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
         String requestPath = request.getRequestURI();
         String method = request.getMethod();
         
-        // #region agent log
-        try {
-            java.io.FileWriter fw = new java.io.FileWriter("/Users/phamhaiphuc/Downloads/DATN/BE - Copy/ba_datn/.cursor/debug.log", true);
-            fw.write("{\"sessionId\":\"debug-session\",\"runId\":\"run1\",\"hypothesisId\":\"C\",\"location\":\"JwtAuthenticationEntryPoint.java:commence\",\"message\":\"401 Unauthorized triggered\",\"data\":{\"path\":\"" + requestPath + "\",\"method\":\"" + method + "\",\"exception\":\"" + (authException != null ? authException.getMessage() : "null") + "\"},\"timestamp\":" + System.currentTimeMillis() + "}\n");
-            fw.close();
-        } catch (Exception e) {}
-        // #endregion
         
         // Log when entry point is called (should NOT happen for public endpoints)
         System.err.println("❌ [JWT EntryPoint] 401 Unauthorized - Path: " + method + " " + requestPath);

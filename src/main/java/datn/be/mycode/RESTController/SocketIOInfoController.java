@@ -27,13 +27,6 @@ public class SocketIOInfoController {
      */
     @RequestMapping(value = "/**", method = {RequestMethod.GET, RequestMethod.POST, RequestMethod.OPTIONS})
     public ResponseEntity<?> handleSocketIORequest(@RequestHeader(value = "Origin", required = false) String origin) {
-        // #region agent log
-        try {
-            java.io.FileWriter fw = new java.io.FileWriter("/Users/phamhaiphuc/Downloads/DATN/BE - Copy/ba_datn/.cursor/debug.log", true);
-            fw.write("{\"sessionId\":\"debug-session\",\"runId\":\"run1\",\"hypothesisId\":\"G\",\"location\":\"SocketIOInfoController.java:handleSocketIORequest\",\"message\":\"Socket.IO request received\",\"data\":{\"enabled\":" + socketioEnabled + ",\"port\":" + socketioPort + ",\"origin\":\"" + (origin != null ? origin : "null") + "\"},\"timestamp\":" + System.currentTimeMillis() + "}\n");
-            fw.close();
-        } catch (Exception e) {}
-        // #endregion
         
         System.out.println("🔍 [SocketIOInfoController] Request to /socket.io/ received");
         System.out.println("🔍 [SocketIOInfoController] Socket.IO enabled: " + socketioEnabled);

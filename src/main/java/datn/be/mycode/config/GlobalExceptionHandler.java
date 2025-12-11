@@ -117,13 +117,6 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Map<String, Object>> handleGenericException(Exception ex) {
-        // #region agent log
-        try {
-            java.io.FileWriter fw = new java.io.FileWriter("/Users/phamhaiphuc/Downloads/DATN/BE - Copy/ba_datn/.cursor/debug.log", true);
-            fw.write("{\"sessionId\":\"debug-session\",\"runId\":\"run1\",\"hypothesisId\":\"H\",\"location\":\"GlobalExceptionHandler.java:handleGenericException\",\"message\":\"500 Internal Server Error\",\"data\":{\"exception\":\"" + ex.getClass().getName() + "\",\"message\":\"" + (ex.getMessage() != null ? ex.getMessage().replace("\"", "\\\"") : "null") + "\"},\"timestamp\":" + System.currentTimeMillis() + "}\n");
-            fw.close();
-        } catch (Exception e) {}
-        // #endregion
         
         Map<String, Object> response = new HashMap<>();
         response.put("status", HttpStatus.INTERNAL_SERVER_ERROR.value());

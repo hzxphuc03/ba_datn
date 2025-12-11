@@ -35,13 +35,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String contextPath = request.getContextPath();
         String servletPath = request.getServletPath();
         
-        // #region agent log
-        try {
-            java.io.FileWriter fw = new java.io.FileWriter("/Users/phamhaiphuc/Downloads/DATN/BE - Copy/ba_datn/.cursor/debug.log", true);
-            fw.write("{\"sessionId\":\"debug-session\",\"runId\":\"run1\",\"hypothesisId\":\"A\",\"location\":\"JwtAuthenticationFilter.java:doFilterInternal\",\"message\":\"Request received\",\"data\":{\"method\":\"" + method + "\",\"path\":\"" + requestPath + "\",\"contextPath\":\"" + (contextPath != null ? contextPath : "null") + "\",\"servletPath\":\"" + (servletPath != null ? servletPath : "null") + "\",\"requestURL\":\"" + request.getRequestURL() + "\"},\"timestamp\":" + System.currentTimeMillis() + "}\n");
-            fw.close();
-        } catch (Exception e) {}
-        // #endregion
         
         // Log incoming request for debugging - Use System.out for immediate visibility
         System.out.println("========================================");
@@ -144,13 +137,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         // Trim và normalize path
         path = path.trim();
         
-        // #region agent log
-        try {
-            java.io.FileWriter fw = new java.io.FileWriter("/Users/phamhaiphuc/Downloads/DATN/BE - Copy/ba_datn/.cursor/debug.log", true);
-            fw.write("{\"sessionId\":\"debug-session\",\"runId\":\"run1\",\"hypothesisId\":\"A\",\"location\":\"JwtAuthenticationFilter.java:isPublicEndpoint\",\"message\":\"Checking if path is public\",\"data\":{\"path\":\"" + path + "\",\"pathLength\":" + path.length() + "},\"timestamp\":" + System.currentTimeMillis() + "}\n");
-            fw.close();
-        } catch (Exception e) {}
-        // #endregion
         
         System.out.println("🔍 [JWT Filter] isPublicEndpoint check - Path: [" + path + "], Length: " + path.length() + ", First 20 chars: [" + (path.length() > 20 ? path.substring(0, 20) : path) + "]");
         
@@ -176,13 +162,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         System.out.println("🔍 [JWT Filter] Socket.IO check - Path: [" + path + "], Normalized: [" + normalizedPath + "], startsWith('/socket.io'): " + path.startsWith("/socket.io") + ", equals('/socket.io'): " + normalizedPath.equals("/socket.io"));
         
         if (isSocketIO) {
-            // #region agent log
-            try {
-                java.io.FileWriter fw = new java.io.FileWriter("/Users/phamhaiphuc/Downloads/DATN/BE - Copy/ba_datn/.cursor/debug.log", true);
-                fw.write("{\"sessionId\":\"debug-session\",\"runId\":\"run1\",\"hypothesisId\":\"B\",\"location\":\"JwtAuthenticationFilter.java:isPublicEndpoint\",\"message\":\"Socket.IO path detected\",\"data\":{\"path\":\"" + path + "\",\"isPublic\":true},\"timestamp\":" + System.currentTimeMillis() + "}\n");
-                fw.close();
-            } catch (Exception e) {}
-            // #endregion
             System.out.println("✅ [JWT Filter] Path is Socket.IO endpoint: " + path);
             System.out.println("ℹ️ [JWT Filter] Note: Socket.IO may be disabled on production. Request will be handled by SocketIOInfoController.");
             return true;

@@ -39,23 +39,9 @@ public class SocketIOServerRunner implements CommandLineRunner {
             System.out.println("🚀 [Socket.IO] Server started successfully");
             System.out.println("🚀 [Socket.IO] Listening on " + socketIOServer.getConfiguration().getHostname() + 
                              ":" + socketIOServer.getConfiguration().getPort());
-            // #region agent log
-            try {
-                java.io.FileWriter fw = new java.io.FileWriter("/Users/phamhaiphuc/Downloads/DATN/BE - Copy/ba_datn/.cursor/debug.log", true);
-                fw.write("{\"sessionId\":\"debug-session\",\"runId\":\"run1\",\"hypothesisId\":\"F\",\"location\":\"SocketIOServerRunner.java:run\",\"message\":\"Socket.IO server started\",\"data\":{\"host\":\"" + socketIOServer.getConfiguration().getHostname() + "\",\"port\":" + socketIOServer.getConfiguration().getPort() + "},\"timestamp\":" + System.currentTimeMillis() + "}\n");
-                fw.close();
-            } catch (Exception e) {}
-            // #endregion
         } catch (Exception e) {
             System.err.println("❌ [Socket.IO] Failed to start server: " + e.getMessage());
             e.printStackTrace();
-            // #region agent log
-            try {
-                java.io.FileWriter fw = new java.io.FileWriter("/Users/phamhaiphuc/Downloads/DATN/BE - Copy/ba_datn/.cursor/debug.log", true);
-                fw.write("{\"sessionId\":\"debug-session\",\"runId\":\"run1\",\"hypothesisId\":\"F\",\"location\":\"SocketIOServerRunner.java:run\",\"message\":\"Socket.IO server failed to start\",\"data\":{\"error\":\"" + e.getMessage() + "\"},\"timestamp\":" + System.currentTimeMillis() + "}\n");
-                fw.close();
-            } catch (Exception ex) {}
-            // #endregion
         }
     }
 

@@ -221,13 +221,6 @@ public class WebSecurityConfigurerAdapter {
                         String originalPath = (String) request.getAttribute("jakarta.servlet.error.request_uri");
                         String method = request.getMethod();
                         
-                        // #region agent log
-                        try {
-                            java.io.FileWriter fw = new java.io.FileWriter("/Users/phamhaiphuc/Downloads/DATN/BE - Copy/ba_datn/.cursor/debug.log", true);
-                            fw.write("{\"sessionId\":\"debug-session\",\"runId\":\"run1\",\"hypothesisId\":\"C\",\"location\":\"WebSecurityConfigurerAdapter.java:authenticationEntryPoint\",\"message\":\"401 Unauthorized triggered\",\"data\":{\"path\":\"" + path + "\",\"method\":\"" + method + "\",\"exception\":\"" + (authException != null ? authException.getMessage() : "null") + "\",\"requestURL\":\"" + request.getRequestURL() + "\"},\"timestamp\":" + System.currentTimeMillis() + "}\n");
-                            fw.close();
-                        } catch (Exception e) {}
-                        // #endregion
                         
                         System.err.println("========================================");
                         System.err.println("❌ [SecurityConfig] AuthenticationEntryPoint called!");

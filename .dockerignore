@@ -1,6 +1,5 @@
 # Maven
 target/
-!.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
 
@@ -38,7 +37,9 @@ Thumbs.db
 
 # Build artifacts
 *.class
+# Exclude JAR files EXCEPT Maven wrapper
 *.jar
+!.mvn/wrapper/maven-wrapper.jar
 *.war
 *.ear
 *.zip
