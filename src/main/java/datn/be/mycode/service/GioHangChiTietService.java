@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -47,41 +48,75 @@ public class GioHangChiTietService {
     }
 
     public ResponseEntity<?> addGioHangChiTiet(AddGioHangChiTietReq request){
+        try {
+            // Tìm hoặc tạo gioHang nếu chưa có
+            var gioHang = gioHangRepository.findByKhachHangId(request.getIdKhachhang()).orElse(null);
 
-        var gioHang = gioHangRepository.findByKhachHangId(request.getIdKhachhang()).orElse(null);
-        if(gioHang == null || gioHang.getTrangThai() == 0) return getErro("Khách hàng này không tồn tại hoặc đã nghỉ");
-        var gioHangChiTiet = repo.findByGioHangIdAndAndSanPhamChiTietId(gioHang.getId(),request.getIdSanPhamChiTiet()).orElse(null);
-        var sanPhamChiTiet = sanPhamChiTietRepository.findById(request.getIdSanPhamChiTiet()).orElse(null);
-        if (sanPhamChiTiet == null || sanPhamChiTiet.getTrangThai() == 0) return getErro("Sản phẩm này hiện đang hết hàng hoặc không có");
-        var giamGia = sanPhamChiTiet.getSanPham().getGiamGia();
-        var gia = sanPhamChiTiet.getGiaBan();
-        var giaDaGiam = new BigDecimal(gia.toString());
+            if (gioHang == null) {
+                // Tạo mới gioHang cho khách hàng
+                var khachHang = khachHangRepository.findById(request.getIdKhachhang()).orElse(null);
+                if (khachHang == null) {
+                    return getErro("Khách hàng này không tồn tại");
+                }
 
-        if(request.getSoLuong() <= 0) return getErro("Số lượng phải lớn hơn 0");
-        if(request.getSoLuong()>sanPhamChiTiet.getSoLuong()) return getErro("Số lượng sản phẩm không vượt quá số lượng đang có");
+                gioHang = new datn.be.mycode.entity.GioHang();
+                gioHang.setKhachHang(khachHang);
+                gioHang.setNgayTao(LocalDateTime.now());
+                gioHang.setPhiShip(BigDecimal.ZERO);
+                gioHang.setTongTien(BigDecimal.ZERO);
+                gioHang.setTongTienGiam(BigDecimal.ZERO);
+                gioHang.setTongTienSanPhamChuaGiam(BigDecimal.ZERO);
+                gioHang.setTrangThai(1);
+                gioHang = gioHangRepository.save(gioHang);
+                gioHang.setMa("GH" + gioHang.getId());
+                gioHang = gioHangRepository.save(gioHang);
+            }
 
-        if(giamGia != null && giamGia.getTrangThai() == 1){
-            var mucGiam = BigDecimal.valueOf(giamGia.getMucGiam()).divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP);
-            giaDaGiam = gia.subtract(gia.multiply(mucGiam));
+            // Kiểm tra trangThai sau khi đã có gioHang
+            if (gioHang.getTrangThai() == 0) {
+                return getErro("Giỏ hàng này đã bị khóa");
+            }
+
+            var gioHangChiTiet = repo.findByGioHangIdAndAndSanPhamChiTietId(gioHang.getId(), request.getIdSanPhamChiTiet()).orElse(null);
+            var sanPhamChiTiet = sanPhamChiTietRepository.findById(request.getIdSanPhamChiTiet()).orElse(null);
+            if (sanPhamChiTiet == null || sanPhamChiTiet.getTrangThai() == 0) {
+                return getErro("Sản phẩm này hiện đang hết hàng hoặc không có");
+            }
+            var giamGia = sanPhamChiTiet.getSanPham().getGiamGia();
+            var gia = sanPhamChiTiet.getGiaBan();
+            var giaDaGiam = new BigDecimal(gia.toString());
+
+            if(request.getSoLuong() <= 0) return getErro("Số lượng phải lớn hơn 0");
+            if(request.getSoLuong()>sanPhamChiTiet.getSoLuong()) return getErro("Số lượng sản phẩm không vượt quá số lượng đang có");
+
+            if(giamGia != null && giamGia.getTrangThai() == 1){
+                var mucGiam = BigDecimal.valueOf(giamGia.getMucGiam()).divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP);
+                giaDaGiam = gia.subtract(gia.multiply(mucGiam));
+            }
+
+            if(gioHangChiTiet == null) {
+                gioHangChiTiet = new GioHangChiTiet();
+                gioHangChiTiet.setSoLuong(request.getSoLuong());
+                gioHangChiTiet.setGiaHienHanh(gia);
+                gioHangChiTiet.setGiaDaGiam(giaDaGiam);
+                gioHangChiTiet.setTrangThai(1);
+                gioHangChiTiet.setGioHang(gioHang);
+                gioHangChiTiet.setSanPhamChiTiet(sanPhamChiTiet);
+            } else {
+                gioHangChiTiet.addSoLuong(request.getSoLuong());
+                if(gioHangChiTiet.getSoLuong() > sanPhamChiTiet.getSoLuong()) return getErro("Số lượng sản phẩm không vượt quá số lượng đang có");
+            }
+
+            gioHangChiTiet= repo.save(gioHangChiTiet);
+            AddGioHangChiTietRes GioHangChiTietRes = new AddGioHangChiTietRes(gioHangChiTiet);
+
+            return ResponseEntity.ok(GioHangChiTietRes);
+        } catch (Exception e) {
+            System.err.println("❌ [GioHangChiTietService] Error in addGioHangChiTiet: " + e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(new erroResponse("Lỗi hệ thống: " + e.getMessage()));
         }
-
-        if(gioHangChiTiet == null) {
-            gioHangChiTiet = new GioHangChiTiet();
-            gioHangChiTiet.setSoLuong(request.getSoLuong());
-            gioHangChiTiet.setGiaHienHanh(gia);
-            gioHangChiTiet.setGiaDaGiam(giaDaGiam);
-            gioHangChiTiet.setTrangThai(1);
-            gioHangChiTiet.setGioHang(gioHang);
-            gioHangChiTiet.setSanPhamChiTiet(sanPhamChiTiet);
-        } else {
-            gioHangChiTiet.addSoLuong(request.getSoLuong());
-            if(gioHangChiTiet.getSoLuong() > sanPhamChiTiet.getSoLuong()) return getErro("Số lượng sản phẩm không vượt quá số lượng đang có");
-        }
-
-        gioHangChiTiet= repo.save(gioHangChiTiet);
-        AddGioHangChiTietRes GioHangChiTietRes = new AddGioHangChiTietRes(gioHangChiTiet);
-
-        return ResponseEntity.ok(GioHangChiTietRes);
     }
 
     public ResponseEntity<?> addSoLuong(AddSoLuongReq request) {
