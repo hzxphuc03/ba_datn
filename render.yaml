@@ -55,6 +55,15 @@ services:
       # Nếu cần real-time, dùng STOMP WebSocket trên cùng port HTTP
       - key: SOCKETIO_ENABLED
         value: "false"
+      
+      # Cloudinary Configuration (for image upload)
+      # Get these from https://cloudinary.com/console
+      - key: CLOUDINARY_CLOUD_NAME
+        sync: false  # Set manually in Render dashboard
+      - key: CLOUDINARY_API_KEY
+        sync: false  # Set manually in Render dashboard
+      - key: CLOUDINARY_API_SECRET
+        sync: false  # Set manually in Render dashboard
 
 databases:
   # PostgreSQL Database (uncomment nếu muốn tạo database tự động)

@@ -127,6 +127,10 @@ public class WebSecurityConfigurerAdapter {
                         // Authentication sẽ được xử lý trong WebSocketAuthInterceptor
                         // Cho phép handshake nhưng sẽ validate token trong interceptor
                         .requestMatchers("/ws/**").permitAll() // Cho phép handshake, nhưng validate trong interceptor
+                        // Socket.IO endpoints - allow handshake requests (HTTP polling fallback)
+                        // Socket.IO server runs on separate port 9092, but HTTP polling requests may come to port 8080
+                        // CRITICAL: Match both /socket.io and /socket.io/** patterns
+                        .requestMatchers("/socket.io", "/socket.io/**").permitAll() // Allow Socket.IO handshake/polling requests
                         // Các endpoint này sẽ được bảo vệ bởi WebSocketAuthInterceptor
                         // .requestMatchers("/app/**").authenticated()
                         // .requestMatchers("/topic/**").authenticated()
@@ -173,6 +177,9 @@ public class WebSecurityConfigurerAdapter {
                         .requestMatchers("/api/thong_bao/**").hasAnyRole("KHACH_HANG", "ADMIN", "NHAN_VIEN")
                         .requestMatchers("/api/voucher_khach_hang/**").hasAnyRole("KHACH_HANG", "ADMIN", "NHAN_VIEN")
                         
+                        // Image upload endpoints - require authentication
+                        .requestMatchers("/api/upload/**").hasAnyRole("KHACH_HANG", "ADMIN", "NHAN_VIEN")
+                        
                         // Quản lý sản phẩm - Admin và Nhân viên (POST, PUT, DELETE)
                         .requestMatchers("POST", "/api/the_loai/**").hasAnyRole("ADMIN", "NHAN_VIEN")
                         .requestMatchers("PUT", "/api/the_loai/**").hasAnyRole("ADMIN", "NHAN_VIEN")
@@ -209,6 +216,14 @@ public class WebSecurityConfigurerAdapter {
                         String originalPath = (String) request.getAttribute("jakarta.servlet.error.request_uri");
                         String method = request.getMethod();
                         
+                        // #region agent log
+                        try {
+                            java.io.FileWriter fw = new java.io.FileWriter("/Users/phamhaiphuc/Downloads/DATN/BE - Copy/ba_datn/.cursor/debug.log", true);
+                            fw.write("{\"sessionId\":\"debug-session\",\"runId\":\"run1\",\"hypothesisId\":\"C\",\"location\":\"WebSecurityConfigurerAdapter.java:authenticationEntryPoint\",\"message\":\"401 Unauthorized triggered\",\"data\":{\"path\":\"" + path + "\",\"method\":\"" + method + "\",\"exception\":\"" + (authException != null ? authException.getMessage() : "null") + "\",\"requestURL\":\"" + request.getRequestURL() + "\"},\"timestamp\":" + System.currentTimeMillis() + "}\n");
+                            fw.close();
+                        } catch (Exception e) {}
+                        // #endregion
+                        
                         System.err.println("========================================");
                         System.err.println("❌ [SecurityConfig] AuthenticationEntryPoint called!");
                         System.err.println("❌ [SecurityConfig] Method: " + method);
@@ -218,6 +233,14 @@ public class WebSecurityConfigurerAdapter {
                         System.err.println("❌ [SecurityConfig] Request URL: " + request.getRequestURL());
                         System.err.println("❌ [SecurityConfig] Servlet Path: " + request.getServletPath());
                         System.err.println("❌ [SecurityConfig] Context Path: " + request.getContextPath());
+                        
+                        // Check if this is a Socket.IO request
+                        if (path != null && path.startsWith("/socket.io")) {
+                            System.err.println("⚠️⚠️⚠️ [SecurityConfig] CRITICAL: EntryPoint called for /socket.io endpoint!");
+                            System.err.println("⚠️⚠️⚠️ [SecurityConfig] This means permitAll() is NOT working for Socket.IO!");
+                            System.err.println("⚠️⚠️⚠️ [SecurityConfig] Path: " + path);
+                            System.err.println("⚠️⚠️⚠️ [SecurityConfig] Check if pattern matches correctly!");
+                        }
                         
                         // If this is called for /api/auth/**, it's a problem!
                         if (path != null && path.startsWith("/api/auth/")) {

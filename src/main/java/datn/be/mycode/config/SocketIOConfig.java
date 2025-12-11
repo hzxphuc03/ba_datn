@@ -63,6 +63,14 @@ public class SocketIOConfig {
         server.addConnectListener(client -> {
             System.out.println("🔌 [Socket.IO] Client connecting: " + client.getSessionId());
             
+            // #region agent log
+            try {
+                java.io.FileWriter fw = new java.io.FileWriter("/Users/phamhaiphuc/Downloads/DATN/BE - Copy/ba_datn/.cursor/debug.log", true);
+                fw.write("{\"sessionId\":\"debug-session\",\"runId\":\"run1\",\"hypothesisId\":\"D\",\"location\":\"SocketIOConfig.java:addConnectListener\",\"message\":\"Socket.IO client connecting\",\"data\":{\"sessionId\":\"" + client.getSessionId() + "\"},\"timestamp\":" + System.currentTimeMillis() + "}\n");
+                fw.close();
+            } catch (Exception e) {}
+            // #endregion
+            
             // Lấy token từ query parameter
             String token = client.getHandshakeData().getSingleUrlParam("token");
             
@@ -74,10 +82,30 @@ public class SocketIOConfig {
                 }
             }
             
+            // #region agent log
+            try {
+                java.io.FileWriter fw = new java.io.FileWriter("/Users/phamhaiphuc/Downloads/DATN/BE - Copy/ba_datn/.cursor/debug.log", true);
+                fw.write("{\"sessionId\":\"debug-session\",\"runId\":\"run1\",\"hypothesisId\":\"E\",\"location\":\"SocketIOConfig.java:addConnectListener\",\"message\":\"Token extracted\",\"data\":{\"hasToken\":" + (token != null && !token.isEmpty()) + ",\"tokenLength\":" + (token != null ? token.length() : 0) + "},\"timestamp\":" + System.currentTimeMillis() + "}\n");
+                fw.close();
+            } catch (Exception e) {}
+            // #endregion
+            
             System.out.println("🔐 [Socket.IO] Token received: " + (token != null && token.length() > 20 ? token.substring(0, 20) + "..." : token));
             
             // Validate token
-            if (token != null && !token.isEmpty() && jwtTokenProvider.validateToken(token)) {
+            boolean isValid = false;
+            if (token != null && !token.isEmpty()) {
+                isValid = jwtTokenProvider.validateToken(token);
+                // #region agent log
+                try {
+                    java.io.FileWriter fw = new java.io.FileWriter("/Users/phamhaiphuc/Downloads/DATN/BE - Copy/ba_datn/.cursor/debug.log", true);
+                    fw.write("{\"sessionId\":\"debug-session\",\"runId\":\"run1\",\"hypothesisId\":\"E\",\"location\":\"SocketIOConfig.java:addConnectListener\",\"message\":\"Token validation result\",\"data\":{\"isValid\":" + isValid + "},\"timestamp\":" + System.currentTimeMillis() + "}\n");
+                    fw.close();
+                } catch (Exception e) {}
+                // #endregion
+            }
+            
+            if (isValid) {
                 // Token hợp lệ - cho phép kết nối
                 System.out.println("✅ [Socket.IO] Authentication successful for client: " + client.getSessionId());
                 
@@ -91,6 +119,13 @@ public class SocketIOConfig {
             } else {
                 // Token không hợp lệ - reject connection
                 System.err.println("❌ [Socket.IO] Invalid or missing token, rejecting connection");
+                // #region agent log
+                try {
+                    java.io.FileWriter fw = new java.io.FileWriter("/Users/phamhaiphuc/Downloads/DATN/BE - Copy/ba_datn/.cursor/debug.log", true);
+                    fw.write("{\"sessionId\":\"debug-session\",\"runId\":\"run1\",\"hypothesisId\":\"E\",\"location\":\"SocketIOConfig.java:addConnectListener\",\"message\":\"Connection rejected - invalid token\",\"data\":{\"hasToken\":" + (token != null && !token.isEmpty()) + "},\"timestamp\":" + System.currentTimeMillis() + "}\n");
+                    fw.close();
+                } catch (Exception e) {}
+                // #endregion
                 client.disconnect();
             }
         });
