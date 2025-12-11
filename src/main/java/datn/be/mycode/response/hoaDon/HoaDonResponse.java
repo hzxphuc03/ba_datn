@@ -42,6 +42,10 @@ public class HoaDonResponse {
     private int trangThai;
 
     public HoaDonResponse(HoaDon hoaDon, List<Voucher> vouchers) {
+        if (hoaDon == null) {
+            throw new IllegalArgumentException("HoaDon cannot be null");
+        }
+        
         this.id = hoaDon.getId();
         this.ma = hoaDon.getMa();
         this.ngayTao = hoaDon.getNgayTao();
@@ -61,7 +65,7 @@ public class HoaDonResponse {
         this.tongTienGiam = hoaDon.getTongTienGiam();
         this.thanhToan = hoaDon.getThanhToan();
         this.giaoHang = hoaDon.getGiaoHang();
-        this.vouchers = vouchers;
+        this.vouchers = vouchers != null ? vouchers : new java.util.ArrayList<>(); // Đảm bảo vouchers không null
         this.phuongThucThanhToan = hoaDon.getPhuongThucThanhToan();
         this.nhanVien = hoaDon.getNhanVien();
         this.khachHang = hoaDon.getKhachHang();

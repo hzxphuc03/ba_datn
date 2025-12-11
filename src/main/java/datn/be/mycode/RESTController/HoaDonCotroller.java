@@ -53,9 +53,26 @@ public class HoaDonCotroller {
             @RequestParam(name = "idNhanVien",required = false) Long idNhanVien,
             @RequestParam(name = "status",required = false) Integer status
     ){
-
-        TableHoaDonRequest request = new TableHoaDonRequest(page,pageSize,keyWord,startDate,endDate,idKhachHang,idNhanVien,status);
-        return ResponseEntity.ok(hoaDonService.getAll(request));
+        try {
+            System.out.println("🔍 [HoaDonController] get-all called with params: page=" + page + ", status=" + status);
+            
+            TableHoaDonRequest request = new TableHoaDonRequest(page,pageSize,keyWord,startDate,endDate,idKhachHang,idNhanVien,status);
+            var result = hoaDonService.getAll(request);
+            
+            System.out.println("✅ [HoaDonController] get-all completed. Returning " + (result.getItem() != null ? result.getItem().size() : 0) + " items");
+            return ResponseEntity.ok(result);
+            
+        } catch (Exception e) {
+            System.err.println("❌ [HoaDonController] Error in get-all: " + e.getMessage());
+            e.printStackTrace();
+            
+            // Return error response
+            java.util.Map<String, Object> error = new java.util.HashMap<>();
+            error.put("success", false);
+            error.put("message", "Failed to get hoa don list: " + e.getMessage());
+            error.put("data", new java.util.ArrayList<>());
+            return ResponseEntity.status(500).body(error);
+        }
     }
 
     @GetMapping("/get-hoa-don-by-id-hoa-don/{idHoaDon}")

@@ -117,14 +117,27 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Map<String, Object>> handleGenericException(Exception ex) {
+        // #region agent log
+        try {
+            java.io.FileWriter fw = new java.io.FileWriter("/Users/phamhaiphuc/Downloads/DATN/BE - Copy/ba_datn/.cursor/debug.log", true);
+            fw.write("{\"sessionId\":\"debug-session\",\"runId\":\"run1\",\"hypothesisId\":\"H\",\"location\":\"GlobalExceptionHandler.java:handleGenericException\",\"message\":\"500 Internal Server Error\",\"data\":{\"exception\":\"" + ex.getClass().getName() + "\",\"message\":\"" + (ex.getMessage() != null ? ex.getMessage().replace("\"", "\\\"") : "null") + "\"},\"timestamp\":" + System.currentTimeMillis() + "}\n");
+            fw.close();
+        } catch (Exception e) {}
+        // #endregion
+        
         Map<String, Object> response = new HashMap<>();
         response.put("status", HttpStatus.INTERNAL_SERVER_ERROR.value());
         response.put("error", "Internal Server Error");
         response.put("message", "Đã xảy ra lỗi hệ thống. Vui lòng thử lại sau.");
         response.put("timestamp", LocalDateTime.now());
+        // Đảm bảo có field 'data' để frontend không bị lỗi .length
+        response.put("data", new java.util.ArrayList<>());
 
         // Log full exception với stack trace
         logger.error("Unexpected error occurred", ex);
+        System.err.println("❌ [GlobalExceptionHandler] Exception: " + ex.getClass().getName());
+        System.err.println("❌ [GlobalExceptionHandler] Message: " + ex.getMessage());
+        ex.printStackTrace();
 
         // Trong production, không trả về stack trace cho client
         // Chỉ trả về message chung
