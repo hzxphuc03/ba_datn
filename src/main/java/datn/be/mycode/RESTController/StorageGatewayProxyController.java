@@ -64,15 +64,62 @@ public class StorageGatewayProxyController {
                 Map.class
             );
             
-            return ResponseEntity.ok(response.getBody());
+            // Normalize response để đảm bảo frontend nhận được format đúng
+            Map<String, Object> responseBody = (Map<String, Object>) response.getBody();
+            if (responseBody == null) {
+                Map<String, Object> error = new HashMap<>();
+                error.put("success", false);
+                error.put("message", "Empty response from storage gateway");
+                error.put("data", new java.util.ArrayList<>()); // Đảm bảo có field data là array
+                return ResponseEntity.status(500).body(error);
+            }
+            
+            // Đảm bảo response có các field cần thiết mà frontend có thể expect
+            Map<String, Object> normalizedResponse = new HashMap<>(responseBody);
+            
+            // Nếu response không có field 'data' hoặc 'data' là null, thêm field data rỗng
+            if (!normalizedResponse.containsKey("data") || normalizedResponse.get("data") == null) {
+                normalizedResponse.put("data", new java.util.ArrayList<>());
+            }
+            
+            // Đảm bảo có field success
+            if (!normalizedResponse.containsKey("success")) {
+                normalizedResponse.put("success", true);
+            }
+            
+            // Log response để debug
+            System.out.println("✅ [StorageGatewayProxy] Upload successful. Response keys: " + normalizedResponse.keySet());
+            System.out.println("✅ [StorageGatewayProxy] Response: " + normalizedResponse);
+            
+            return ResponseEntity.ok(normalizedResponse);
             
         } catch (org.springframework.web.client.HttpClientErrorException e) {
+            System.err.println("❌ [StorageGatewayProxy] HttpClientErrorException: " + e.getMessage());
+            System.err.println("❌ [StorageGatewayProxy] Status: " + e.getStatusCode());
+            System.err.println("❌ [StorageGatewayProxy] Response body: " + e.getResponseBodyAsString());
+            
             Map<String, Object> error = new HashMap<>();
             error.put("success", false);
             error.put("status", e.getStatusCode().value());
             error.put("message", "Upload failed: " + e.getMessage());
+            
+            // Try to parse error response from fsel-gateway
+            try {
+                String responseBody = e.getResponseBodyAsString();
+                if (responseBody != null && !responseBody.isEmpty()) {
+                    com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
+                    Map<String, Object> gatewayError = mapper.readValue(responseBody, Map.class);
+                    error.putAll(gatewayError);
+                }
+            } catch (Exception parseEx) {
+                // Ignore parse error
+            }
+            
             return ResponseEntity.status(e.getStatusCode()).body(error);
         } catch (Exception e) {
+            System.err.println("❌ [StorageGatewayProxy] Exception: " + e.getMessage());
+            e.printStackTrace();
+            
             Map<String, Object> error = new HashMap<>();
             error.put("success", false);
             error.put("message", "Failed to upload image: " + e.getMessage());
@@ -139,9 +186,62 @@ public class StorageGatewayProxyController {
                 new org.springframework.core.ParameterizedTypeReference<Map<String, Object>>() {}
             );
             
-            return ResponseEntity.ok(response.getBody());
+            // Normalize response để đảm bảo frontend nhận được format đúng
+            Map<String, Object> responseBody = response.getBody();
+            if (responseBody == null) {
+                Map<String, Object> error = new HashMap<>();
+                error.put("success", false);
+                error.put("message", "Empty response from storage gateway");
+                error.put("data", new java.util.ArrayList<>()); // Đảm bảo có field data là array
+                return ResponseEntity.status(500).body(error);
+            }
             
+            // Đảm bảo response có các field cần thiết mà frontend có thể expect
+            Map<String, Object> normalizedResponse = new HashMap<>(responseBody);
+            
+            // Nếu response không có field 'data' hoặc 'data' là null, thêm field data rỗng
+            if (!normalizedResponse.containsKey("data") || normalizedResponse.get("data") == null) {
+                normalizedResponse.put("data", new java.util.ArrayList<>());
+            }
+            
+            // Đảm bảo có field success
+            if (!normalizedResponse.containsKey("success")) {
+                normalizedResponse.put("success", true);
+            }
+            
+            // Log response để debug
+            System.out.println("✅ [StorageGatewayProxy] Upload successful (base64). Response keys: " + normalizedResponse.keySet());
+            System.out.println("✅ [StorageGatewayProxy] Response: " + normalizedResponse);
+            
+            return ResponseEntity.ok(normalizedResponse);
+            
+        } catch (org.springframework.web.client.HttpClientErrorException e) {
+            System.err.println("❌ [StorageGatewayProxy] HttpClientErrorException (base64): " + e.getMessage());
+            System.err.println("❌ [StorageGatewayProxy] Status: " + e.getStatusCode());
+            System.err.println("❌ [StorageGatewayProxy] Response body: " + e.getResponseBodyAsString());
+            
+            Map<String, Object> error = new HashMap<>();
+            error.put("success", false);
+            error.put("status", e.getStatusCode().value());
+            error.put("message", "Upload failed: " + e.getMessage());
+            
+            // Try to parse error response from fsel-gateway
+            try {
+                String responseBody = e.getResponseBodyAsString();
+                if (responseBody != null && !responseBody.isEmpty()) {
+                    com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
+                    Map<String, Object> gatewayError = mapper.readValue(responseBody, Map.class);
+                    error.putAll(gatewayError);
+                }
+            } catch (Exception parseEx) {
+                // Ignore parse error
+            }
+            
+            return ResponseEntity.status(e.getStatusCode()).body(error);
         } catch (Exception e) {
+            System.err.println("❌ [StorageGatewayProxy] Exception (base64): " + e.getMessage());
+            e.printStackTrace();
+            
             Map<String, Object> error = new HashMap<>();
             error.put("success", false);
             error.put("message", "Failed to upload image: " + e.getMessage());
