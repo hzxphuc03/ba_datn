@@ -79,33 +79,88 @@ public class HoaDonService {
     private HoaDonChiTietService hoaDonChiTietService;
 
     public NormalTableResponse<HoaDonResponse> getAllByTrangThai1(TableHoaDonRequest request) {
-        if (request.getPage() == null) {
-            request.setPage(1);
+        try {
+            System.out.println("🔍 [HoaDonService] getAllByTrangThai1 called with request: " + request);
+            
+            if (request.getPage() == null) {
+                request.setPage(1);
+            }
+            if (request.getPageSize() == null) {
+                request.setPageSize(10);
+            }
+            if (request.getStatus() == null) {
+                request.setStatus(1);
+            }
+
+            Pageable pageable = PageRequest.of(request.getPage() - 1, request.getPageSize());
+            System.out.println("🔍 [HoaDonService] Calling repo.searchAll with status: 1 (hardcoded)");
+            
+            Page<HoaDon> hoaDonResponsePage;
+            hoaDonResponsePage = repo.searchAll(request.getKeyWord(), request.getStartDate(), request.getEndDate(), request.getIdKhachHang(), request.getIdNhanVien(), 1, pageable);
+
+            System.out.println("🔍 [HoaDonService] Found " + hoaDonResponsePage.getTotalElements() + " hoa don(s)");
+
+            List<HoaDon> hoaDons = hoaDonResponsePage.getContent();
+            List<HoaDonResponse> hoaDonResponses = new ArrayList<>();
+
+            for (HoaDon hoaDon : hoaDons) {
+                try {
+                    System.out.println("🔍 [HoaDonService] Processing hoa don ID: " + hoaDon.getId());
+                    
+                    List<Voucher> vouchers = voucherHoaDonService.getVouchersByHoaDonId(hoaDon.getId());
+                    if (vouchers == null) {
+                        vouchers = new ArrayList<>(); // Đảm bảo vouchers không null
+                        System.out.println("⚠️ [HoaDonService] Vouchers is null for hoa don ID: " + hoaDon.getId() + ", using empty list");
+                    }
+                    
+                    HoaDonResponse hoaDonResponse = new HoaDonResponse(hoaDon, vouchers);
+                    hoaDonResponses.add(hoaDonResponse);
+                    System.out.println("✅ [HoaDonService] Successfully created HoaDonResponse for ID: " + hoaDon.getId());
+                } catch (Exception e) {
+                    System.err.println("❌ [HoaDonService] Error processing hoa don ID: " + (hoaDon != null ? hoaDon.getId() : "null"));
+                    System.err.println("❌ [HoaDonService] Exception: " + e.getMessage());
+                    e.printStackTrace();
+                    // Skip this hoa don và continue với các hoa don khác
+                }
+            }
+
+            // Đảm bảo hoaDonResponses không null
+            if (hoaDonResponses == null) {
+                hoaDonResponses = new ArrayList<>();
+            }
+
+            var hoaDonNormalTableResponse = new NormalTableResponse<HoaDonResponse>(hoaDonResponses, request.getPage(), request.getPageSize(), hoaDonResponsePage.getTotalElements());
+            
+            // Đảm bảo response có item không null
+            if (hoaDonNormalTableResponse.getItem() == null) {
+                hoaDonNormalTableResponse.setItem(new ArrayList<>());
+            }
+
+            System.out.println("✅ [HoaDonService] getAllByTrangThai1 completed. Returning " + hoaDonResponses.size() + " items");
+            return hoaDonNormalTableResponse;
+            
+        } catch (Exception e) {
+            System.err.println("❌ [HoaDonService] Fatal error in getAllByTrangThai1: " + e.getMessage());
+            System.err.println("❌ [HoaDonService] Exception class: " + e.getClass().getName());
+            e.printStackTrace();
+            
+            // Return empty response thay vì throw exception
+            List<HoaDonResponse> emptyList = new ArrayList<>();
+            NormalTableResponse<HoaDonResponse> errorResponse = new NormalTableResponse<HoaDonResponse>(
+                emptyList, 
+                request.getPage() != null ? request.getPage() : 1, 
+                request.getPageSize() != null ? request.getPageSize() : 10, 
+                0L
+            );
+            
+            // Đảm bảo item không null
+            if (errorResponse.getItem() == null) {
+                errorResponse.setItem(new ArrayList<>());
+            }
+            
+            System.err.println("⚠️ [HoaDonService] Returning empty response due to error");
+            return errorResponse;
         }
-        if (request.getPageSize() == null) {
-            request.setPageSize(10);
-        }
-        if (request.getStatus() == null) {
-            request.setStatus(1);
-        }
-
-        Pageable pageable = PageRequest.of(request.getPage() - 1,request.getPageSize());
-        Page<HoaDon> hoaDonResponsePage;
-        hoaDonResponsePage = repo.searchAll(request.getKeyWord(), request.getStartDate(), request.getEndDate(), request.getIdKhachHang(), request.getIdNhanVien(), 1, pageable);
-
-        List<HoaDon> hoaDons = hoaDonResponsePage.getContent();
-        List<HoaDonResponse> hoaDonResponses = new ArrayList<>();
-
-        for (HoaDon hoaDon :hoaDons) {
-            List<Voucher> vouchers = voucherHoaDonService.getVouchersByHoaDonId(hoaDon.getId());
-            HoaDonResponse hoaDonResponse = new HoaDonResponse(hoaDon,vouchers);
-            hoaDonResponses.add(hoaDonResponse);
-        }
-
-        var hoaDonNormalTableResponse = new NormalTableResponse<HoaDonResponse>(hoaDonResponses,request.getPage(),request.getPageSize(),hoaDonResponsePage.getTotalElements());
-
-
-        return hoaDonNormalTableResponse;
     }
 
     public NormalTableResponse<HoaDonResponse> getAll(TableHoaDonRequest request) {
