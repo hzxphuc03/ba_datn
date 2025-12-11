@@ -16,30 +16,41 @@ RUN ./mvnw dependency:go-offline -B
 COPY src src
 
 # Build application và đảm bảo JAR được tạo ra
-RUN ./mvnw clean package -DskipTests || (echo "Build failed!" && exit 1)
+RUN echo "=== Starting Maven build ===" && \
+    if ! ./mvnw clean package -DskipTests; then \
+        echo "✗ Build failed! Showing error output:" && \
+        exit 1; \
+    fi && \
+    echo "✓ Build completed successfully"
 
 # Verify JAR files được tạo và tìm executable JAR
-RUN echo "=== Listing all JAR files ===" && \
-    ls -lh /app/target/*.jar 2>/dev/null || echo "No JAR files found!" && \
+RUN echo "=== Checking target directory ===" && \
+    ls -la /app/target/ 2>/dev/null || (echo "Target directory does not exist!" && exit 1) && \
+    echo "=== Listing all JAR files ===" && \
+    ls -lh /app/target/*.jar 2>/dev/null || (echo "No JAR files found in target!" && ls -la /app/target/ && exit 1) && \
     echo "=== Finding executable JAR (excluding *-plain.jar) ===" && \
     JAR_FILE=$(find /app/target -name "*.jar" ! -name "*-plain.jar" -type f | head -1) && \
     if [ -z "$JAR_FILE" ]; then \
         echo "ERROR: No executable JAR found!" && \
+        echo "=== All JAR files in target ===" && \
+        find /app/target -name "*.jar" -type f && \
         echo "=== Contents of /app/target ===" && \
         ls -la /app/target/ && \
-        echo "=== Checking if target directory exists ===" && \
-        test -d /app/target && echo "Target directory exists" || echo "Target directory does not exist" && \
-        echo "=== Trying to find mycode JAR directly ===" && \
-        ls -la /app/target/mycode*.jar 2>/dev/null || echo "No mycode JAR found" && \
         exit 1; \
     fi && \
     echo "Found JAR: $JAR_FILE" && \
+    echo "=== JAR file details ===" && \
+    ls -lh "$JAR_FILE" && \
+    echo "=== Copying to app.jar ===" && \
     cp "$JAR_FILE" /app/target/app.jar && \
     echo "=== Verifying app.jar was created ===" && \
     ls -lh /app/target/app.jar && \
-    test -f /app/target/app.jar && echo "app.jar exists and is a file" || (echo "app.jar copy failed!" && exit 1) && \
-    echo "=== Final verification: app.jar size ===" && \
-    test -s /app/target/app.jar && echo "app.jar is not empty" || (echo "app.jar is empty!" && exit 1)
+    test -f /app/target/app.jar && echo "✓ app.jar exists and is a file" || (echo "✗ app.jar copy failed!" && exit 1) && \
+    JAR_SIZE=$(stat -c%s /app/target/app.jar 2>/dev/null || wc -c < /app/target/app.jar) && \
+    test -s /app/target/app.jar && echo "✓ app.jar is not empty (size: $JAR_SIZE bytes)" || (echo "✗ app.jar is empty!" && exit 1) && \
+    echo "=== Build stage verification complete ===" && \
+    echo "=== Final check: app.jar ready for COPY ===" && \
+    ls -lh /app/target/app.jar
 
 # Giai đoạn 2: Tạo hình ảnh Docker cuối cùng
 FROM eclipse-temurin:17-jre-jammy
@@ -48,10 +59,8 @@ WORKDIR /app
 # Tạo user non-root để chạy ứng dụng (bảo mật hơn)
 RUN groupadd -r spring && useradd -r -g spring spring
 
-# Copy JAR từ build stage (đã được đổi tên thành app.jar)
-# Sử dụng ARG để debug nếu cần
-ARG JAR_FILE=app.jar
-COPY --from=build /app/target/${JAR_FILE} app.jar
+# Copy JAR từ build stage (đã được đổi tên thành app.jar trong build stage)
+COPY --from=build /app/target/app.jar app.jar
 
 # Verify JAR file exists và có quyền đọc
 RUN echo "=== Checking for app.jar ===" && \
