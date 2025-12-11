@@ -39,14 +39,33 @@ public class AuthenticationService {
     
     public ResponseEntity<?> authenticateKhachHang(loginTest loginRequest, String clientIp) {
         try {
-            System.out.println("🔍 Authenticating KhachHang: " + loginRequest.getUsername());
+            System.out.println("========================================");
+            System.out.println("🔍 [AUTH SERVICE] Authenticating KhachHang");
+            System.out.println("🔍 [AUTH SERVICE] Username: " + loginRequest.getUsername());
+            System.out.println("🔍 [AUTH SERVICE] Password provided: " + (loginRequest.getPass() != null ? "YES (length: " + loginRequest.getPass().length() + ")" : "NO"));
+            System.out.println("🔍 [AUTH SERVICE] Client IP: " + clientIp);
+            
+            // Validate input
+            if (loginRequest.getUsername() == null || loginRequest.getUsername().trim().isEmpty()) {
+                System.err.println("❌ [AUTH SERVICE] Username is null or empty");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new erroResponse("Tài khoản không được để trống"));
+            }
+            
+            if (loginRequest.getPass() == null || loginRequest.getPass().trim().isEmpty()) {
+                System.err.println("❌ [AUTH SERVICE] Password is null or empty");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new erroResponse("Mật khẩu không được để trống"));
+            }
             
             // Tìm khách hàng theo tài khoản
+            System.out.println("🔍 [AUTH SERVICE] Searching for user with taiKhoan: " + loginRequest.getUsername() + ", trangThai: 1");
             Optional<KhachHang> khachHangOpt = khachHangRepository
-                .findByTaiKhoanAndTrangThai(loginRequest.getUsername(), 1);
+                .findByTaiKhoanAndTrangThai(loginRequest.getUsername().trim(), 1);
             
             if (khachHangOpt.isEmpty()) {
-                System.out.println("❌ User not found: " + loginRequest.getUsername());
+                System.out.println("❌ [AUTH SERVICE] User not found: " + loginRequest.getUsername());
+                System.out.println("   ⚠️ User not found with taiKhoan: " + loginRequest.getUsername() + " and trangThai: 1");
                 auditService.logFailedLogin(loginRequest.getUsername(), clientIp, "USER_NOT_FOUND");
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(new erroResponse("Tài khoản hoặc mật khẩu không chính xác"));
@@ -57,28 +76,57 @@ public class AuthenticationService {
             
             // Kiểm tra mật khẩu
             System.out.println("🔐 Checking password...");
-            System.out.println("   Raw password: " + loginRequest.getPass());
-            System.out.println("   DB password: " + (khachHang.getMatKhau() != null ? 
-                (khachHang.getMatKhau().startsWith("$2a$") || khachHang.getMatKhau().startsWith("$2b$") ? 
-                    "BCrypt hash" : khachHang.getMatKhau()) : "NULL"));
+            String rawPassword = loginRequest.getPass();
+            System.out.println("   Raw password length: " + (rawPassword != null ? rawPassword.length() : "NULL"));
+            System.out.println("   Raw password (first 3 chars): " + (rawPassword != null && rawPassword.length() >= 3 ? rawPassword.substring(0, 3) + "..." : rawPassword));
+            
+            String dbPassword = khachHang.getMatKhau();
+            System.out.println("   DB password: " + (dbPassword != null ? 
+                (dbPassword.startsWith("$2a$") || dbPassword.startsWith("$2b$") ? 
+                    "BCrypt hash (length: " + dbPassword.length() + ")" : 
+                    "Plain text (length: " + dbPassword.length() + ", value: " + dbPassword + ")") : "NULL"));
             
             // Kiểm tra xem password có phải BCrypt hash không
             boolean passwordMatches = false;
-            String dbPassword = khachHang.getMatKhau();
             
-            if (dbPassword != null) {
+            if (dbPassword == null) {
+                System.out.println("   ❌ DB password is NULL!");
+                passwordMatches = false;
+            } else if (rawPassword == null) {
+                System.out.println("   ❌ Raw password is NULL!");
+                passwordMatches = false;
+            } else {
                 // Nếu password là BCrypt hash (bắt đầu bằng $2a$ hoặc $2b$)
                 if (dbPassword.startsWith("$2a$") || dbPassword.startsWith("$2b$")) {
-                    passwordMatches = passwordService.matches(loginRequest.getPass(), dbPassword);
                     System.out.println("   Password type: BCrypt");
+                    if (passwordService == null) {
+                        System.err.println("   ❌ passwordService is NULL!");
+                        passwordMatches = false;
+                    } else {
+                        try {
+                            passwordMatches = passwordService.matches(rawPassword, dbPassword);
+                            System.out.println("   BCrypt match result: " + passwordMatches);
+                        } catch (Exception e) {
+                            System.err.println("   ❌ Error in BCrypt matching: " + e.getMessage());
+                            e.printStackTrace();
+                            passwordMatches = false;
+                        }
+                    }
                 } else {
                     // Nếu password là plain text (tạm thời hỗ trợ để migration)
-                    passwordMatches = dbPassword.equals(loginRequest.getPass());
                     System.out.println("   Password type: Plain text (legacy)");
+                    // Trim và so sánh để tránh lỗi whitespace
+                    passwordMatches = dbPassword.trim().equals(rawPassword.trim());
+                    System.out.println("   Plain text match result: " + passwordMatches);
+                    if (!passwordMatches) {
+                        System.out.println("   DB password (trimmed): [" + dbPassword.trim() + "]");
+                        System.out.println("   Raw password (trimmed): [" + rawPassword.trim() + "]");
+                        System.out.println("   Length comparison - DB: " + dbPassword.trim().length() + ", Raw: " + rawPassword.trim().length());
+                    }
                 }
             }
             
-            System.out.println("   Password matches: " + passwordMatches);
+            System.out.println("   Final password matches: " + passwordMatches);
             
             if (!passwordMatches) {
                 System.out.println("❌ Wrong password for user: " + loginRequest.getUsername());

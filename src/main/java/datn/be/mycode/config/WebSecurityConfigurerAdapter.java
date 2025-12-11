@@ -113,6 +113,9 @@ public class WebSecurityConfigurerAdapter {
                         // ========================================
                         // CRITICAL: PUBLIC ENDPOINTS - MUST BE FIRST
                         // ========================================
+                        // Root path - allow for health checks and browser access
+                        .requestMatchers("/", "/favicon.ico").permitAll()
+                        
                         .requestMatchers("/api/auth/**").permitAll()
                         
                         // Other public endpoints

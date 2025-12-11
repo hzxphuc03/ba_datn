@@ -154,6 +154,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         
         System.out.println("🔍 [JWT Filter] isPublicEndpoint check - Path: [" + path + "], Length: " + path.length() + ", First 20 chars: [" + (path.length() > 20 ? path.substring(0, 20) : path) + "]");
         
+        // Root path - allow for health checks
+        if (path.equals("/") || path.equals("/favicon.ico")) {
+            System.out.println("✅ [JWT Filter] Path is root or favicon: " + path);
+            return true;
+        }
+        
         // Public auth endpoints - ALL /api/auth/** endpoints are public
         // This includes: /api/auth/login, /api/auth/login/**, /api/auth/register, /api/auth/register/**
         if (path.startsWith("/api/auth/")) {
