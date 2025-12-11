@@ -36,6 +36,8 @@ public interface KhachHangRepository extends JpaRepository<KhachHang, Long> {
 
     Optional<KhachHang> findByTaiKhoanAndMatKhauAndTrangThai(String taiKhoan, String matKhau,int trangThai);
     Optional<KhachHang> findByTaiKhoanAndTrangThai(String taiKhoan, int trangThai);
+    // Tìm user không cần kiểm tra trangThai (để hỗ trợ user có trangThai = NULL)
+    Optional<KhachHang> findByTaiKhoan(String taiKhoan);
     KhachHang  findByEmail(String email);
     boolean existsByEmail(String email);
     boolean existsByTaiKhoan(String taiKhoan);

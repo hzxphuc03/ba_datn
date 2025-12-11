@@ -28,6 +28,7 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Service
 public class KhachHangService {
@@ -210,41 +211,86 @@ public class KhachHangService {
 
     public ResponseEntity<?> getAccount(loginTest loginRequest) {
         try {
+            System.out.println("🔍 [KhachHangService] getAccount called for: " + loginRequest.getUsername());
+            
             // Tìm khách hàng theo username (không so sánh password trong SQL)
-            KhachHang khachHang = repository.findByTaiKhoanAndTrangThai(loginRequest.getUsername(), 1)
-                    .orElse(null);
+            // Thử tìm với trangThai = 1 trước, nếu không tìm thấy thì tìm không cần trangThai
+            Optional<KhachHang> khachHangOpt = repository.findByTaiKhoanAndTrangThai(loginRequest.getUsername(), 1);
+            
+            if (khachHangOpt.isEmpty()) {
+                System.out.println("   ⚠️ User not found with trangThai=1, trying without trangThai check...");
+                khachHangOpt = repository.findByTaiKhoan(loginRequest.getUsername());
+                
+                if (khachHangOpt.isPresent()) {
+                    KhachHang found = khachHangOpt.get();
+                    System.out.println("   ⚠️ User found but trangThai=" + found.getTrangThai() + " (expected: 1)");
+                }
+            }
+            
+            KhachHang khachHang = khachHangOpt.orElse(null);
             
             Map<String, String> response = new HashMap<>();
 
             if (khachHang == null) {
+                System.out.println("❌ [KhachHangService] User not found: " + loginRequest.getUsername());
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                         .body(new erroResponse("Tài khoản hoặc mật khẩu không chính xác"));
             }
+            
+            System.out.println("✅ [KhachHangService] User found: " + khachHang.getTaiKhoan() + ", trangThai: " + khachHang.getTrangThai());
 
             // Kiểm tra password - hỗ trợ cả BCrypt và plain text
             String dbPassword = khachHang.getMatKhau();
+            String rawPassword = loginRequest.getPass();
             boolean passwordMatches = false;
             
-            if (dbPassword != null && loginRequest.getPass() != null) {
+            System.out.println("🔐 [KhachHangService] Checking password...");
+            System.out.println("   Raw password length: " + (rawPassword != null ? rawPassword.length() : "NULL"));
+            System.out.println("   DB password: " + (dbPassword != null ? 
+                (dbPassword.startsWith("$2a$") || dbPassword.startsWith("$2b$") ? 
+                    "BCrypt hash" : "Plain text: " + dbPassword) : "NULL"));
+            
+            if (dbPassword == null || rawPassword == null) {
+                System.out.println("   ❌ Password is NULL!");
+                passwordMatches = false;
+            } else {
                 // Nếu password là BCrypt hash (bắt đầu bằng $2a$ hoặc $2b$)
                 if (dbPassword.startsWith("$2a$") || dbPassword.startsWith("$2b$")) {
+                    System.out.println("   Password type: BCrypt");
                     // Dùng BCrypt matching
                     if (passwordService != null) {
-                        passwordMatches = passwordService.matches(loginRequest.getPass(), dbPassword);
+                        try {
+                            passwordMatches = passwordService.matches(rawPassword.trim(), dbPassword);
+                            System.out.println("   BCrypt match result: " + passwordMatches);
+                        } catch (Exception e) {
+                            System.err.println("   ❌ Error in BCrypt matching: " + e.getMessage());
+                            passwordMatches = false;
+                        }
                     } else {
-                        // Fallback nếu passwordService null
+                        System.err.println("   ❌ passwordService is NULL!");
                         passwordMatches = false;
                     }
                 } else {
                     // Nếu password là plain text (hỗ trợ legacy)
-                    passwordMatches = dbPassword.equals(loginRequest.getPass());
+                    System.out.println("   Password type: Plain text (legacy)");
+                    // Trim để tránh lỗi whitespace
+                    passwordMatches = dbPassword.trim().equals(rawPassword.trim());
+                    System.out.println("   Plain text match result: " + passwordMatches);
+                    if (!passwordMatches) {
+                        System.out.println("   DB password (trimmed): [" + dbPassword.trim() + "]");
+                        System.out.println("   Raw password (trimmed): [" + rawPassword.trim() + "]");
+                        System.out.println("   Length - DB: " + dbPassword.trim().length() + ", Raw: " + rawPassword.trim().length());
+                    }
                 }
             }
 
             if (!passwordMatches) {
+                System.out.println("❌ [KhachHangService] Wrong password for user: " + loginRequest.getUsername());
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                         .body(new erroResponse("Tài khoản hoặc mật khẩu không chính xác"));
             }
+            
+            System.out.println("✅ [KhachHangService] Password matches!");
 
             // Password đúng, tạo token
             UserLoginResponse user = UserLoginResponse.builder()

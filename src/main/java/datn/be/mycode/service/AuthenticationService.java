@@ -59,13 +59,25 @@ public class AuthenticationService {
             }
             
             // Tìm khách hàng theo tài khoản
-            System.out.println("🔍 [AUTH SERVICE] Searching for user with taiKhoan: " + loginRequest.getUsername() + ", trangThai: 1");
+            // Thử tìm với trangThai = 1 trước, nếu không tìm thấy thì tìm không cần trangThai
+            System.out.println("🔍 [AUTH SERVICE] Searching for user with taiKhoan: " + loginRequest.getUsername());
             Optional<KhachHang> khachHangOpt = khachHangRepository
                 .findByTaiKhoanAndTrangThai(loginRequest.getUsername().trim(), 1);
             
             if (khachHangOpt.isEmpty()) {
+                System.out.println("   ⚠️ User not found with trangThai=1, trying without trangThai check...");
+                khachHangOpt = khachHangRepository.findByTaiKhoan(loginRequest.getUsername().trim());
+                
+                if (khachHangOpt.isPresent()) {
+                    KhachHang found = khachHangOpt.get();
+                    System.out.println("   ⚠️ User found but trangThai=" + found.getTrangThai() + " (expected: 1)");
+                    // Vẫn cho phép đăng nhập nếu trangThai = NULL hoặc 0 (chưa kích hoạt)
+                    // Nhưng có thể thêm check nếu cần
+                }
+            }
+            
+            if (khachHangOpt.isEmpty()) {
                 System.out.println("❌ [AUTH SERVICE] User not found: " + loginRequest.getUsername());
-                System.out.println("   ⚠️ User not found with taiKhoan: " + loginRequest.getUsername() + " and trangThai: 1");
                 auditService.logFailedLogin(loginRequest.getUsername(), clientIp, "USER_NOT_FOUND");
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(new erroResponse("Tài khoản hoặc mật khẩu không chính xác"));
