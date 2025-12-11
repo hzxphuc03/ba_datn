@@ -53,8 +53,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         
         // CRITICAL: Skip JWT validation for public endpoints (login, register, etc.)
         // Must return immediately without touching SecurityContext
+        System.out.println("🔍 [JWT Filter] Checking if public endpoint - Path: [" + requestPath + "]");
         boolean isPublic = isPublicEndpoint(requestPath);
-        System.out.println("🔍 [JWT Filter] Is public endpoint? " + isPublic);
+        System.out.println("🔍 [JWT Filter] Is public endpoint? " + isPublic + " (Path: [" + requestPath + "])");
         
         if (isPublic) {
             System.out.println("✅ [JWT Filter] PUBLIC ENDPOINT DETECTED - SKIPPING JWT VALIDATION");
@@ -140,13 +141,18 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             return false;
         }
         
+        // Trim và normalize path
+        path = path.trim();
+        
         // #region agent log
         try {
             java.io.FileWriter fw = new java.io.FileWriter("/Users/phamhaiphuc/Downloads/DATN/BE - Copy/ba_datn/.cursor/debug.log", true);
-            fw.write("{\"sessionId\":\"debug-session\",\"runId\":\"run1\",\"hypothesisId\":\"A\",\"location\":\"JwtAuthenticationFilter.java:isPublicEndpoint\",\"message\":\"Checking if path is public\",\"data\":{\"path\":\"" + path + "\"},\"timestamp\":" + System.currentTimeMillis() + "}\n");
+            fw.write("{\"sessionId\":\"debug-session\",\"runId\":\"run1\",\"hypothesisId\":\"A\",\"location\":\"JwtAuthenticationFilter.java:isPublicEndpoint\",\"message\":\"Checking if path is public\",\"data\":{\"path\":\"" + path + "\",\"pathLength\":" + path.length() + "},\"timestamp\":" + System.currentTimeMillis() + "}\n");
             fw.close();
         } catch (Exception e) {}
         // #endregion
+        
+        System.out.println("🔍 [JWT Filter] isPublicEndpoint check - Path: [" + path + "], Length: " + path.length() + ", First 20 chars: [" + (path.length() > 20 ? path.substring(0, 20) : path) + "]");
         
         // Public auth endpoints - ALL /api/auth/** endpoints are public
         // This includes: /api/auth/login, /api/auth/login/**, /api/auth/register, /api/auth/register/**
@@ -158,7 +164,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         // Socket.IO endpoints - allow handshake requests (HTTP polling fallback)
         // Socket.IO server runs on separate port 9092, but HTTP polling requests may come to port 8080
         // Match both /socket.io and /socket.io/** patterns
-        if (path.startsWith("/socket.io")) {
+        // Normalize path: remove trailing slash for comparison
+        String normalizedPath = path.endsWith("/") && path.length() > 1 ? path.substring(0, path.length() - 1) : path;
+        boolean isSocketIO = path.startsWith("/socket.io") || normalizedPath.equals("/socket.io");
+        System.out.println("🔍 [JWT Filter] Socket.IO check - Path: [" + path + "], Normalized: [" + normalizedPath + "], startsWith('/socket.io'): " + path.startsWith("/socket.io") + ", equals('/socket.io'): " + normalizedPath.equals("/socket.io"));
+        
+        if (isSocketIO) {
             // #region agent log
             try {
                 java.io.FileWriter fw = new java.io.FileWriter("/Users/phamhaiphuc/Downloads/DATN/BE - Copy/ba_datn/.cursor/debug.log", true);
