@@ -1,5 +1,6 @@
 package datn.be.mycode.RESTController;
 
+import datn.be.mycode.entity.HoaDon;
 import datn.be.mycode.entity.HoaDonChiTiet;
 import datn.be.mycode.request.HoaDon.HoaDonByKhachHang;
 import datn.be.mycode.request.HoaDon.HuyHoaDonRequest;
@@ -12,6 +13,7 @@ import datn.be.mycode.service.HoaDonService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -165,8 +167,50 @@ public class HoaDonCotroller {
 
     @PostMapping("/add-nhanh")
     public ResponseEntity<?> addFast(@RequestParam("idNhanVien") Long idNhanVien){
-
-        return ResponseEntity.ok(hoaDonService.add(idNhanVien));
+        // #region agent log
+        try (java.io.FileWriter fw = new java.io.FileWriter("/Users/phamhaiphuc/Downloads/DATN/BE - Copy/ba_datn/.cursor/debug.log", true)) {
+            fw.write("{\"id\":\"log_" + System.currentTimeMillis() + "_hoaDon_addFast_entry\",\"timestamp\":" + System.currentTimeMillis() + ",\"location\":\"HoaDonCotroller.java:167\",\"message\":\"addFast ENTRY\",\"data\":{\"idNhanVien\":" + idNhanVien + "},\"sessionId\":\"debug-session\",\"runId\":\"run1\",\"hypothesisId\":\"H1,H2\"}\n");
+        } catch (java.io.IOException e) {}
+        // #endregion
+        
+        try {
+            HoaDon hoaDon = hoaDonService.add(idNhanVien);
+            if (hoaDon == null) {
+                // #region agent log
+                try (java.io.FileWriter fw = new java.io.FileWriter("/Users/phamhaiphuc/Downloads/DATN/BE - Copy/ba_datn/.cursor/debug.log", true)) {
+                    fw.write("{\"id\":\"log_" + System.currentTimeMillis() + "_hoaDon_addFast_null\",\"timestamp\":" + System.currentTimeMillis() + ",\"location\":\"HoaDonCotroller.java:170\",\"message\":\"add returned null\",\"data\":{},\"sessionId\":\"debug-session\",\"runId\":\"run1\",\"hypothesisId\":\"H1,H2\"}\n");
+                } catch (java.io.IOException e) {}
+                // #endregion
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new java.util.HashMap<String, Object>() {{
+                        put("success", false);
+                        put("message", "Không thể tạo hóa đơn. Vui lòng kiểm tra thông tin nhân viên hoặc phương thức thanh toán.");
+                        put("data", new java.util.ArrayList<>());
+                    }});
+            }
+            
+            // #region agent log
+            try (java.io.FileWriter fw = new java.io.FileWriter("/Users/phamhaiphuc/Downloads/DATN/BE - Copy/ba_datn/.cursor/debug.log", true)) {
+                fw.write("{\"id\":\"log_" + System.currentTimeMillis() + "_hoaDon_addFast_success\",\"timestamp\":" + System.currentTimeMillis() + ",\"location\":\"HoaDonCotroller.java:170\",\"message\":\"addFast SUCCESS\",\"data\":{\"hoaDonId\":" + hoaDon.getId() + "},\"sessionId\":\"debug-session\",\"runId\":\"run1\",\"hypothesisId\":\"H1,H2\"}\n");
+            } catch (java.io.IOException e) {}
+            // #endregion
+            
+            return ResponseEntity.ok(hoaDon);
+        } catch (Exception e) {
+            // #region agent log
+            try (java.io.FileWriter fw = new java.io.FileWriter("/Users/phamhaiphuc/Downloads/DATN/BE - Copy/ba_datn/.cursor/debug.log", true)) {
+                fw.write("{\"id\":\"log_" + System.currentTimeMillis() + "_hoaDon_addFast_exception\",\"timestamp\":" + System.currentTimeMillis() + ",\"location\":\"HoaDonCotroller.java:167\",\"message\":\"addFast EXCEPTION\",\"data\":{\"exception\":\"" + e.getClass().getSimpleName() + "\",\"message\":\"" + (e.getMessage() != null ? e.getMessage().replace("\"", "\\\"") : "null") + "\"},\"sessionId\":\"debug-session\",\"runId\":\"run1\",\"hypothesisId\":\"H1,H2\"}\n");
+            } catch (java.io.IOException e2) {}
+            // #endregion
+            System.err.println("❌ [HoaDonController] Exception in addFast: " + e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(new java.util.HashMap<String, Object>() {{
+                    put("success", false);
+                    put("message", "Lỗi hệ thống: " + e.getMessage());
+                    put("data", new java.util.ArrayList<>());
+                }});
+        }
     }
 
     @PutMapping("update")

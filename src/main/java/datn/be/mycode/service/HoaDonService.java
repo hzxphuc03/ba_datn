@@ -294,34 +294,97 @@ public class HoaDonService {
         return hoaDonRes;
     }
     public HoaDon add(Long idNhanVien){
-        NhanVien nhanVien = nhanVienRepository.findById(idNhanVien).orElse(null);
-        if(nhanVien != null){
-        HoaDon hoaDon = new HoaDon().builder()
-                .ngayTao(LocalDateTime.now())
-                .phiShip(BigDecimal.valueOf(0))
-                .tongTien(BigDecimal.valueOf(0))
-                .tongTienSanPhamChuaGiam(BigDecimal.valueOf(0))
-                .tongTienGiam(BigDecimal.valueOf(0))
-                .giaoHang(false)
-                .thanhToan(false)
-                .phuongThucThanhToan(phuongThucThanhToanRepository.findById(Long.valueOf(1)).get())
-                .nhanVien(nhanVien)
-                .trangThai(1)
-                .build();
-
-        HoaDon hoaDonRes = repo.save(hoaDon);
-        hoaDonRes.setMa("HD" + hoaDonRes.getId());
-        ThaoTacHoaDonAddRequest thaoTacHoaDon = new ThaoTacHoaDonAddRequest().builder()
-                    .thaoTac("Tạo hóa đơn")
-                    .idHoaDon(hoaDonRes.getId())
-                    .idNhanVien(hoaDon.getNhanVien().getId())
+        // #region agent log
+        try (java.io.FileWriter fw = new java.io.FileWriter("/Users/phamhaiphuc/Downloads/DATN/BE - Copy/ba_datn/.cursor/debug.log", true)) {
+            fw.write("{\"id\":\"log_" + System.currentTimeMillis() + "_hoaDon_add_entry\",\"timestamp\":" + System.currentTimeMillis() + ",\"location\":\"HoaDonService.java:296\",\"message\":\"add(Long idNhanVien) ENTRY\",\"data\":{\"idNhanVien\":" + idNhanVien + "},\"sessionId\":\"debug-session\",\"runId\":\"run1\",\"hypothesisId\":\"H1,H2\"}\n");
+        } catch (java.io.IOException e) {}
+        // #endregion
+        
+        try {
+            NhanVien nhanVien = nhanVienRepository.findById(idNhanVien).orElse(null);
+            if(nhanVien == null) {
+                // #region agent log
+                try (java.io.FileWriter fw = new java.io.FileWriter("/Users/phamhaiphuc/Downloads/DATN/BE - Copy/ba_datn/.cursor/debug.log", true)) {
+                    fw.write("{\"id\":\"log_" + System.currentTimeMillis() + "_hoaDon_add_nhanVien_null\",\"timestamp\":" + System.currentTimeMillis() + ",\"location\":\"HoaDonService.java:298\",\"message\":\"NhanVien is null\",\"data\":{\"idNhanVien\":" + idNhanVien + "},\"sessionId\":\"debug-session\",\"runId\":\"run1\",\"hypothesisId\":\"H1\"}\n");
+                } catch (java.io.IOException e) {}
+                // #endregion
+                System.err.println("❌ [HoaDonService] NhanVien not found with id: " + idNhanVien);
+                return null;
+            }
+            
+            // FIX: Use orElse instead of get() to avoid NoSuchElementException
+            var pttt = phuongThucThanhToanRepository.findById(Long.valueOf(1)).orElse(null);
+            if (pttt == null) {
+                // #region agent log
+                try (java.io.FileWriter fw = new java.io.FileWriter("/Users/phamhaiphuc/Downloads/DATN/BE - Copy/ba_datn/.cursor/debug.log", true)) {
+                    fw.write("{\"id\":\"log_" + System.currentTimeMillis() + "_hoaDon_add_pttt_null\",\"timestamp\":" + System.currentTimeMillis() + ",\"location\":\"HoaDonService.java:307\",\"message\":\"PhuongThucThanhToan ID=1 is null\",\"data\":{},\"sessionId\":\"debug-session\",\"runId\":\"run1\",\"hypothesisId\":\"H2\"}\n");
+                } catch (java.io.IOException e) {}
+                // #endregion
+                System.err.println("❌ [HoaDonService] PhuongThucThanhToan ID=1 not found");
+                return null;
+            }
+            
+            // #region agent log
+            try (java.io.FileWriter fw = new java.io.FileWriter("/Users/phamhaiphuc/Downloads/DATN/BE - Copy/ba_datn/.cursor/debug.log", true)) {
+                fw.write("{\"id\":\"log_" + System.currentTimeMillis() + "_hoaDon_add_before_build\",\"timestamp\":" + System.currentTimeMillis() + ",\"location\":\"HoaDonService.java:310\",\"message\":\"BEFORE building HoaDon\",\"data\":{},\"sessionId\":\"debug-session\",\"runId\":\"run1\",\"hypothesisId\":\"H1,H2\"}\n");
+            } catch (java.io.IOException e) {}
+            // #endregion
+            
+            HoaDon hoaDon = new HoaDon().builder()
+                    .ngayTao(LocalDateTime.now())
+                    .phiShip(BigDecimal.valueOf(0))
+                    .tongTien(BigDecimal.valueOf(0))
+                    .tongTienSanPhamChuaGiam(BigDecimal.valueOf(0))
+                    .tongTienGiam(BigDecimal.valueOf(0))
+                    .giaoHang(false)
+                    .thanhToan(false)
+                    .phuongThucThanhToan(pttt)
+                    .nhanVien(nhanVien)
+                    .trangThai(1)
                     .build();
 
-        thaoTacHoaDonService.add(thaoTacHoaDon);
+            // #region agent log
+            try (java.io.FileWriter fw = new java.io.FileWriter("/Users/phamhaiphuc/Downloads/DATN/BE - Copy/ba_datn/.cursor/debug.log", true)) {
+                fw.write("{\"id\":\"log_" + System.currentTimeMillis() + "_hoaDon_add_before_save\",\"timestamp\":" + System.currentTimeMillis() + ",\"location\":\"HoaDonService.java:312\",\"message\":\"BEFORE save hoaDon\",\"data\":{},\"sessionId\":\"debug-session\",\"runId\":\"run1\",\"hypothesisId\":\"H1,H2\"}\n");
+            } catch (java.io.IOException e) {}
+            // #endregion
 
-        return repo.save(hoaDonRes);
-    }
-        return null;
+            HoaDon hoaDonRes = repo.save(hoaDon);
+            hoaDonRes.setMa("HD" + hoaDonRes.getId());
+            
+            // #region agent log
+            try (java.io.FileWriter fw = new java.io.FileWriter("/Users/phamhaiphuc/Downloads/DATN/BE - Copy/ba_datn/.cursor/debug.log", true)) {
+                fw.write("{\"id\":\"log_" + System.currentTimeMillis() + "_hoaDon_add_after_save\",\"timestamp\":" + System.currentTimeMillis() + ",\"location\":\"HoaDonService.java:313\",\"message\":\"AFTER save hoaDon\",\"data\":{\"hoaDonId\":" + hoaDonRes.getId() + ",\"ma\":\"" + hoaDonRes.getMa() + "\"},\"sessionId\":\"debug-session\",\"runId\":\"run1\",\"hypothesisId\":\"H1,H2\"}\n");
+            } catch (java.io.IOException e) {}
+            // #endregion
+            
+            ThaoTacHoaDonAddRequest thaoTacHoaDon = new ThaoTacHoaDonAddRequest().builder()
+                        .thaoTac("Tạo hóa đơn")
+                        .idHoaDon(hoaDonRes.getId())
+                        .idNhanVien(hoaDon.getNhanVien().getId())
+                        .build();
+
+            thaoTacHoaDonService.add(thaoTacHoaDon);
+
+            HoaDon finalHoaDon = repo.save(hoaDonRes);
+            
+            // #region agent log
+            try (java.io.FileWriter fw = new java.io.FileWriter("/Users/phamhaiphuc/Downloads/DATN/BE - Copy/ba_datn/.cursor/debug.log", true)) {
+                fw.write("{\"id\":\"log_" + System.currentTimeMillis() + "_hoaDon_add_success\",\"timestamp\":" + System.currentTimeMillis() + ",\"location\":\"HoaDonService.java:322\",\"message\":\"add SUCCESS\",\"data\":{\"hoaDonId\":" + finalHoaDon.getId() + "},\"sessionId\":\"debug-session\",\"runId\":\"run1\",\"hypothesisId\":\"H1,H2\"}\n");
+            } catch (java.io.IOException e) {}
+            // #endregion
+
+            return finalHoaDon;
+        } catch (Exception e) {
+            // #region agent log
+            try (java.io.FileWriter fw = new java.io.FileWriter("/Users/phamhaiphuc/Downloads/DATN/BE - Copy/ba_datn/.cursor/debug.log", true)) {
+                fw.write("{\"id\":\"log_" + System.currentTimeMillis() + "_hoaDon_add_exception\",\"timestamp\":" + System.currentTimeMillis() + ",\"location\":\"HoaDonService.java:296\",\"message\":\"add EXCEPTION\",\"data\":{\"exception\":\"" + e.getClass().getSimpleName() + "\",\"message\":\"" + (e.getMessage() != null ? e.getMessage().replace("\"", "\\\"") : "null") + "\"},\"sessionId\":\"debug-session\",\"runId\":\"run1\",\"hypothesisId\":\"H1,H2\"}\n");
+            } catch (java.io.IOException e2) {}
+            // #endregion
+            System.err.println("❌ [HoaDonService] Exception in add(Long idNhanVien): " + e.getMessage());
+            e.printStackTrace();
+            return null;
+        }
     }
 
     public HoaDon update(HoaDonRequest request){
