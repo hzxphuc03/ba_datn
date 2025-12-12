@@ -165,7 +165,7 @@ public class HoaDonCotroller {
         return ResponseEntity.ok(hoaDonService.add(request));
     }
 
-    @PostMapping("/add-nhanh")
+    @RequestMapping(value = "/add-nhanh", method = {RequestMethod.GET, RequestMethod.POST}) // FIX: Support both GET and POST
     public ResponseEntity<?> addFast(@RequestParam("idNhanVien") Long idNhanVien){
         // #region agent log
         try (java.io.FileWriter fw = new java.io.FileWriter("/Users/phamhaiphuc/Downloads/DATN/BE - Copy/ba_datn/.cursor/debug.log", true)) {

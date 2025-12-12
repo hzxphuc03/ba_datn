@@ -75,6 +75,9 @@ public class WebSecurityConfigurerAdapter {
         
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
+        // FIX: Explicitly register CORS for WebSocket/SockJS endpoints
+        source.registerCorsConfiguration("/ws/**", configuration);
+        source.registerCorsConfiguration("/ws/info/**", configuration);
         return source;
     }
 

@@ -29,9 +29,14 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     public void registerStompEndpoints(@NonNull StompEndpointRegistry registry) {
         // Endpoint WebSocket cho client kết nối
         // Cho phép CORS và SockJS fallback
+        // FIX: Explicitly set CORS for SockJS info endpoint
         registry.addEndpoint("/ws")
                 .setAllowedOriginPatterns("*")
-                .withSockJS();
+                .setAllowedOrigins("*") // Also set allowedOrigins for SockJS compatibility
+                .withSockJS()
+                .setSessionCookieNeeded(false) // Disable cookies for CORS compatibility
+                .setHeartbeatTime(25000)
+                .setDisconnectDelay(5000);
     }
 
     @Override
