@@ -213,7 +213,8 @@ public class GioHangService {
         try {
             System.out.println("🔍 [GioHangService] thanhToanKhiGiaohang called for khachHangId: " + request.getIdKhachHang());
 
-            var pttt = phuongThucThanhToanRepository.findById(Long.valueOf(3)).orElse(null);
+            // FIX: ID=1 is COD (Cash on Delivery), not ID=3
+            var pttt = phuongThucThanhToanRepository.findById(Long.valueOf(1)).orElse(null);
             if (pttt == null) {
                 System.err.println("❌ [GioHangService] PhuongThucThanhToan ID=3 not found");
                 return getErro("Phương thức thanh toán không tồn tại");
@@ -624,7 +625,8 @@ public class GioHangService {
     }
 
     private HoaDon taoHoaDonThanhToan(ThanhToanKhiNhanHang request){
-        var pttt = phuongThucThanhToanRepository.findById(Long.valueOf(3)).orElse(null);
+        // FIX: ID=1 is COD (Cash on Delivery), not ID=3
+        var pttt = phuongThucThanhToanRepository.findById(Long.valueOf(1)).orElse(null);
         if (pttt == null) return null;
         var khachHang = khachHangRepository.findById(request.getIdKhachHang()).orElse(null);
         if (khachHang == null) return null;
