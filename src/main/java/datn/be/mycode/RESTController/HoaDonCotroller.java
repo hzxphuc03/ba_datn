@@ -35,8 +35,14 @@ public class HoaDonCotroller {
             @RequestParam(name = "endDate",required = false) LocalDateTime endDate,
             @RequestParam(name = "idKhachHang",required = false) Long idKhachHang,
             @RequestParam(name = "idNhanVien",required = false) Long idNhanVien,
-            @RequestParam(name = "status",required = false) Integer status
+            @RequestParam(name = "status",required = false) Integer status,
+            HttpServletRequest httpRequest
     ){
+        // #region agent log
+        try (java.io.FileWriter fw = new java.io.FileWriter("/Users/phamhaiphuc/Downloads/DATN/BE - Copy/ba_datn/.cursor/debug.log", true)) {
+            fw.write("{\"id\":\"log_" + System.currentTimeMillis() + "_hoaDon_getAll_entry\",\"timestamp\":" + System.currentTimeMillis() + ",\"location\":\"HoaDonCotroller.java:30\",\"message\":\"getAll ENTRY\",\"data\":{\"page\":" + (page != null ? page : "null") + ",\"pageSize\":" + (pageSize != null ? pageSize : "null") + ",\"status\":" + (status != null ? status : "null") + ",\"requestURI\":\"" + httpRequest.getRequestURI() + "\"},\"sessionId\":\"debug-session\",\"runId\":\"run1\",\"hypothesisId\":\"H1\"}\n");
+        } catch (java.io.IOException e) {}
+        // #endregion
         try {
             System.out.println("🔍 [HoaDonController] getAll called with params: page=" + page + ", idNhanVien=" + idNhanVien + ", status=" + status);
             
@@ -44,9 +50,19 @@ public class HoaDonCotroller {
             var result = hoaDonService.getAllByTrangThai1(request);
             
             System.out.println("✅ [HoaDonController] getAll completed. Returning " + (result.getItem() != null ? result.getItem().size() : 0) + " items");
+            // #region agent log
+            try (java.io.FileWriter fw = new java.io.FileWriter("/Users/phamhaiphuc/Downloads/DATN/BE - Copy/ba_datn/.cursor/debug.log", true)) {
+                fw.write("{\"id\":\"log_" + System.currentTimeMillis() + "_hoaDon_getAll_success\",\"timestamp\":" + System.currentTimeMillis() + ",\"location\":\"HoaDonCotroller.java:47\",\"message\":\"getAll SUCCESS\",\"data\":{\"itemCount\":" + (result.getItem() != null ? result.getItem().size() : 0) + "},\"sessionId\":\"debug-session\",\"runId\":\"run1\",\"hypothesisId\":\"H1\"}\n");
+            } catch (java.io.IOException e) {}
+            // #endregion
             return ResponseEntity.ok(result);
             
         } catch (Exception e) {
+            // #region agent log
+            try (java.io.FileWriter fw = new java.io.FileWriter("/Users/phamhaiphuc/Downloads/DATN/BE - Copy/ba_datn/.cursor/debug.log", true)) {
+                fw.write("{\"id\":\"log_" + System.currentTimeMillis() + "_hoaDon_getAll_exception\",\"timestamp\":" + System.currentTimeMillis() + ",\"location\":\"HoaDonCotroller.java:49\",\"message\":\"getAll EXCEPTION\",\"data\":{\"exception\":\"" + e.getClass().getSimpleName() + "\",\"message\":\"" + (e.getMessage() != null ? e.getMessage().replace("\"", "\\\"") : "null") + "\"},\"sessionId\":\"debug-session\",\"runId\":\"run1\",\"hypothesisId\":\"H1\"}\n");
+            } catch (java.io.IOException e2) {}
+            // #endregion
             System.err.println("❌ [HoaDonController] Error in getAll: " + e.getMessage());
             e.printStackTrace();
             
@@ -68,8 +84,14 @@ public class HoaDonCotroller {
             @RequestParam(name = "endDate",required = false) LocalDateTime endDate,
             @RequestParam(name = "idKhachHang",required = false) Long idKhachHang,
             @RequestParam(name = "idNhanVien",required = false) Long idNhanVien,
-            @RequestParam(name = "status",required = false) Integer status
+            @RequestParam(name = "status",required = false) Integer status,
+            HttpServletRequest httpRequest
     ){
+        // #region agent log
+        try (java.io.FileWriter fw = new java.io.FileWriter("/Users/phamhaiphuc/Downloads/DATN/BE - Copy/ba_datn/.cursor/debug.log", true)) {
+            fw.write("{\"id\":\"log_" + System.currentTimeMillis() + "_hoaDon_getAllByTrangThai_entry\",\"timestamp\":" + System.currentTimeMillis() + ",\"location\":\"HoaDonCotroller.java:63\",\"message\":\"getAllByTrangThai ENTRY\",\"data\":{\"page\":" + (page != null ? page : "null") + ",\"pageSize\":" + (pageSize != null ? pageSize : "null") + ",\"status\":" + (status != null ? status : "null") + ",\"requestURI\":\"" + httpRequest.getRequestURI() + "\"},\"sessionId\":\"debug-session\",\"runId\":\"run1\",\"hypothesisId\":\"H1\"}\n");
+        } catch (java.io.IOException e) {}
+        // #endregion
         try {
             System.out.println("🔍 [HoaDonController] get-all called with params: page=" + page + ", status=" + status);
             
@@ -77,9 +99,19 @@ public class HoaDonCotroller {
             var result = hoaDonService.getAll(request);
             
             System.out.println("✅ [HoaDonController] get-all completed. Returning " + (result.getItem() != null ? result.getItem().size() : 0) + " items");
+            // #region agent log
+            try (java.io.FileWriter fw = new java.io.FileWriter("/Users/phamhaiphuc/Downloads/DATN/BE - Copy/ba_datn/.cursor/debug.log", true)) {
+                fw.write("{\"id\":\"log_" + System.currentTimeMillis() + "_hoaDon_getAllByTrangThai_success\",\"timestamp\":" + System.currentTimeMillis() + ",\"location\":\"HoaDonCotroller.java:80\",\"message\":\"getAllByTrangThai SUCCESS\",\"data\":{\"itemCount\":" + (result.getItem() != null ? result.getItem().size() : 0) + "},\"sessionId\":\"debug-session\",\"runId\":\"run1\",\"hypothesisId\":\"H1\"}\n");
+            } catch (java.io.IOException e) {}
+            // #endregion
             return ResponseEntity.ok(result);
             
         } catch (Exception e) {
+            // #region agent log
+            try (java.io.FileWriter fw = new java.io.FileWriter("/Users/phamhaiphuc/Downloads/DATN/BE - Copy/ba_datn/.cursor/debug.log", true)) {
+                fw.write("{\"id\":\"log_" + System.currentTimeMillis() + "_hoaDon_getAllByTrangThai_exception\",\"timestamp\":" + System.currentTimeMillis() + ",\"location\":\"HoaDonCotroller.java:82\",\"message\":\"getAllByTrangThai EXCEPTION\",\"data\":{\"exception\":\"" + e.getClass().getSimpleName() + "\",\"message\":\"" + (e.getMessage() != null ? e.getMessage().replace("\"", "\\\"") : "null") + "\"},\"sessionId\":\"debug-session\",\"runId\":\"run1\",\"hypothesisId\":\"H1\"}\n");
+            } catch (java.io.IOException e2) {}
+            // #endregion
             System.err.println("❌ [HoaDonController] Error in get-all: " + e.getMessage());
             e.printStackTrace();
             
