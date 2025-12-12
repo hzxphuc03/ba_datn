@@ -70,7 +70,7 @@ public class GioHangService {
     public ResponseEntity<?> updateGioHang(GioHangAdd request){
         var khachHang = khachHangRepository.findById(request.getIdKhachHang()).orElse(null);
         if(khachHang == null) return getErro("Khách hàng này chưa tồn tại hoặc đã dừng hoạt động");
-        var gioHang = gioHangRepository.findByKhachHangId(khachHang.getId()).orElse(null);
+        var gioHang = getGioHangByKhachHangId(khachHang.getId());
         if(khachHang == null) return getErro("Khách hàng này chưa tồn tại hoặc đã dừng hoạt động");
         if (request.getIdPhuongThucThanhToan() == 1) return getErro("Phương thức thanh toán này không áp dụng ở giỏ hàng");
         var phuongThucThanhToan = phuongThucThanhToanRepository.findById(request.getIdPhuongThucThanhToan()).orElse(null);
@@ -106,7 +106,7 @@ public class GioHangService {
     public ResponseEntity<?> getSoLuong(Long request){
         var khachHang = khachHangRepository.findById(request).orElse(null);
         if(khachHang == null) return ResponseEntity.ok(0);
-        var gioHang = gioHangRepository.findByKhachHangId(khachHang.getId()).orElse(null);
+        var gioHang = getGioHangByKhachHangId(khachHang.getId());
         if(khachHang == null) return getErro("Khách hàng này chưa tồn tại hoặc đã dừng hoạt động");
 
         var soLuong = gioHangChiTietRepository.getTongSoLuong(gioHang.getId());
@@ -775,10 +775,11 @@ public class GioHangService {
     }
     
     // FIX: Helper method to safely get GioHang, handling multiple results
-    private GioHang getGioHangByKhachHangId(Long idKhachHang) {
+    // Package-private so other services in the same package can use it
+    GioHang getGioHangByKhachHangId(Long idKhachHang) {
         try {
             // Try the original method first (for single result)
-            return getGioHangByKhachHangId(idKhachHang);
+            return gioHangRepository.findByKhachHangId(idKhachHang).orElse(null);
         } catch (org.springframework.dao.IncorrectResultSizeDataAccessException e) {
             // If multiple results, get the first active one
             System.err.println("⚠️ [GioHangService] Multiple carts found for khachHangId: " + idKhachHang + ", taking first active one");
@@ -790,6 +791,17 @@ public class GioHangService {
             var allCarts = gioHangRepository.findAllByKhachHangIdOrderByNgayTaoDesc(idKhachHang);
             return allCarts.isEmpty() ? null : allCarts.get(0);
         } catch (Exception e) {
+            // Check if it's a NonUniqueResultException (Hibernate) or IncorrectResultSizeDataAccessException (Spring)
+            if (e instanceof org.springframework.dao.IncorrectResultSizeDataAccessException || 
+                e.getCause() instanceof org.hibernate.NonUniqueResultException) {
+                System.err.println("⚠️ [GioHangService] Multiple carts found for khachHangId: " + idKhachHang + ", taking first active one");
+                var activeCarts = gioHangRepository.findActiveCartsByKhachHangId(idKhachHang);
+                if (!activeCarts.isEmpty()) {
+                    return activeCarts.get(0);
+                }
+                var allCarts = gioHangRepository.findAllByKhachHangIdOrderByNgayTaoDesc(idKhachHang);
+                return allCarts.isEmpty() ? null : allCarts.get(0);
+            }
             System.err.println("❌ [GioHangService] Error getting GioHang: " + e.getMessage());
             e.printStackTrace();
             return null;

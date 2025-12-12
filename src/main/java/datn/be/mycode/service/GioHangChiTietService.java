@@ -33,13 +33,15 @@ public class GioHangChiTietService {
     @Autowired
     private GioHangRepository gioHangRepository;
     @Autowired
+    private GioHangService gioHangService; // Inject to use helper method
+    @Autowired
     private KhachHangRepository khachHangRepository;
     @Autowired
     private SanPhamChiTietRepository sanPhamChiTietRepository;
 
     public List<GioHangChiTiet> getAllByGioHang(Long request) {
 
-        var gioHang = gioHangRepository.findByKhachHangId(request).orElse(null);
+        var gioHang = gioHangService.getGioHangByKhachHangId(request);
         if(gioHang == null) return null;
 
         var gioHangChiTiets = repo.findAllByGioHangId(gioHang.getId());
@@ -50,7 +52,7 @@ public class GioHangChiTietService {
     public ResponseEntity<?> addGioHangChiTiet(AddGioHangChiTietReq request){
         try {
             // Tìm hoặc tạo gioHang nếu chưa có
-            var gioHang = gioHangRepository.findByKhachHangId(request.getIdKhachhang()).orElse(null);
+            var gioHang = gioHangService.getGioHangByKhachHangId(request.getIdKhachhang());
 
             if (gioHang == null) {
                 // Tạo mới gioHang cho khách hàng
@@ -140,7 +142,7 @@ public class GioHangChiTietService {
     }
 
     public ResponseEntity<?> deleteAllByGioHang(Long idKhachHang) {
-        var gioHang = gioHangRepository.findByKhachHangId(idKhachHang).orElse(null);
+        var gioHang = gioHangService.getGioHangByKhachHangId(idKhachHang);
         var gioHangChiTiets = repo.findAllByGioHangId(gioHang.getId());
         if (gioHangChiTiets == null )return getErro("Giỏ hàng này không tồn tại");
         repo.deleteAll(gioHangChiTiets);
