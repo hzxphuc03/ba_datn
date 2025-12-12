@@ -25,6 +25,9 @@ public interface VoucherRepository extends JpaRepository<Voucher,Long> {
     List<Voucher> findAllByTheLoai(int theLoai);
 
     Optional<Voucher> findByMa(String ma);
+    
+    // FIX: Return List to handle duplicate voucher codes, then take first active one
+    List<Voucher> findAllByMaOrderByIdDesc(String ma);
 
     @Query("SELECT u FROM Voucher u WHERE u.ten LIKE %:query% OR u.ma LIKE %:query%")
     Page<Voucher> searchByTenOrMa(@Param("query") String query, Pageable pageable);

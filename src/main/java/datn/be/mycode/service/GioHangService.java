@@ -62,7 +62,7 @@ public class GioHangService {
     private EmailSender emailSender;
 
     public ResponseEntity<?> getByKhachHang(Long idKhachHang) {
-        var gioHang = gioHangRepository.findByKhachHangId(idKhachHang).orElse(null);
+        var gioHang = getGioHangByKhachHangId(idKhachHang);
         if (gioHang == null ) return getErro("Khách hàng này không tồn tại");
         return ResponseEntity.ok(gioHang);
     }
@@ -115,7 +115,7 @@ public class GioHangService {
     }
 
     public ResponseEntity<?> addDiaChi(GioHangDiaChi request) {
-        var gioHang = gioHangRepository.findByKhachHangId(request.getIdKhachHang()).orElse(null);
+        var gioHang = getGioHangByKhachHangId(request.getIdKhachHang());
         if(gioHang == null) return getErro("Giỏ hàng không tồn tại");
 
         if(checkDiaChi(request)){
@@ -128,7 +128,7 @@ public class GioHangService {
     }
 
     public ResponseEntity<?> addVoucher(GioHangVoucher request) {
-        var gioHang = gioHangRepository.findByKhachHangId(request.getIdKhachHang()).orElse(null);
+        var gioHang = getGioHangByKhachHangId(request.getIdKhachHang());
         if(gioHang == null) return getErro("Giỏ hàng không tồn tại");
 
         var idVoucher = request.getIdVoucher();
@@ -166,7 +166,7 @@ public class GioHangService {
     }
 
     public ResponseEntity<?> addPhuongThucThanhToan(GioHangPhuongThucThanhToan request) {
-        var gioHang = gioHangRepository.findByKhachHangId(request.getIdKhachHang()).orElse(null);
+        var gioHang = getGioHangByKhachHangId(request.getIdKhachHang());
         var phuongThucThanhToan = phuongThucThanhToanRepository.findById(request.getIdPhuongThucThanhToan()).orElse(null);
 
         if(gioHang == null) return getErro("Hóa đơn không tồn tại");
@@ -179,7 +179,7 @@ public class GioHangService {
 
     public ResponseEntity<?> thanhToanOnline(ThanhToanKhiNhanHang request){
 //        var pttt = phuongThucThanhToanRepository.findById(Long.valueOf(2)).orElse(null);
-//        var gioHang = gioHangRepository.findByKhachHangId(request.getIdKhachHang()).orElse(null);
+//        var gioHang = getGioHangByKhachHangId(request.getIdKhachHang());
 //        if(gioHang == null) return getErro("Khách hàng này đã dừng");
 
 //        HoaDon hoaDon = taoHoaDonThanhToan(request);
@@ -219,7 +219,8 @@ public class GioHangService {
                 return getErro("Phương thức thanh toán không tồn tại");
             }
 
-            var gioHang = gioHangRepository.findByKhachHangId(request.getIdKhachHang()).orElse(null);
+            // FIX: Handle multiple carts by taking the first active one
+            var gioHang = getGioHangByKhachHangId(request.getIdKhachHang());
             if(gioHang == null) {
                 System.err.println("❌ [GioHangService] GioHang not found for khachHangId: " + request.getIdKhachHang());
                 return getErro("Khách hàng này đã dừng");
@@ -400,7 +401,7 @@ public class GioHangService {
 
     public ResponseEntity<?> thanhToanThanhCong(ThanhToanKhiNhanHang request) {
         var pttt = phuongThucThanhToanRepository.findById(Long.valueOf(2)).orElse(null);
-        var gioHang = gioHangRepository.findByKhachHangId(request.getIdKhachHang()).orElse(null);
+        var gioHang = getGioHangByKhachHangId(request.getIdKhachHang());
         if(gioHang == null) return getErro("Khách hàng này không hoạt động hoặc chưa tạo tài khoản");
         if(request.getIdTinhThanh() == null) return getErro("");
 //        tao hoa don
@@ -427,7 +428,7 @@ public class GioHangService {
     private void AddVouchherFreeShip(HoaDon hoaDon) {
         BigDecimal giaTraThuong = BigDecimal.valueOf(500000);
         if(hoaDon.getTongTien().compareTo(giaTraThuong) >= 0){
-            var voucherFreeShip = voucherRepository.findByMa("G5FP").orElse(null);
+            var voucherFreeShip = getVoucherByMa("G5FP");
             if(voucherFreeShip == null){
                 Voucher voucher = new Voucher();
                 voucher.setTen("Phiếu giảm giá cho hóa đơn trên 500000 đ");
@@ -441,7 +442,7 @@ public class GioHangService {
 
                 voucherFreeShip = voucherRepository.save(voucher);
             }
-            var voucherKhachHhang = voucherKhachHangRepository.findByVoucherId(voucherFreeShip.getId()).orElse(null);
+            var voucherKhachHhang = getVoucherKhachHangByVoucherId(voucherFreeShip.getId());
             if(voucherKhachHhang == null){
                 VoucherKhachHang voucherKhachHang = new VoucherKhachHang();
                 voucherKhachHang.setNgayTao(LocalDateTime.now());
@@ -471,7 +472,7 @@ public class GioHangService {
 
     private void setSanPhamThanhToanOnline(HoaDon hoaDon) {
         var hoaDonChiTiets = hoaDonChiTietRepository.findAllByHoaDon_Id(hoaDon.getId());
-        var gioHang = gioHangRepository.findByKhachHangId(hoaDon.getKhachHang().getId()).orElse(null);
+        var gioHang = getGioHangByKhachHangId(hoaDon.getKhachHang().getId());
 
 
         for (HoaDonChiTiet hoaDonChiTiet:hoaDonChiTiets) {
@@ -771,5 +772,55 @@ public class GioHangService {
 
     private ResponseEntity<?> getErro(String s){
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new erroResponse(s));
+    }
+    
+    // FIX: Helper method to safely get GioHang, handling multiple results
+    private GioHang getGioHangByKhachHangId(Long idKhachHang) {
+        try {
+            // Try the original method first (for single result)
+            return getGioHangByKhachHangId(idKhachHang);
+        } catch (org.springframework.dao.IncorrectResultSizeDataAccessException e) {
+            // If multiple results, get the first active one
+            System.err.println("⚠️ [GioHangService] Multiple carts found for khachHangId: " + idKhachHang + ", taking first active one");
+            var activeCarts = gioHangRepository.findActiveCartsByKhachHangId(idKhachHang);
+            if (!activeCarts.isEmpty()) {
+                return activeCarts.get(0);
+            }
+            // If no active carts, get the most recent one
+            var allCarts = gioHangRepository.findAllByKhachHangIdOrderByNgayTaoDesc(idKhachHang);
+            return allCarts.isEmpty() ? null : allCarts.get(0);
+        } catch (Exception e) {
+            System.err.println("❌ [GioHangService] Error getting GioHang: " + e.getMessage());
+            e.printStackTrace();
+            return null;
+        }
+    }
+    
+    // FIX: Helper method to safely get Voucher, handling duplicate codes
+    private Voucher getVoucherByMa(String ma) {
+        try {
+            return voucherRepository.findByMa(ma).orElse(null);
+        } catch (org.springframework.dao.IncorrectResultSizeDataAccessException e) {
+            System.err.println("⚠️ [GioHangService] Multiple vouchers found with ma: " + ma + ", taking first one");
+            var vouchers = voucherRepository.findAllByMaOrderByIdDesc(ma);
+            return vouchers.isEmpty() ? null : vouchers.get(0);
+        } catch (Exception e) {
+            System.err.println("❌ [GioHangService] Error getting Voucher: " + e.getMessage());
+            return null;
+        }
+    }
+    
+    // FIX: Helper method to safely get VoucherKhachHang, handling multiple records
+    private VoucherKhachHang getVoucherKhachHangByVoucherId(Long idVoucher) {
+        try {
+            return voucherKhachHangRepository.findByVoucherId(idVoucher).orElse(null);
+        } catch (org.springframework.dao.IncorrectResultSizeDataAccessException e) {
+            System.err.println("⚠️ [GioHangService] Multiple VoucherKhachHang found for voucherId: " + idVoucher + ", taking first one");
+            var voucherKhachHangs = voucherKhachHangRepository.findAllByVoucherIdOrderByNgayTaoDesc(idVoucher);
+            return voucherKhachHangs.isEmpty() ? null : voucherKhachHangs.get(0);
+        } catch (Exception e) {
+            System.err.println("❌ [GioHangService] Error getting VoucherKhachHang: " + e.getMessage());
+            return null;
+        }
     }
 }

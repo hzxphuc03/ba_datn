@@ -35,4 +35,7 @@ public interface VoucherKhachHangRepository extends JpaRepository<VoucherKhachHa
     List<VoucherKhachHang> findAllByKhachHangId(Long idKhachHang);
 
     Optional<VoucherKhachHang> findByVoucherId(Long idVoucher);
+    
+    // FIX: Return List to handle multiple records, then take first one
+    List<VoucherKhachHang> findAllByVoucherIdOrderByNgayTaoDesc(Long idVoucher);
 }
