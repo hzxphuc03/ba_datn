@@ -189,7 +189,7 @@ public class GioHangService {
 //        setGiohang(gioHang);
 
         for (Long idGioHangChiTiet : request.getIdGioHangChiTietList()) {
-            var gioHangChiTietCheck = gioHangChiTietRepository.findById(idGioHangChiTiet).get();
+            var gioHangChiTietCheck = gioHangChiTietRepository.findById(idGioHangChiTiet).orElse(null);
             var sanPhamCheck = gioHangChiTietCheck.getSanPhamChiTiet();
             if (sanPhamCheck.getSanPham().getTrangThai() != 1) return getErro("Sản phẩm hiện tại không hoạt đông");
 //            if(sanPhamCheck.getSoLuong()<gioHangChiTietCheck.getSoLuong()) return getErro("Cửa hàng không còn đủ số lượng của sản phẩm "+gioHangChiTietCheck.getId());
@@ -201,31 +201,106 @@ public class GioHangService {
 
 
     public ResponseEntity<?> thanhToanKhiGiaohang(ThanhToanKhiNhanHang request) {
-        var pttt = phuongThucThanhToanRepository.findById(Long.valueOf(3)).orElse(null);
-        var gioHang = gioHangRepository.findByKhachHangId(request.getIdKhachHang()).orElse(null);
-        if(gioHang == null) return getErro("Khách hàng này đã dừng");
+        try {
+            System.out.println("🔍 [GioHangService] thanhToanKhiGiaohang called for khachHangId: " + request.getIdKhachHang());
 
-//        List<GioHangChiTiet> gioHangChiTietCheck = new ArrayList<>();
-        for (Long idGioHangChiTiet : request.getIdGioHangChiTietList()) {
-            var gioHangChiTietCheck = gioHangChiTietRepository.findById(idGioHangChiTiet).get();
-            var sanPhamCheck = gioHangChiTietCheck.getSanPhamChiTiet();
-            if (sanPhamCheck.getSanPham().getTrangThai() != 1) return getErro("Sản phẩm hiện tại không hoạt đông");
-//            if(sanPhamCheck.getSoLuong()<gioHangChiTietCheck.getSoLuong()) return getErro("Cửa hàng không còn đủ số lượng của sản phẩm "+gioHangChiTietCheck.getId());
+            var pttt = phuongThucThanhToanRepository.findById(Long.valueOf(3)).orElse(null);
+            if (pttt == null) {
+                System.err.println("❌ [GioHangService] PhuongThucThanhToan ID=3 not found");
+                return getErro("Phương thức thanh toán không tồn tại");
+            }
+
+            var gioHang = gioHangRepository.findByKhachHangId(request.getIdKhachHang()).orElse(null);
+            if(gioHang == null) {
+                System.err.println("❌ [GioHangService] GioHang not found for khachHangId: " + request.getIdKhachHang());
+                return getErro("Khách hàng này đã dừng");
+            }
+
+            // Kiểm tra sản phẩm trong giỏ hàng
+            if (request.getIdGioHangChiTietList() == null || request.getIdGioHangChiTietList().isEmpty()) {
+                System.err.println("❌ [GioHangService] idGioHangChiTietList is null or empty");
+                return getErro("Chưa có sản phẩm trong giỏ hàng");
+            }
+
+            for (Long idGioHangChiTiet : request.getIdGioHangChiTietList()) {
+                var gioHangChiTietOpt = gioHangChiTietRepository.findById(idGioHangChiTiet);
+                if (gioHangChiTietOpt.isEmpty()) {
+                    System.err.println("❌ [GioHangService] GioHangChiTiet not found: " + idGioHangChiTiet);
+                    return getErro("Sản phẩm trong giỏ hàng không tồn tại");
+                }
+
+                var gioHangChiTietCheck = gioHangChiTietOpt.get();
+                var sanPhamCheck = gioHangChiTietCheck.getSanPhamChiTiet();
+
+                if (sanPhamCheck == null) {
+                    System.err.println("❌ [GioHangService] SanPhamChiTiet is null for gioHangChiTiet: " + idGioHangChiTiet);
+                    return getErro("Sản phẩm không tồn tại");
+                }
+
+                if (sanPhamCheck.getSanPham() == null) {
+                    System.err.println("❌ [GioHangService] SanPham is null for sanPhamChiTiet: " + sanPhamCheck.getId());
+                    return getErro("Sản phẩm không tồn tại");
+                }
+
+                if (sanPhamCheck.getSanPham().getTrangThai() != 1) {
+                    System.err.println("❌ [GioHangService] SanPham trangThai != 1: " + sanPhamCheck.getSanPham().getTrangThai());
+                    return getErro("Sản phẩm hiện tại không hoạt động");
+                }
+            }
+
+            // Tạo hóa đơn
+            HoaDon hoaDon = taoHoaDonThanhToan(request);
+            if (hoaDon == null) {
+                System.err.println("❌ [GioHangService] taoHoaDonThanhToan returned null");
+                return getErro("Không thể tạo hóa đơn. Vui lòng kiểm tra thông tin khách hàng");
+            }
+
+            hoaDon.setPhuongThucThanhToan(pttt);
+            hoaDon = hoaDonRepository.save(hoaDon);
+
+            // Tạo hóa đơn chi tiết
+            List<HoaDonChiTiet> hoaDonChiTietList = taoHoaDonChiTiet(hoaDon, request.getIdGioHangChiTietList());
+            if(hoaDonChiTietList == null || hoaDonChiTietList.isEmpty()) {
+                System.err.println("❌ [GioHangService] taoHoaDonChiTiet returned null or empty");
+                // Rollback: xóa hóa đơn đã tạo
+                try {
+                    hoaDonRepository.delete(hoaDon);
+                } catch (Exception e) {
+                    System.err.println("❌ [GioHangService] Failed to rollback hoaDon: " + e.getMessage());
+                }
+                return getErro("Chưa có sản phẩm trong giỏ hàng");
+            }
+
+            setGiohang(gioHang);
+
+            // Gửi thông báo và email (không fail nếu email lỗi)
+            try {
+                TaoThongBao(hoaDon);
+            } catch (Exception e) {
+                System.err.println("⚠️ [GioHangService] Failed to create notification: " + e.getMessage());
+                // Không fail vì đây không phải lỗi nghiêm trọng
+            }
+
+            try {
+                if (hoaDon.getKhachHang() != null && hoaDon.getKhachHang().getEmail() != null && !hoaDon.getKhachHang().getEmail().trim().isEmpty()) {
+                    emailSender.sendEmailHoaDon(hoaDon.getKhachHang().getEmail(), hoaDonChiTietList, hoaDon);
+                } else {
+                    System.out.println("⚠️ [GioHangService] Không có email để gửi thông báo");
+                }
+            } catch (Exception e) {
+                System.err.println("⚠️ [GioHangService] Failed to send email: " + e.getMessage());
+                // Không fail vì email không phải bắt buộc
+            }
+
+            System.out.println("✅ [GioHangService] thanhToanKhiGiaohang completed successfully. HoaDon ID: " + hoaDon.getId());
+            return ResponseEntity.ok(hoaDon);
+
+        } catch (Exception e) {
+            System.err.println("❌ [GioHangService] Exception in thanhToanKhiGiaohang: " + e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(new erroResponse("Lỗi hệ thống: " + e.getMessage()));
         }
-
-//        tao hoa don
-        HoaDon hoaDon = taoHoaDonThanhToan(request);
-        hoaDon.setPhuongThucThanhToan(pttt);
-        hoaDon = hoaDonRepository.save(hoaDon);
-//            toa hoa don chi tiet
-        List<HoaDonChiTiet> hoaDonChiTietList = taoHoaDonChiTiet(hoaDon,request.getIdGioHangChiTietList());
-        if(hoaDonChiTietList == null) return getErro("Chưa có sản phẩm trong giỏ hàng");
-        setGiohang(gioHang);
-
-        TaoThongBao(hoaDon);
-        emailSender.sendEmailHoaDon(hoaDon.getKhachHang().getEmail(),hoaDonChiTietList,hoaDon);
-        return ResponseEntity.ok(hoaDon);
-
     }
 
     private void TaoThongBao(HoaDon hoaDon) {
@@ -368,28 +443,53 @@ public class GioHangService {
 
 
     private List<HoaDonChiTiet> taoHoaDonChiTiet(HoaDon hoaDon, List<Long> idGioHangChiTiets) {
-        var gioHangChiTiets = new ArrayList<GioHangChiTiet>();
-        for (Long idGioHangChiTiet:idGioHangChiTiets) {
-            var gioHangChiTiet = gioHangChiTietRepository.findById(idGioHangChiTiet).get();
-            gioHangChiTiets.add(gioHangChiTiet);
+        try {
+            if (idGioHangChiTiets == null || idGioHangChiTiets.isEmpty()) {
+                System.err.println("❌ [GioHangService] idGioHangChiTiets is null or empty");
+                return null;
+            }
+
+            var gioHangChiTiets = new ArrayList<GioHangChiTiet>();
+            for (Long idGioHangChiTiet : idGioHangChiTiets) {
+                var gioHangChiTietOpt = gioHangChiTietRepository.findById(idGioHangChiTiet);
+                if (gioHangChiTietOpt.isEmpty()) {
+                    System.err.println("❌ [GioHangService] GioHangChiTiet not found: " + idGioHangChiTiet);
+                    return null;
+                }
+                gioHangChiTiets.add(gioHangChiTietOpt.get());
+            }
+
+            List<HoaDonChiTiet> hoaDonChiTiets = new ArrayList<>();
+            for (GioHangChiTiet gioHangChiTiet : gioHangChiTiets) {
+                if (gioHangChiTiet == null || gioHangChiTiet.getSanPhamChiTiet() == null) {
+                    System.err.println("❌ [GioHangService] GioHangChiTiet or SanPhamChiTiet is null");
+                    continue; // Skip invalid items
+                }
+
+                HoaDonChiTiet hoaDonChiTiet = new HoaDonChiTiet();
+                hoaDonChiTiet.setSoLuong(gioHangChiTiet.getSoLuong());
+                hoaDonChiTiet.setGiaHienHanh(gioHangChiTiet.getGiaHienHanh());
+                hoaDonChiTiet.setGiaDaGiam(gioHangChiTiet.getGiaDaGiam());
+                hoaDonChiTiet.setTrangThai(1);
+                hoaDonChiTiet.setHoaDon(hoaDon);
+                hoaDonChiTiet.setSanPhamChiTiet(gioHangChiTiet.getSanPhamChiTiet());
+
+                setSanPham(hoaDon, gioHangChiTiet);
+                hoaDonChiTiets.add(hoaDonChiTiet);
+            }
+
+            if (hoaDonChiTiets.isEmpty()) {
+                System.err.println("❌ [GioHangService] No valid hoaDonChiTiets created");
+                return null;
+            }
+
+            return hoaDonChiTietRepository.saveAll(hoaDonChiTiets);
+
+        } catch (Exception e) {
+            System.err.println("❌ [GioHangService] Exception in taoHoaDonChiTiet: " + e.getMessage());
+            e.printStackTrace();
+            return null;
         }
-        List<HoaDonChiTiet> hoaDonChiTiets = new ArrayList<>();
-        for (GioHangChiTiet gioHangChiTiet :gioHangChiTiets) {
-
-            HoaDonChiTiet hoaDonChiTiet = new HoaDonChiTiet();
-            hoaDonChiTiet.setSoLuong(gioHangChiTiet.getSoLuong());
-            hoaDonChiTiet.setGiaHienHanh(gioHangChiTiet.getGiaHienHanh());
-            hoaDonChiTiet.setGiaDaGiam(gioHangChiTiet.getGiaDaGiam());
-            hoaDonChiTiet.setTrangThai(1);
-            hoaDonChiTiet.setHoaDon(hoaDon);
-            hoaDonChiTiet.setSanPhamChiTiet(gioHangChiTiet.getSanPhamChiTiet());
-
-            setSanPham(hoaDon,gioHangChiTiet);
-
-            hoaDonChiTiets.add(hoaDonChiTiet);
-        }
-
-        return hoaDonChiTietRepository.saveAll(hoaDonChiTiets);
     }
 
     private void setSanPham(HoaDon hoaDon, GioHangChiTiet gioHangChiTiet) {
