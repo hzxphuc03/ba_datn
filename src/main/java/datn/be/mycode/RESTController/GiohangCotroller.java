@@ -51,8 +51,20 @@ public class GiohangCotroller {
 
     @PutMapping("/thanh-toan-khi-giao-hang")
     public ResponseEntity<?> thanhToanKhiGiaohang(@RequestBody() ThanhToanKhiNhanHang request){
-
-        return ResponseEntity.ok(gioHangService.thanhToanKhiGiaohang(request));
+        // #region agent log
+        try (java.io.FileWriter fw = new java.io.FileWriter("/Users/phamhaiphuc/Downloads/DATN/BE - Copy/ba_datn/.cursor/debug.log", true)) {
+            fw.write("{\"id\":\"log_" + System.currentTimeMillis() + "_controller_entry\",\"timestamp\":" + System.currentTimeMillis() + ",\"location\":\"GiohangCotroller.java:53\",\"message\":\"Controller ENTRY\",\"data\":{},\"sessionId\":\"debug-session\",\"runId\":\"run1\",\"hypothesisId\":\"H3\"}\n");
+        } catch (java.io.IOException e) {}
+        // #endregion
+        ResponseEntity<?> response = gioHangService.thanhToanKhiGiaohang(request);
+        // #region agent log
+        try (java.io.FileWriter fw = new java.io.FileWriter("/Users/phamhaiphuc/Downloads/DATN/BE - Copy/ba_datn/.cursor/debug.log", true)) {
+            fw.write("{\"id\":\"log_" + System.currentTimeMillis() + "_controller_exit\",\"timestamp\":" + System.currentTimeMillis() + ",\"location\":\"GiohangCotroller.java:55\",\"message\":\"Controller EXIT\",\"data\":{\"statusCode\":" + response.getStatusCode().value() + ",\"hasBody\":" + (response.getBody() != null) + "},\"sessionId\":\"debug-session\",\"runId\":\"run1\",\"hypothesisId\":\"H3\"}\n");
+        } catch (java.io.IOException e) {}
+        // #endregion
+        // FIX: Return service response directly instead of wrapping in 200 OK
+        // This ensures error status codes (400, 500) are properly returned to frontend
+        return response;
     }
 
     @PutMapping("/thanh-toan-online")

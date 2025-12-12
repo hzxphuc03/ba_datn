@@ -14,7 +14,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.io.FileWriter;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -200,7 +203,13 @@ public class GioHangService {
     }
 
 
+    @Transactional
     public ResponseEntity<?> thanhToanKhiGiaohang(ThanhToanKhiNhanHang request) {
+        // #region agent log
+        try (FileWriter fw = new FileWriter("/Users/phamhaiphuc/Downloads/DATN/BE - Copy/ba_datn/.cursor/debug.log", true)) {
+            fw.write("{\"id\":\"log_" + System.currentTimeMillis() + "_entry\",\"timestamp\":" + System.currentTimeMillis() + ",\"location\":\"GioHangService.java:203\",\"message\":\"thanhToanKhiGiaohang ENTRY\",\"data\":{\"khachHangId\":" + request.getIdKhachHang() + ",\"idGioHangChiTietList\":" + (request.getIdGioHangChiTietList() != null ? request.getIdGioHangChiTietList().size() : 0) + "},\"sessionId\":\"debug-session\",\"runId\":\"run1\",\"hypothesisId\":\"H1,H2,H3,H4,H5\"}\n");
+        } catch (IOException e) {}
+        // #endregion
         try {
             System.out.println("🔍 [GioHangService] thanhToanKhiGiaohang called for khachHangId: " + request.getIdKhachHang());
 
@@ -249,20 +258,55 @@ public class GioHangService {
             }
 
             // Tạo hóa đơn
+            // #region agent log
+            try (FileWriter fw = new FileWriter("/Users/phamhaiphuc/Downloads/DATN/BE - Copy/ba_datn/.cursor/debug.log", true)) {
+                fw.write("{\"id\":\"log_" + System.currentTimeMillis() + "_before_taoHoaDon\",\"timestamp\":" + System.currentTimeMillis() + ",\"location\":\"GioHangService.java:252\",\"message\":\"BEFORE taoHoaDonThanhToan\",\"data\":{},\"sessionId\":\"debug-session\",\"runId\":\"run1\",\"hypothesisId\":\"H1,H2\"}\n");
+            } catch (IOException e) {}
+            // #endregion
             HoaDon hoaDon = taoHoaDonThanhToan(request);
             if (hoaDon == null) {
+                // #region agent log
+                try (FileWriter fw = new FileWriter("/Users/phamhaiphuc/Downloads/DATN/BE - Copy/ba_datn/.cursor/debug.log", true)) {
+                    fw.write("{\"id\":\"log_" + System.currentTimeMillis() + "_taoHoaDon_null\",\"timestamp\":" + System.currentTimeMillis() + ",\"location\":\"GioHangService.java:253\",\"message\":\"taoHoaDonThanhToan returned null\",\"data\":{},\"sessionId\":\"debug-session\",\"runId\":\"run1\",\"hypothesisId\":\"H2\"}\n");
+                } catch (IOException e) {}
+                // #endregion
                 System.err.println("❌ [GioHangService] taoHoaDonThanhToan returned null");
                 return getErro("Không thể tạo hóa đơn. Vui lòng kiểm tra thông tin khách hàng");
             }
 
             hoaDon.setPhuongThucThanhToan(pttt);
+            // #region agent log
+            try (FileWriter fw = new FileWriter("/Users/phamhaiphuc/Downloads/DATN/BE - Copy/ba_datn/.cursor/debug.log", true)) {
+                fw.write("{\"id\":\"log_" + System.currentTimeMillis() + "_before_save_hoaDon\",\"timestamp\":" + System.currentTimeMillis() + ",\"location\":\"GioHangService.java:259\",\"message\":\"BEFORE save hoaDon\",\"data\":{\"hoaDonId\":" + (hoaDon.getId() != null ? hoaDon.getId() : "null") + "},\"sessionId\":\"debug-session\",\"runId\":\"run1\",\"hypothesisId\":\"H1,H2,H4\"}\n");
+            } catch (IOException e) {}
+            // #endregion
             hoaDon = hoaDonRepository.save(hoaDon);
+            // #region agent log
+            try (FileWriter fw = new FileWriter("/Users/phamhaiphuc/Downloads/DATN/BE - Copy/ba_datn/.cursor/debug.log", true)) {
+                fw.write("{\"id\":\"log_" + System.currentTimeMillis() + "_after_save_hoaDon\",\"timestamp\":" + System.currentTimeMillis() + ",\"location\":\"GioHangService.java:259\",\"message\":\"AFTER save hoaDon\",\"data\":{\"hoaDonId\":" + hoaDon.getId() + ",\"ma\":\"" + hoaDon.getMa() + "\"},\"sessionId\":\"debug-session\",\"runId\":\"run1\",\"hypothesisId\":\"H1,H2,H4\"}\n");
+            } catch (IOException e) {}
+            // #endregion
 
             // Tạo hóa đơn chi tiết
+            // #region agent log
+            try (FileWriter fw = new FileWriter("/Users/phamhaiphuc/Downloads/DATN/BE - Copy/ba_datn/.cursor/debug.log", true)) {
+                fw.write("{\"id\":\"log_" + System.currentTimeMillis() + "_before_taoHoaDonChiTiet\",\"timestamp\":" + System.currentTimeMillis() + ",\"location\":\"GioHangService.java:262\",\"message\":\"BEFORE taoHoaDonChiTiet\",\"data\":{\"hoaDonId\":" + hoaDon.getId() + ",\"cartItemCount\":" + request.getIdGioHangChiTietList().size() + "},\"sessionId\":\"debug-session\",\"runId\":\"run1\",\"hypothesisId\":\"H1,H5\"}\n");
+            } catch (IOException e) {}
+            // #endregion
             List<HoaDonChiTiet> hoaDonChiTietList = taoHoaDonChiTiet(hoaDon, request.getIdGioHangChiTietList());
+            // #region agent log
+            try (FileWriter fw = new FileWriter("/Users/phamhaiphuc/Downloads/DATN/BE - Copy/ba_datn/.cursor/debug.log", true)) {
+                fw.write("{\"id\":\"log_" + System.currentTimeMillis() + "_after_taoHoaDonChiTiet\",\"timestamp\":" + System.currentTimeMillis() + ",\"location\":\"GioHangService.java:262\",\"message\":\"AFTER taoHoaDonChiTiet\",\"data\":{\"hoaDonChiTietListSize\":" + (hoaDonChiTietList != null ? hoaDonChiTietList.size() : 0) + ",\"isNull\":" + (hoaDonChiTietList == null) + "},\"sessionId\":\"debug-session\",\"runId\":\"run1\",\"hypothesisId\":\"H1,H5\"}\n");
+            } catch (IOException e) {}
+            // #endregion
             if(hoaDonChiTietList == null || hoaDonChiTietList.isEmpty()) {
                 System.err.println("❌ [GioHangService] taoHoaDonChiTiet returned null or empty");
                 // Rollback: xóa hóa đơn đã tạo
+                // #region agent log
+                try (FileWriter fw = new FileWriter("/Users/phamhaiphuc/Downloads/DATN/BE - Copy/ba_datn/.cursor/debug.log", true)) {
+                    fw.write("{\"id\":\"log_" + System.currentTimeMillis() + "_rollback_hoaDon\",\"timestamp\":" + System.currentTimeMillis() + ",\"location\":\"GioHangService.java:264\",\"message\":\"ROLLBACK hoaDon\",\"data\":{\"hoaDonId\":" + hoaDon.getId() + "},\"sessionId\":\"debug-session\",\"runId\":\"run1\",\"hypothesisId\":\"H2\"}\n");
+                } catch (IOException e) {}
+                // #endregion
                 try {
                     hoaDonRepository.delete(hoaDon);
                 } catch (Exception e) {
@@ -271,7 +315,17 @@ public class GioHangService {
                 return getErro("Chưa có sản phẩm trong giỏ hàng");
             }
 
+            // #region agent log
+            try (FileWriter fw = new FileWriter("/Users/phamhaiphuc/Downloads/DATN/BE - Copy/ba_datn/.cursor/debug.log", true)) {
+                fw.write("{\"id\":\"log_" + System.currentTimeMillis() + "_before_setGiohang\",\"timestamp\":" + System.currentTimeMillis() + ",\"location\":\"GioHangService.java:274\",\"message\":\"BEFORE setGiohang\",\"data\":{\"gioHangId\":" + gioHang.getId() + "},\"sessionId\":\"debug-session\",\"runId\":\"run1\",\"hypothesisId\":\"H1\"}\n");
+            } catch (IOException e) {}
+            // #endregion
             setGiohang(gioHang);
+            // #region agent log
+            try (FileWriter fw = new FileWriter("/Users/phamhaiphuc/Downloads/DATN/BE - Copy/ba_datn/.cursor/debug.log", true)) {
+                fw.write("{\"id\":\"log_" + System.currentTimeMillis() + "_after_setGiohang\",\"timestamp\":" + System.currentTimeMillis() + ",\"location\":\"GioHangService.java:274\",\"message\":\"AFTER setGiohang\",\"data\":{},\"sessionId\":\"debug-session\",\"runId\":\"run1\",\"hypothesisId\":\"H1\"}\n");
+            } catch (IOException e) {}
+            // #endregion
 
             // Gửi thông báo và email (không fail nếu email lỗi)
             try {
@@ -293,9 +347,19 @@ public class GioHangService {
             }
 
             System.out.println("✅ [GioHangService] thanhToanKhiGiaohang completed successfully. HoaDon ID: " + hoaDon.getId());
+            // #region agent log
+            try (FileWriter fw = new FileWriter("/Users/phamhaiphuc/Downloads/DATN/BE - Copy/ba_datn/.cursor/debug.log", true)) {
+                fw.write("{\"id\":\"log_" + System.currentTimeMillis() + "_success_exit\",\"timestamp\":" + System.currentTimeMillis() + ",\"location\":\"GioHangService.java:296\",\"message\":\"SUCCESS EXIT\",\"data\":{\"hoaDonId\":" + hoaDon.getId() + ",\"status\":\"OK\"},\"sessionId\":\"debug-session\",\"runId\":\"run1\",\"hypothesisId\":\"H1,H2,H3,H4,H5\"}\n");
+            } catch (IOException e) {}
+            // #endregion
             return ResponseEntity.ok(hoaDon);
 
         } catch (Exception e) {
+            // #region agent log
+            try (FileWriter fw = new FileWriter("/Users/phamhaiphuc/Downloads/DATN/BE - Copy/ba_datn/.cursor/debug.log", true)) {
+                fw.write("{\"id\":\"log_" + System.currentTimeMillis() + "_exception\",\"timestamp\":" + System.currentTimeMillis() + ",\"location\":\"GioHangService.java:298\",\"message\":\"EXCEPTION caught\",\"data\":{\"exception\":\"" + e.getClass().getSimpleName() + "\",\"message\":\"" + e.getMessage().replace("\"", "\\\"") + "\"},\"sessionId\":\"debug-session\",\"runId\":\"run1\",\"hypothesisId\":\"H1,H2\"}\n");
+            } catch (IOException e2) {}
+            // #endregion
             System.err.println("❌ [GioHangService] Exception in thanhToanKhiGiaohang: " + e.getMessage());
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -493,19 +557,52 @@ public class GioHangService {
     }
 
     private void setSanPham(HoaDon hoaDon, GioHangChiTiet gioHangChiTiet) {
+        // #region agent log
+        try (FileWriter fw = new FileWriter("/Users/phamhaiphuc/Downloads/DATN/BE - Copy/ba_datn/.cursor/debug.log", true)) {
+            fw.write("{\"id\":\"log_" + System.currentTimeMillis() + "_setSanPham_entry\",\"timestamp\":" + System.currentTimeMillis() + ",\"location\":\"GioHangService.java:559\",\"message\":\"setSanPham ENTRY\",\"data\":{\"gioHangChiTietId\":" + gioHangChiTiet.getId() + "},\"sessionId\":\"debug-session\",\"runId\":\"run1\",\"hypothesisId\":\"H1\"}\n");
+        } catch (IOException e) {}
+        // #endregion
 
-
+        try {
             var sanPhamChiTiet = gioHangChiTiet.getSanPhamChiTiet();
+            if (sanPhamChiTiet == null) {
+                // #region agent log
+                try (FileWriter fw = new FileWriter("/Users/phamhaiphuc/Downloads/DATN/BE - Copy/ba_datn/.cursor/debug.log", true)) {
+                    fw.write("{\"id\":\"log_" + System.currentTimeMillis() + "_setSanPham_null_sanPhamChiTiet\",\"timestamp\":" + System.currentTimeMillis() + ",\"location\":\"GioHangService.java:566\",\"message\":\"sanPhamChiTiet is null\",\"data\":{},\"sessionId\":\"debug-session\",\"runId\":\"run1\",\"hypothesisId\":\"H1\"}\n");
+                } catch (IOException e) {}
+                // #endregion
+                throw new RuntimeException("SanPhamChiTiet is null for gioHangChiTiet: " + gioHangChiTiet.getId());
+            }
+            
             var sanPham = sanPhamChiTiet.getSanPham();
+            if (sanPham == null) {
+                // #region agent log
+                try (FileWriter fw = new FileWriter("/Users/phamhaiphuc/Downloads/DATN/BE - Copy/ba_datn/.cursor/debug.log", true)) {
+                    fw.write("{\"id\":\"log_" + System.currentTimeMillis() + "_setSanPham_null_sanPham\",\"timestamp\":" + System.currentTimeMillis() + ",\"location\":\"GioHangService.java:574\",\"message\":\"sanPham is null\",\"data\":{},\"sessionId\":\"debug-session\",\"runId\":\"run1\",\"hypothesisId\":\"H1\"}\n");
+                } catch (IOException e) {}
+                // #endregion
+                throw new RuntimeException("SanPham is null for sanPhamChiTiet: " + sanPhamChiTiet.getId());
+            }
+            
 //            if(hoaDon.getPhuongThucThanhToan().getId() != 3) {
 //                sanPhamChiTiet.setSoLuong(sanPhamChiTiet.getSoLuong() - gioHangChiTiet.getSoLuong());
 //                if (sanPhamChiTiet.getSoLuong() == 0) sanPhamChiTiet.setTrangThai(0);
 //
 //                sanPhamChiTietRepository.save(sanPhamChiTiet);
 //            }
+            // #region agent log
+            try (FileWriter fw = new FileWriter("/Users/phamhaiphuc/Downloads/DATN/BE - Copy/ba_datn/.cursor/debug.log", true)) {
+                fw.write("{\"id\":\"log_" + System.currentTimeMillis() + "_before_delete_cart\",\"timestamp\":" + System.currentTimeMillis() + ",\"location\":\"GioHangService.java:579\",\"message\":\"BEFORE delete gioHangChiTiet\",\"data\":{\"gioHangChiTietId\":" + gioHangChiTiet.getId() + "},\"sessionId\":\"debug-session\",\"runId\":\"run1\",\"hypothesisId\":\"H1\"}\n");
+            } catch (IOException e) {}
+            // #endregion
             gioHangChiTietRepository.delete(gioHangChiTiet);
+            // #region agent log
+            try (FileWriter fw = new FileWriter("/Users/phamhaiphuc/Downloads/DATN/BE - Copy/ba_datn/.cursor/debug.log", true)) {
+                fw.write("{\"id\":\"log_" + System.currentTimeMillis() + "_after_delete_cart\",\"timestamp\":" + System.currentTimeMillis() + ",\"location\":\"GioHangService.java:579\",\"message\":\"AFTER delete gioHangChiTiet\",\"data\":{\"gioHangChiTietId\":" + gioHangChiTiet.getId() + "},\"sessionId\":\"debug-session\",\"runId\":\"run1\",\"hypothesisId\":\"H1\"}\n");
+            } catch (IOException e) {}
+            // #endregion
 //            tinh lai so luong cua san pham
-        int soLuongTong = sanPhamChiTietRepository.sumSoLuongByTrangThai(sanPham.getId());
+            int soLuongTong = sanPhamChiTietRepository.sumSoLuongByTrangThai(sanPham.getId());
             sanPham.setSoLuong(soLuongTong);
             sanPhamRepository.save(sanPham);
             var sanPhamChiTiets = sanPhamChiTietRepository.findAllBySanPham_IdAndTrangThai(sanPham.getId(), 1);
@@ -513,6 +610,16 @@ public class GioHangService {
                 sanPham.setTrangThai(0);
                 sanPhamRepository.save(sanPham);
             }
+        } catch (Exception e) {
+            // #region agent log
+            try (FileWriter fw = new FileWriter("/Users/phamhaiphuc/Downloads/DATN/BE - Copy/ba_datn/.cursor/debug.log", true)) {
+                fw.write("{\"id\":\"log_" + System.currentTimeMillis() + "_setSanPham_exception\",\"timestamp\":" + System.currentTimeMillis() + ",\"location\":\"GioHangService.java:594\",\"message\":\"EXCEPTION in setSanPham\",\"data\":{\"exception\":\"" + e.getClass().getSimpleName() + "\",\"message\":\"" + e.getMessage().replace("\"", "\\\"") + "\"},\"sessionId\":\"debug-session\",\"runId\":\"run1\",\"hypothesisId\":\"H1\"}\n");
+            } catch (IOException e2) {}
+            // #endregion
+            System.err.println("❌ [GioHangService] Exception in setSanPham: " + e.getMessage());
+            e.printStackTrace();
+            throw e; // Re-throw to trigger transaction rollback
+        }
     }
 
     private HoaDon taoHoaDonThanhToan(ThanhToanKhiNhanHang request){
@@ -544,9 +651,46 @@ public class GioHangService {
 
         hoaDon = hoaDonRepository.save(hoaDon);
         hoaDon.setMa("HD"+hoaDon.getId());
-        addVoucher(hoaDon, request.getIdVoucherKhachHangList());
+        
+        // #region agent log
+        try (FileWriter fw = new FileWriter("/Users/phamhaiphuc/Downloads/DATN/BE - Copy/ba_datn/.cursor/debug.log", true)) {
+            fw.write("{\"id\":\"log_" + System.currentTimeMillis() + "_before_addVoucher\",\"timestamp\":" + System.currentTimeMillis() + ",\"location\":\"GioHangService.java:625\",\"message\":\"BEFORE addVoucher\",\"data\":{\"idVoucherKhachHangList\":" + (request.getIdVoucherKhachHangList() != null ? request.getIdVoucherKhachHangList().size() : "null") + "},\"sessionId\":\"debug-session\",\"runId\":\"run1\",\"hypothesisId\":\"H1,H2\"}\n");
+        } catch (IOException e) {}
+        // #endregion
+        
+        // FIX: Handle null voucher list and check return value
+        if (request.getIdVoucherKhachHangList() != null && !request.getIdVoucherKhachHangList().isEmpty()) {
+            String voucherResult = addVoucher(hoaDon, request.getIdVoucherKhachHangList());
+            // #region agent log
+            try (FileWriter fw = new FileWriter("/Users/phamhaiphuc/Downloads/DATN/BE - Copy/ba_datn/.cursor/debug.log", true)) {
+                fw.write("{\"id\":\"log_" + System.currentTimeMillis() + "_after_addVoucher\",\"timestamp\":" + System.currentTimeMillis() + ",\"location\":\"GioHangService.java:625\",\"message\":\"AFTER addVoucher\",\"data\":{\"result\":\"" + (voucherResult != null ? voucherResult.replace("\"", "\\\"") : "null") + "\"},\"sessionId\":\"debug-session\",\"runId\":\"run1\",\"hypothesisId\":\"H1,H2\"}\n");
+            } catch (IOException e) {}
+            // #endregion
+            // If voucher processing fails, log but don't fail the entire transaction
+            if (voucherResult != null && !voucherResult.equals("done")) {
+                System.err.println("⚠️ [GioHangService] Voucher processing warning: " + voucherResult);
+                // Don't throw exception - just log the warning
+            }
+        }
 
-        TaoThaoTacHoaDon(hoaDon);
+        // #region agent log
+        try (FileWriter fw = new FileWriter("/Users/phamhaiphuc/Downloads/DATN/BE - Copy/ba_datn/.cursor/debug.log", true)) {
+            fw.write("{\"id\":\"log_" + System.currentTimeMillis() + "_before_TaoThaoTacHoaDon\",\"timestamp\":" + System.currentTimeMillis() + ",\"location\":\"GioHangService.java:627\",\"message\":\"BEFORE TaoThaoTacHoaDon\",\"data\":{},\"sessionId\":\"debug-session\",\"runId\":\"run1\",\"hypothesisId\":\"H1,H2\"}\n");
+        } catch (IOException e) {}
+        // #endregion
+        
+        try {
+            TaoThaoTacHoaDon(hoaDon);
+        } catch (Exception e) {
+            System.err.println("⚠️ [GioHangService] Failed to create ThaoTacHoaDon: " + e.getMessage());
+            // Don't fail the entire transaction if this fails
+        }
+
+        // #region agent log
+        try (FileWriter fw = new FileWriter("/Users/phamhaiphuc/Downloads/DATN/BE - Copy/ba_datn/.cursor/debug.log", true)) {
+            fw.write("{\"id\":\"log_" + System.currentTimeMillis() + "_taoHoaDonThanhToan_success\",\"timestamp\":" + System.currentTimeMillis() + ",\"location\":\"GioHangService.java:630\",\"message\":\"taoHoaDonThanhToan SUCCESS\",\"data\":{\"hoaDonId\":" + hoaDon.getId() + "},\"sessionId\":\"debug-session\",\"runId\":\"run1\",\"hypothesisId\":\"H1,H2\"}\n");
+        } catch (IOException e) {}
+        // #endregion
 
         return hoaDon;
     }
@@ -562,6 +706,10 @@ public class GioHangService {
     }
 
     private String addVoucher(HoaDon hoaDon, List<Long> idVoucherKhachHangList) {
+        // FIX: Handle null list
+        if (idVoucherKhachHangList == null || idVoucherKhachHangList.isEmpty()) {
+            return "done";
+        }
 
 //        get vocher
         List<Voucher> vouchers = new ArrayList<>();

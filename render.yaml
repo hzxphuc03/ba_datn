@@ -55,7 +55,7 @@ services:
       # Nếu cần real-time, dùng STOMP WebSocket trên cùng port HTTP
       - key: SOCKETIO_ENABLED
         value: "false"
-      
+
       # Cloudinary Configuration (for image upload)
       # Get these from https://cloudinary.com/console
       - key: CLOUDINARY_CLOUD_NAME
