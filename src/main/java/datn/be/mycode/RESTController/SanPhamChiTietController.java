@@ -16,7 +16,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
-@CrossOrigin("*")
+// CORS được cấu hình globally trong WebConfig
 @RestController
 @RequestMapping("/api/san_pham_chi_tiet")
 public class SanPhamChiTietController {

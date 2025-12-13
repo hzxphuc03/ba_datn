@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/auth")
-@CrossOrigin(origins = "*")
+// CORS được cấu hình globally trong WebConfig, không cần @CrossOrigin ở đây
 public class AuthController {
     
     private final AuthenticationService authenticationService;
@@ -24,6 +24,9 @@ public class AuthController {
      */
     @PostMapping("/login/khach-hang")
     public ResponseEntity<?> loginKhachHang(@RequestBody loginTest request, HttpServletRequest httpRequest) {
+        // #region agent log
+        try { java.nio.file.Files.write(java.nio.file.Paths.get("/Users/phamhaiphuc/Downloads/DATN/BE - Copy/ba_datn/.cursor/debug.log"), (java.time.Instant.now().toEpochMilli() + "|{\"sessionId\":\"debug-session\",\"runId\":\"run1\",\"hypothesisId\":\"F\",\"location\":\"AuthController.java:26\",\"message\":\"loginKhachHang controller method called\",\"data\":{\"path\":\"" + httpRequest.getServletPath() + "\"},\"timestamp\":" + java.time.Instant.now().toEpochMilli() + "}\n").getBytes(), java.nio.file.StandardOpenOption.CREATE, java.nio.file.StandardOpenOption.APPEND); } catch (Exception e) {}
+        // #endregion
         String clientIp = getClientIp(httpRequest);
         return authenticationService.authenticateKhachHang(request, clientIp);
     }

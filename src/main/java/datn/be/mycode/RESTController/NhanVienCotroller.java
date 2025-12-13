@@ -12,7 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
-@CrossOrigin("*")
+// CORS được cấu hình globally trong WebConfig
 @RestController
 @RequestMapping("/api/nhan_vien")
 public class NhanVienCotroller {

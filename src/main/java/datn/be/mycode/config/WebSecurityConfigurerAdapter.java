@@ -11,6 +11,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.core.annotation.Order;
+import datn.be.mycode.config.JwtTokenProvider;
 
 @Configuration
 @EnableWebSecurity
@@ -20,9 +21,9 @@ public class WebSecurityConfigurerAdapter {
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
 
-    public WebSecurityConfigurerAdapter(JwtAuthenticationFilter jwtAuthenticationFilter,
-                                       JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint) {
-        this.jwtAuthenticationFilter = jwtAuthenticationFilter;
+    public WebSecurityConfigurerAdapter(JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint,
+                                       JwtTokenProvider jwtTokenProvider) {
+        this.jwtAuthenticationFilter = new JwtAuthenticationFilter(jwtTokenProvider);
         this.jwtAuthenticationEntryPoint = jwtAuthenticationEntryPoint;
     }
 
@@ -31,19 +32,70 @@ public class WebSecurityConfigurerAdapter {
         return new BCryptPasswordEncoder(12);
     }
 
+    /**
+     * SecurityFilterChain cho /api/auth/** - Order 0 để được xử lý trước
+     * KHÔNG có JWT filter và KHÔNG có exception handling
+     */
     @Bean
-    @Order(2)
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    @Order(0)
+    public SecurityFilterChain authSecurityFilterChain(HttpSecurity http) throws Exception {
+        // #region agent log
+        try { java.nio.file.Files.write(java.nio.file.Paths.get("/Users/phamhaiphuc/Downloads/DATN/BE - Copy/ba_datn/.cursor/debug.log"), (java.time.Instant.now().toEpochMilli() + "|{\"sessionId\":\"debug-session\",\"runId\":\"run1\",\"hypothesisId\":\"A\",\"location\":\"WebSecurityConfigurerAdapter.java:40\",\"message\":\"authSecurityFilterChain bean created\",\"data\":{\"order\":0,\"matcher\":\"lambda\"},\"timestamp\":" + java.time.Instant.now().toEpochMilli() + "}\n").getBytes(), java.nio.file.StandardOpenOption.CREATE, java.nio.file.StandardOpenOption.APPEND); } catch (Exception e) {}
+        // #endregion
         http
+                // Sử dụng securityMatcher để chỉ áp dụng chain này cho /api/auth/** và /error
+                .securityMatcher("/api/auth/**", "/error")
+                .csrf(csrf -> csrf.disable())
+                .httpBasic(httpBasic -> httpBasic.disable())
+                .formLogin(formLogin -> formLogin.disable())
+                .sessionManagement(session -> 
+                    session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authorizeHttpRequests(auth -> {
+                    // #region agent log
+                    try { java.nio.file.Files.write(java.nio.file.Paths.get("/Users/phamhaiphuc/Downloads/DATN/BE - Copy/ba_datn/.cursor/debug.log"), (java.time.Instant.now().toEpochMilli() + "|{\"sessionId\":\"debug-session\",\"runId\":\"run1\",\"hypothesisId\":\"A\",\"location\":\"WebSecurityConfigurerAdapter.java:58\",\"message\":\"authSecurityFilterChain authorizeHttpRequests permitAll configured\",\"data\":{},\"timestamp\":" + java.time.Instant.now().toEpochMilli() + "}\n").getBytes(), java.nio.file.StandardOpenOption.CREATE, java.nio.file.StandardOpenOption.APPEND); } catch (Exception e) {}
+                    // #endregion
+                    auth.anyRequest().permitAll();
+                });
+        
+        // #region agent log
+        try { java.nio.file.Files.write(java.nio.file.Paths.get("/Users/phamhaiphuc/Downloads/DATN/BE - Copy/ba_datn/.cursor/debug.log"), (java.time.Instant.now().toEpochMilli() + "|{\"sessionId\":\"debug-session\",\"runId\":\"run1\",\"hypothesisId\":\"A\",\"location\":\"WebSecurityConfigurerAdapter.java:66\",\"message\":\"authSecurityFilterChain built - no filter, exception handling disabled\",\"data\":{},\"timestamp\":" + java.time.Instant.now().toEpochMilli() + "}\n").getBytes(), java.nio.file.StandardOpenOption.CREATE, java.nio.file.StandardOpenOption.APPEND); } catch (Exception e) {}
+        // #endregion
+        
+        return http.build();
+    }
+
+    /**
+     * SecurityFilterChain cho các endpoints khác - Order 1
+     * Có JWT filter và exception handling
+     * KHÔNG match với /api/auth/** vì đã được xử lý bởi authSecurityFilterChain
+     */
+    @Bean
+    @Order(1)
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        // #region agent log
+        try { java.nio.file.Files.write(java.nio.file.Paths.get("/Users/phamhaiphuc/Downloads/DATN/BE - Copy/ba_datn/.cursor/debug.log"), (java.time.Instant.now().toEpochMilli() + "|{\"sessionId\":\"debug-session\",\"runId\":\"run1\",\"hypothesisId\":\"B\",\"location\":\"WebSecurityConfigurerAdapter.java:58\",\"message\":\"securityFilterChain bean created\",\"data\":{\"order\":1},\"timestamp\":" + java.time.Instant.now().toEpochMilli() + "}\n").getBytes(), java.nio.file.StandardOpenOption.CREATE, java.nio.file.StandardOpenOption.APPEND); } catch (Exception e) {}
+        // #endregion
+        http
+                // Đảm bảo chain này KHÔNG match với /api/auth/**
+                .securityMatcher(request -> {
+                    String path = request.getServletPath();
+                    // #region agent log
+                    try { java.nio.file.Files.write(java.nio.file.Paths.get("/Users/phamhaiphuc/Downloads/DATN/BE - Copy/ba_datn/.cursor/debug.log"), (java.time.Instant.now().toEpochMilli() + "|{\"sessionId\":\"debug-session\",\"runId\":\"run1\",\"hypothesisId\":\"E\",\"location\":\"WebSecurityConfigurerAdapter.java:63\",\"message\":\"securityMatcher lambda evaluated\",\"data\":{\"path\":\"" + path + "\",\"matches\":\"" + !path.startsWith("/api/auth/") + "\"},\"timestamp\":" + java.time.Instant.now().toEpochMilli() + "}\n").getBytes(), java.nio.file.StandardOpenOption.CREATE, java.nio.file.StandardOpenOption.APPEND); } catch (Exception e) {}
+                    // #endregion
+                    return !path.startsWith("/api/auth/");
+                })
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> 
                     session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests((authorize) -> authorize
-                        // Public endpoints - không cần authentication
-                        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", 
-                                       "/swagger-resources/**", "/webjars/**").permitAll()
-                        .requestMatchers("/api/auth/**", "/dang-ky/**", 
-                                       "/quen-mat-khau/**").permitAll()
+                        // Public endpoints - PHẢI ĐẶT TRƯỚC TẤT CẢ
+                        // Lưu ý: /api/auth/** đã được xử lý bởi authSecurityFilterChain
+                        .requestMatchers("/dang-ky/**").permitAll()
+                        .requestMatchers("/quen-mat-khau/**").permitAll()
+                        .requestMatchers("/swagger-ui/**").permitAll()
+                        .requestMatchers("/v3/api-docs/**").permitAll()
+                        .requestMatchers("/swagger-resources/**").permitAll()
+                        .requestMatchers("/webjars/**").permitAll()
                         
                         // WebSocket endpoints - public
                         .requestMatchers("/ws/**").permitAll()
@@ -118,10 +170,12 @@ public class WebSecurityConfigurerAdapter {
                         // Tất cả các request còn lại cần authentication
                         .anyRequest().authenticated()
                 )
-                .exceptionHandling(ex -> 
-                    ex.authenticationEntryPoint(jwtAuthenticationEntryPoint))
+                // JWT filter sẽ tự bỏ qua public endpoints qua shouldNotFilter()
+                // Phải thêm filter TRƯỚC exception handling để filter có thể xử lý trước
                 .addFilterBefore(jwtAuthenticationFilter, 
-                    UsernamePasswordAuthenticationFilter.class);
+                    UsernamePasswordAuthenticationFilter.class)
+                .exceptionHandling(ex -> 
+                    ex.authenticationEntryPoint(jwtAuthenticationEntryPoint));
         
         return http.build();
     }

@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@CrossOrigin("*")
+// CORS được cấu hình globally trong WebConfig
 @RestController
 @RequestMapping("/api/thao_tac_hoa_don")
 public class ThaoTacHoaDonController {

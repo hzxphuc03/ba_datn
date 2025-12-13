@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDateTime;
 import java.util.List;
 
-@CrossOrigin("*")
+// CORS được cấu hình globally trong WebConfig
 @RestController
 @RequestMapping("/api/hoa_don")
 public class HoaDonCotroller {
