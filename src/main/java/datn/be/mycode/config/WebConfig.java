@@ -3,7 +3,6 @@ package datn.be.mycode.config;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
@@ -29,8 +28,10 @@ public class WebConfig {
                     origins[i] = origins[i].trim();
                 }
                 
+                // QUAN TRỌNG: Dùng allowedOriginPatterns() thay vì allowedOrigins()
+                // Vì khi allowCredentials=true, không thể dùng allowedOrigins() với nhiều origins
                 registry.addMapping("/**")
-                        .allowedOrigins(origins)
+                        .allowedOriginPatterns(origins)  // Thay đổi từ allowedOrigins()
                         .allowedMethods(
                             HttpMethod.GET.name(),
                             HttpMethod.POST.name(),
@@ -39,12 +40,7 @@ public class WebConfig {
                             HttpMethod.OPTIONS.name(),
                             HttpMethod.PATCH.name()
                         )
-                        .allowedHeaders(
-                            HttpHeaders.CONTENT_TYPE,
-                            HttpHeaders.AUTHORIZATION,
-                            HttpHeaders.ACCEPT,
-                            HttpHeaders.ORIGIN
-                        )
+                        .allowedHeaders("*")  // Cho phép tất cả headers
                         .allowCredentials(true)
                         .maxAge(3600); // Cache preflight for 1 hour
             }

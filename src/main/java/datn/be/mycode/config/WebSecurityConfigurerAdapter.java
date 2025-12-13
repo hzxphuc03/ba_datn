@@ -193,6 +193,7 @@ public class WebSecurityConfigurerAdapter {
     
     /**
      * CORS Configuration Source - Đọc từ environment variable CORS_ALLOWED_ORIGINS
+     * Sử dụng allowedOriginPatterns() thay vì allowedOrigins() để tương thích với allowCredentials(true)
      */
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
@@ -211,11 +212,26 @@ public class WebSecurityConfigurerAdapter {
             originsArray[i] = originsArray[i].trim();
         }
         
-        configuration.setAllowedOrigins(Arrays.asList(originsArray));
+        // Log để debug (có thể xóa sau khi fix xong)
+        System.out.println("CORS Configuration - Allowed Origins: " + Arrays.toString(originsArray));
+        
+        // QUAN TRỌNG: Dùng setAllowedOriginPatterns() thay vì setAllowedOrigins()
+        // Vì khi allowCredentials=true, không thể dùng setAllowedOrigins() với nhiều origins
+        // allowedOriginPatterns() cho phép dùng wildcard và credentials cùng lúc
+        configuration.setAllowedOriginPatterns(Arrays.asList(originsArray));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         configuration.setAllowedHeaders(Arrays.asList("*"));
         configuration.setAllowCredentials(true);
         configuration.setMaxAge(3600L);
+        
+        // Expose headers để frontend có thể đọc được
+        configuration.setExposedHeaders(Arrays.asList(
+            "Authorization",
+            "Content-Type",
+            "X-Requested-With",
+            "Accept",
+            "Origin"
+        ));
         
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
