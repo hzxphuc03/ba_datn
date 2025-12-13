@@ -11,7 +11,13 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.core.annotation.Order;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import datn.be.mycode.config.JwtTokenProvider;
+
+import java.util.Arrays;
 
 @Configuration
 @EnableWebSecurity
@@ -20,6 +26,9 @@ public class WebSecurityConfigurerAdapter {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
+    
+    @Value("${app.cors.allowed-origins:http://localhost:4200}")
+    private String allowedOrigins;
 
     public WebSecurityConfigurerAdapter(JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint,
                                        JwtTokenProvider jwtTokenProvider) {
@@ -45,6 +54,7 @@ public class WebSecurityConfigurerAdapter {
         http
                 // Sử dụng securityMatcher để chỉ áp dụng chain này cho /api/auth/** và /error
                 .securityMatcher("/api/auth/**", "/error")
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(csrf -> csrf.disable())
                 .httpBasic(httpBasic -> httpBasic.disable())
                 .formLogin(formLogin -> formLogin.disable())
@@ -84,6 +94,7 @@ public class WebSecurityConfigurerAdapter {
                     // #endregion
                     return !path.startsWith("/api/auth/");
                 })
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> 
                     session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -178,5 +189,36 @@ public class WebSecurityConfigurerAdapter {
                     ex.authenticationEntryPoint(jwtAuthenticationEntryPoint));
         
         return http.build();
+    }
+    
+    /**
+     * CORS Configuration Source - Đọc từ environment variable CORS_ALLOWED_ORIGINS
+     */
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        
+        // Đọc từ @Value (sẽ đọc từ app.cors.allowed-origins trong application.properties)
+        // application-prod.properties đọc từ CORS_ALLOWED_ORIGINS env var
+        String origins = allowedOrigins;
+        if (origins == null || origins.isEmpty()) {
+            origins = "http://localhost:4200";
+        }
+        
+        // Split và trim origins
+        String[] originsArray = origins.split(",");
+        for (int i = 0; i < originsArray.length; i++) {
+            originsArray[i] = originsArray[i].trim();
+        }
+        
+        configuration.setAllowedOrigins(Arrays.asList(originsArray));
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
+        configuration.setAllowedHeaders(Arrays.asList("*"));
+        configuration.setAllowCredentials(true);
+        configuration.setMaxAge(3600L);
+        
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
     }
 }
