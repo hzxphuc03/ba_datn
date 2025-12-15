@@ -99,6 +99,9 @@ public class WebSecurityConfigurerAdapter {
                 .sessionManagement(session -> 
                     session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests((authorize) -> authorize
+                        // QUAN TRỌNG: Cho phép OPTIONS request (preflight CORS) - PHẢI ĐẶT ĐẦU TIÊN
+                        .requestMatchers("OPTIONS", "/**").permitAll()
+                        
                         // Public endpoints - PHẢI ĐẶT TRƯỚC TẤT CẢ
                         // Lưu ý: /api/auth/** đã được xử lý bởi authSecurityFilterChain
                         .requestMatchers("/dang-ky/**").permitAll()

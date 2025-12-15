@@ -21,14 +21,22 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
 
     /**
-     * Bỏ qua filter cho các public endpoints để tránh xung đột
+     * Bỏ qua filter cho các public endpoints và OPTIONS request (preflight CORS) để tránh xung đột
      */
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
         String path = request.getServletPath();
+        String method = request.getMethod();
+        
         // #region agent log
-        try { java.nio.file.Files.write(java.nio.file.Paths.get("/Users/phamhaiphuc/Downloads/DATN/BE - Copy/ba_datn/.cursor/debug.log"), (java.time.Instant.now().toEpochMilli() + "|{\"sessionId\":\"debug-session\",\"runId\":\"run1\",\"hypothesisId\":\"C\",\"location\":\"JwtAuthenticationFilter.java:29\",\"message\":\"shouldNotFilter called\",\"data\":{\"path\":\"" + path + "\"},\"timestamp\":" + java.time.Instant.now().toEpochMilli() + "}\n").getBytes(), java.nio.file.StandardOpenOption.CREATE, java.nio.file.StandardOpenOption.APPEND); } catch (Exception e) {}
+        try { java.nio.file.Files.write(java.nio.file.Paths.get("/Users/phamhaiphuc/Downloads/DATN/BE - Copy/ba_datn/.cursor/debug.log"), (java.time.Instant.now().toEpochMilli() + "|{\"sessionId\":\"debug-session\",\"runId\":\"run1\",\"hypothesisId\":\"C\",\"location\":\"JwtAuthenticationFilter.java:29\",\"message\":\"shouldNotFilter called\",\"data\":{\"path\":\"" + path + "\",\"method\":\"" + method + "\"},\"timestamp\":" + java.time.Instant.now().toEpochMilli() + "}\n").getBytes(), java.nio.file.StandardOpenOption.CREATE, java.nio.file.StandardOpenOption.APPEND); } catch (Exception e) {}
         // #endregion
+        
+        // QUAN TRỌNG: Bỏ qua OPTIONS request (preflight CORS)
+        if ("OPTIONS".equalsIgnoreCase(method)) {
+            logger.debug("Skipping JWT filter for OPTIONS request (preflight CORS): " + path);
+            return true;
+        }
         
         // Bỏ qua filter cho các public endpoints
         boolean shouldSkip = path.startsWith("/api/auth/") ||
