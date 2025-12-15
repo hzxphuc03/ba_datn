@@ -11,7 +11,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.core.annotation.Order;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -26,9 +25,6 @@ public class WebSecurityConfigurerAdapter {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
-    
-    @Value("${app.cors.allowed-origins:http://localhost:4200}")
-    private String allowedOrigins;
 
     public WebSecurityConfigurerAdapter(JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint,
                                        JwtTokenProvider jwtTokenProvider) {
@@ -202,17 +198,15 @@ public class WebSecurityConfigurerAdapter {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         
-        // Đọc từ @Value (sẽ đọc từ app.cors.allowed-origins trong application.properties)
-        // application-prod.properties đọc từ CORS_ALLOWED_ORIGINS env var
-        String origins = allowedOrigins;
+        // Đọc trực tiếp từ environment variable CORS_ALLOWED_ORIGINS
+        // Đây là cách đáng tin cậy nhất để đọc env var trên Render/cloud platforms
+        String origins = System.getenv("CORS_ALLOWED_ORIGINS");
         
-        // Fallback: Đọc trực tiếp từ environment variable nếu @Value rỗng
         if (origins == null || origins.isEmpty()) {
-            origins = System.getenv("CORS_ALLOWED_ORIGINS");
-            if (origins == null || origins.isEmpty()) {
-                origins = "http://localhost:4200";
-                System.out.println("WARNING: CORS_ALLOWED_ORIGINS not set, using default: " + origins);
-            }
+            origins = "http://localhost:4200";
+            System.out.println("WARNING: CORS_ALLOWED_ORIGINS not set, using default: " + origins);
+        } else {
+            System.out.println("Using CORS_ALLOWED_ORIGINS env var: " + origins);
         }
         
         // Split và trim origins
@@ -223,7 +217,7 @@ public class WebSecurityConfigurerAdapter {
         
         // Log để debug
         System.out.println("=== CORS Configuration ===");
-        System.out.println("Raw allowedOrigins from @Value: " + allowedOrigins);
+        System.out.println("CORS_ALLOWED_ORIGINS env var: " + System.getenv("CORS_ALLOWED_ORIGINS"));
         System.out.println("Final allowedOrigins: " + origins);
         System.out.println("Allowed Origins Array: " + Arrays.toString(originsArray));
         System.out.println("===========================");
