@@ -48,16 +48,30 @@ public class GioHangChiTietService {
 
     public ResponseEntity<?> addGioHangChiTiet(AddGioHangChiTietReq request){
 
+        // Kiểm tra số lượng đầu tiên
+        if(request.getSoLuong() <= 0) return getErro("Số lượng phải lớn hơn 0");
+        
         var gioHang = gioHangRepository.findByKhachHangId(request.getIdKhachhang()).orElse(null);
         if(gioHang == null || gioHang.getTrangThai() == 0) return getErro("Khách hàng này không tồn tại hoặc đã nghỉ");
         var gioHangChiTiet = repo.findByGioHangIdAndAndSanPhamChiTietId(gioHang.getId(),request.getIdSanPhamChiTiet()).orElse(null);
         var sanPhamChiTiet = sanPhamChiTietRepository.findById(request.getIdSanPhamChiTiet()).orElse(null);
         if (sanPhamChiTiet == null || sanPhamChiTiet.getTrangThai() == 0) return getErro("Sản phẩm này hiện đang hết hàng hoặc không có");
+        
+        // Kiểm tra null cho sanPham
+        if(sanPhamChiTiet.getSanPham() == null) {
+            return getErro("Sản phẩm chi tiết không có thông tin sản phẩm");
+        }
+        
         var giamGia = sanPhamChiTiet.getSanPham().getGiamGia();
         var gia = sanPhamChiTiet.getGiaBan();
+        
+        // Kiểm tra null cho giaBan
+        if(gia == null) {
+            return getErro("Sản phẩm này chưa có giá bán");
+        }
+        
         var giaDaGiam = new BigDecimal(gia.toString());
 
-        if(request.getSoLuong() <= 0) return getErro("Số lượng phải lớn hơn 0");
         if(request.getSoLuong()>sanPhamChiTiet.getSoLuong()) return getErro("Số lượng sản phẩm không vượt quá số lượng đang có");
 
         if(giamGia != null && giamGia.getTrangThai() == 1){
