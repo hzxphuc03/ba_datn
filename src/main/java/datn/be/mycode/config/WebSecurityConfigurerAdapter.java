@@ -205,8 +205,14 @@ public class WebSecurityConfigurerAdapter {
         // Đọc từ @Value (sẽ đọc từ app.cors.allowed-origins trong application.properties)
         // application-prod.properties đọc từ CORS_ALLOWED_ORIGINS env var
         String origins = allowedOrigins;
+        
+        // Fallback: Đọc trực tiếp từ environment variable nếu @Value rỗng
         if (origins == null || origins.isEmpty()) {
-            origins = "http://localhost:4200";
+            origins = System.getenv("CORS_ALLOWED_ORIGINS");
+            if (origins == null || origins.isEmpty()) {
+                origins = "http://localhost:4200";
+                System.out.println("WARNING: CORS_ALLOWED_ORIGINS not set, using default: " + origins);
+            }
         }
         
         // Split và trim origins
@@ -215,8 +221,12 @@ public class WebSecurityConfigurerAdapter {
             originsArray[i] = originsArray[i].trim();
         }
         
-        // Log để debug (có thể xóa sau khi fix xong)
-        System.out.println("CORS Configuration - Allowed Origins: " + Arrays.toString(originsArray));
+        // Log để debug
+        System.out.println("=== CORS Configuration ===");
+        System.out.println("Raw allowedOrigins from @Value: " + allowedOrigins);
+        System.out.println("Final allowedOrigins: " + origins);
+        System.out.println("Allowed Origins Array: " + Arrays.toString(originsArray));
+        System.out.println("===========================");
         
         // QUAN TRỌNG: Dùng setAllowedOriginPatterns() thay vì setAllowedOrigins()
         // Vì khi allowCredentials=true, không thể dùng setAllowedOrigins() với nhiều origins
