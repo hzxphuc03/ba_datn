@@ -152,6 +152,7 @@ public class GioHangChiTietService {
 
             if(gioHangChiTiet == null) {
                 gioHangChiTiet = new GioHangChiTiet();
+                gioHangChiTiet.setId(null); // Đảm bảo id là null để Hibernate không insert
                 gioHangChiTiet.setSoLuong(request.getSoLuong());
                 gioHangChiTiet.setGiaHienHanh(gia);
                 gioHangChiTiet.setGiaDaGiam(giaDaGiam);
