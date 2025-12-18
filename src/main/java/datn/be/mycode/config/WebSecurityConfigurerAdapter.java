@@ -100,8 +100,8 @@ public class WebSecurityConfigurerAdapter {
                         
                         // Public endpoints - PHẢI ĐẶT TRƯỚC TẤT CẢ
                         // Lưu ý: /api/auth/** đã được xử lý bởi authSecurityFilterChain
-                        .requestMatchers("/dang-ky/**").permitAll()
-                        .requestMatchers("/quen-mat-khau/**").permitAll()
+                        .requestMatchers("/dang-ky", "/dang-ky/**").permitAll()
+                        .requestMatchers("/quen-mat-khau", "/quen-mat-khau/**").permitAll()
                         .requestMatchers("/swagger-ui/**").permitAll()
                         .requestMatchers("/v3/api-docs/**").permitAll()
                         .requestMatchers("/swagger-resources/**").permitAll()

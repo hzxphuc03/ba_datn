@@ -40,8 +40,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         
         // Bỏ qua filter cho các public endpoints
         boolean shouldSkip = path.startsWith("/api/auth/") ||
-                            path.startsWith("/dang-ky/") ||
-                            path.startsWith("/quen-mat-khau/") ||
+                            path.startsWith("/dang-ky") ||
+                            path.startsWith("/quen-mat-khau") ||
                             path.startsWith("/swagger-ui/") ||
                             path.startsWith("/v3/api-docs/") ||
                             path.startsWith("/swagger-resources/") ||
