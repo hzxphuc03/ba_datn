@@ -22,6 +22,16 @@ public class DangKyController {
     @Autowired
     private EmailSender emailSender;
 
+    @GetMapping
+    public String index() {
+        return "redirect:/dang-ky/lay-ma-opt";
+    }
+
+    @GetMapping("/")
+    public String indexSlash() {
+        return "redirect:/dang-ky/lay-ma-opt";
+    }
+
     @GetMapping("/lay-ma-opt")
     public String getOTP(Model model,@ModelAttribute("user") DangKy dangKy) {
 //       var optCode = 100000 + new Random().nextInt(999999);
