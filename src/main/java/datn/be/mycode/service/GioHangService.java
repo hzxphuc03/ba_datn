@@ -10,6 +10,7 @@ import datn.be.mycode.request.GioHang.GioHangVoucher;
 import datn.be.mycode.response.erroResponse;
 import datn.be.mycode.util.EmailSender;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -57,6 +58,8 @@ public class GioHangService {
     private SimpMessagingTemplate messagingTemplate;
     @Autowired
     private EmailSender emailSender;
+    @Value("${spring.domain}")
+    private String domain;
 
     public ResponseEntity<?> getByKhachHang(Long idKhachHang) {
         var gioHang = gioHangRepository.findByKhachHangId(idKhachHang).orElse(null);
@@ -255,7 +258,7 @@ public class GioHangService {
     }
 
     public String taoURLThanhToan(int orderTotal,String maHoaDon) {
-        return vnPayService.createOrder(orderTotal,maHoaDon,"http://localhost:4200/thanh-toan-online-res");
+        return vnPayService.createOrder(orderTotal,maHoaDon,domain+"/thanh-toan-online-res");
     }
 
 

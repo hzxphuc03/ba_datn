@@ -33,8 +33,6 @@ build/
 .vscode/
 
 ### Sensitive Configuration Files ###
-src/main/resources/application.properties
-src/main/resources/application-prod.properties
 *.xlsx
 *.xls
 

@@ -16,8 +16,8 @@ public class VNpayConfig {
 
     public static String vnp_PayUrl = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html";
 //    public static String vnp_Returnurl = "http://localhost:4200/auth/admin/ban-hang-tai-quay";
-    public static String vnp_TmnCode = "P1718LFT";
-    public static String vnp_HashSecret = "XSCKEXGJZMNWFTKRSUTXXMWIHXRJLICW";
+    public static String vnp_TmnCode = "E64IOFL6";
+    public static String vnp_HashSecret = "UXZPQRGSAFT771QOTKA1EQUR17NYK1SD";
     public static String vnp_apiUrl = "https://sandbox.vnpayment.vn/merchant_webapi/api/transaction";
 
     public static String md5(String message) {
